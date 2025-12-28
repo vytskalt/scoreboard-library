@@ -99,3 +99,24 @@ like [Shadow](https://gradleup.com/shadow/).
 ```
 
 You will need to shade these dependencies and relocate them with [maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/).
+
+## `plugin.yaml` (Paper)
+
+Alternatively you can add the dependencies to your `plugin.yaml`. Paper will then automatically load these dependencies at runtime, no shading required.
+
+Add this to your `plugin.yaml`
+
+```yaml
+libraries:
+  - net.megavex:scoreboard-library-api:2.4.4
+  - net.megavex:scoreboard-library-implementation:2.4.4
+  - net.megavex:scoreboard-library-modern:2.4.4 # replace with the API you want to use
+```
+
+You will still need to add the API to your dependencies, for example like this in gradle:
+
+```java
+dependencies {
+  implementation("net.megavex:scoreboard-library-api:2.4.4") // replace with latest version
+}
+```
