@@ -97,8 +97,8 @@ public class ReflectUtil {
       if (i == index) {
         try {
           MethodHandle getter = LOOKUP.unreflectGetter(field);
-          MethodHandle setter = LOOKUP.unreflectSetter(field);
-          return new FieldAccessor<>(getter, setter.asType(VIRTUAL_FIELD_SETTER));
+          MethodHandle setter = !isStatic || !Modifier.isFinal(field.getModifiers()) ? LOOKUP.unreflectSetter(field).asType(VIRTUAL_FIELD_SETTER) : null;
+          return new FieldAccessor<>(getter, setter);
         } catch (IllegalAccessException e) {
           throw new RuntimeException("failed to unreflect field setter", e);
         }

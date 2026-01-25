@@ -20,20 +20,16 @@ public final class ScoreFormatConverter {
   private static final ConstructorAccessor<?> FIXED_CONSTRUCTOR;
 
   static {
-    try {
-      STYLE_CODEC = PacketAccessors.STYLE_SERIALIZER_CLASS.getField("CODEC").get(null);
+    STYLE_CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.STYLE_SERIALIZER_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
 
-      Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
-      BLANK = blankFormatClass.getField("INSTANCE").get(null);
+    Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
+    BLANK = ReflectUtil.findFieldUnchecked(blankFormatClass, 0, blankFormatClass, true).get(null);
 
-      Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
-      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, PacketAccessors.STYLE_CLASS);
+    Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
+    STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, PacketAccessors.STYLE_CLASS);
 
-      Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
-      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, PacketAccessors.COMPONENT_CLASS);
-    } catch (IllegalAccessException | NoSuchFieldException e) {
-      throw new RuntimeException(e);
-    }
+    Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
+    FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, PacketAccessors.COMPONENT_CLASS);
   }
 
   private ScoreFormatConverter() {
