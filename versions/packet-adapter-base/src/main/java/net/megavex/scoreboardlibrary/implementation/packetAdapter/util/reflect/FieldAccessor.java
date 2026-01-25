@@ -6,13 +6,22 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.lang.invoke.MethodHandle;
 
 public class FieldAccessor<T, V> {
-  private final MethodHandle setter;
+  private final MethodHandle getter, setter;
 
-  public FieldAccessor(@NotNull MethodHandle setter) {
+  public FieldAccessor(@NotNull MethodHandle getter, @NotNull MethodHandle setter) {
+    this.getter = getter;
     this.setter = setter;
   }
 
-  public void set(@NotNull T instance, @UnknownNullability V value) {
+  public Object get(T instance) {
+    try {
+      return getter.invokeExact(instance);
+    } catch (Throwable e) {
+      throw new IllegalStateException("couldn't set value of field", e);
+    }
+  }
+
+  public void set(T instance, @UnknownNullability V value) {
     try {
       setter.invokeExact(instance, value);
     } catch (Throwable e) {

@@ -4,9 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.NativeAdventureUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,7 @@ public class PaperObjectivePacketAdapter extends AbstractObjectivePacketAdapter 
     @NotNull ObjectiveRenderType renderType,
     @Nullable ScoreFormat scoreFormat
   ) {
-    Object nmsValue = NativeAdventureUtil.fromAdventureComponent(value);
+    Object nmsValue = PacketAccessors.fromAdventureComponent(value);
     Object numberFormat = ScoreFormatConverter.convert(null, scoreFormat);
     Object packet = createObjectivePacket(packetType, nmsValue, renderType, numberFormat);
     ModernPacketSender.INSTANCE.sendPacket(players, packet);

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
@@ -25,19 +26,18 @@ public class ModernComponentProvider {
   private static final Object CODEC;
 
   static {
-    String cbPackage = Bukkit.getServer().getClass().getPackage().getName();
     Class<?> craftRegistry;
     try {
-      craftRegistry = Class.forName(cbPackage + ".CraftRegistry");
+      craftRegistry = Class.forName(MinecraftClasses.craftBukkit("CraftRegistry"));
     } catch (ClassNotFoundException e) {
       throw new ExceptionInInitializerError(e);
     }
 
     try {
-      Method method = craftRegistry.getDeclaredMethod("getMinecraftRegistry");
+      Method method = craftRegistry.getMethod("getMinecraftRegistry");
       MINECRAFT_REGISTRY = method.invoke(null);
-      CODEC = PacketAccessors.COMPONENT_SERIALIZATION_CLASS.getField("CODEC").get(null);
-    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
+      CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.COMPONENT_SERIALIZATION_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
+    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
 
@@ -81,7 +81,7 @@ public class ModernComponentProvider {
 
   public static @NotNull Object fromAdventure(@NotNull Component adventure, @Nullable Locale locale) {
     if (IS_NATIVE_ADVENTURE) {
-      return NativeAdventureUtil.fromAdventureComponent(adventure);
+      return PacketAccessors.fromAdventureComponent(adventure);
     }
 
     Component translated = adventure;

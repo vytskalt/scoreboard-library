@@ -6,7 +6,6 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamP
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.NativeAdventureUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import org.bukkit.entity.Player;
@@ -66,19 +65,19 @@ public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl 
       super.fillParameters(parameters, locale);
 
       if (properties.displayName() != displayName) {
-        Object vanilla = NativeAdventureUtil.fromAdventureComponent(properties.displayName());
+        Object vanilla = PacketAccessors.fromAdventureComponent(properties.displayName());
         PacketAccessors.DISPLAY_NAME_FIELD.set(parameters, vanilla);
         displayName = properties.displayName();
       }
 
       if (properties.prefix() != prefix) {
-        Object vanilla = NativeAdventureUtil.fromAdventureComponent(properties.prefix());
+        Object vanilla = PacketAccessors.fromAdventureComponent(properties.prefix());
         PacketAccessors.PREFIX_FIELD.set(parameters, vanilla);
         prefix = properties.prefix();
       }
 
       if (properties.suffix() != suffix) {
-        Object vanilla = NativeAdventureUtil.fromAdventureComponent(properties.suffix());
+        Object vanilla = PacketAccessors.fromAdventureComponent(properties.suffix());
         PacketAccessors.SUFFIX_FIELD.set(parameters, vanilla);
         suffix = properties.suffix();
       }

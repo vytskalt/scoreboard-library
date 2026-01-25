@@ -2,12 +2,10 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodType;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public final class PacketAccessors {
   public static final Class<?> PKT_CLASS,
@@ -33,37 +31,37 @@ public final class PacketAccessors {
     DYNAMIC_OPS_CLASS,
     JSON_OPS_CLASS,
     CODEC_CLASS,
-  SERVER_PLAYER_CLASS,
-  PLAYER_CONNECTION_CLASS,
-  ADVENTURE_COMPONENT_CLASS;
+    SERVER_PLAYER_CLASS,
+    PLAYER_CONNECTION_CLASS,
+    ADVENTURE_COMPONENT_CLASS;
 
   static {
     // TODO: spigot mapping names
     PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.Packet");
-    SET_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetObjectivePacket");
-    SET_DISPLAY_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket");
-    SET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetScorePacket");
-    RESET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundResetScorePacket");
-    SET_PLAYER_TEAM_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket");
-    TEAM_PARAMETERS_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket$Parameters");
-    COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component");
-    MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent");
+    SET_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective");
+    SET_DISPLAY_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardDisplayObjective");
+    SET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
+    RESET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundResetScorePacket");
+    SET_PLAYER_TEAM_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam");
+    TEAM_PARAMETERS_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket$Parameters", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam$b");
+    COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component", "net.minecraft.network.chat.IChatBaseComponent");
+    MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent", "net.minecraft.network.chat.IChatMutableComponent");
     COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.ComponentSerialization");
-    STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style");
-    STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer");
+    STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style", "net.minecraft.network.chat.ChatModifier");
+    STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer");
     NUMBER_FORMAT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.NumberFormat");
     DISPLAY_SLOT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.DisplaySlot");
-    OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective");
-    TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility");
-    TEAM_COLLISION_RULE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$CollisionRule");
-    CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.ChatFormatting");
-    OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType");
+    OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective", "net.minecraft.world.scores.ScoreboardObjective");
+    TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility");
+    TEAM_COLLISION_RULE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush");
+    CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat");
+    OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay");
     DATA_RESULT_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.DataResult");
     DYNAMIC_OPS_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.DynamicOps");
     JSON_OPS_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.JsonOps");
     CODEC_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.Codec");
-    SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer");
-    PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl");
+    SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer");
+    PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection");
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
   }
 
@@ -155,13 +153,13 @@ public final class PacketAccessors {
       SCORE_1_20_2_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, methodClass, String.class, String.class, int.class);
     }
 
-    RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(PacketAccessors.DATA_RESULT_CLASS, "result", false, MethodType.methodType(Optional.class));
+    RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(PacketAccessors.DATA_RESULT_CLASS, false, MethodType.methodType(Optional.class), "result");
     try {
       JSON_OPS = PacketAccessors.JSON_OPS_CLASS.getField("INSTANCE").get(null);
     } catch (IllegalAccessException | NoSuchFieldException e) {
       throw new RuntimeException(e);
     }
-    CODEC_PARSE = ReflectUtil.findMethod(PacketAccessors.CODEC_CLASS, "parse", false, MethodType.methodType(PacketAccessors.DATA_RESULT_CLASS, PacketAccessors.DYNAMIC_OPS_CLASS, Object.class));
+    CODEC_PARSE = ReflectUtil.findMethod(PacketAccessors.CODEC_CLASS, false, MethodType.methodType(PacketAccessors.DATA_RESULT_CLASS, PacketAccessors.DYNAMIC_OPS_CLASS, Object.class), "parse");
   }
 
   public static final MethodAccessor RESULT_UNWRAP_METHOD;
@@ -169,7 +167,7 @@ public final class PacketAccessors {
   public static final Object JSON_OPS;
 
   public static final MethodAccessor CHAT_FORMATTING_GET_BY_CODE =
-    ReflectUtil.findMethod(CHAT_FORMATTING_CLASS, "getByCode", true, MethodType.methodType(CHAT_FORMATTING_CLASS, char.class));
+    ReflectUtil.findMethod(CHAT_FORMATTING_CLASS,true, MethodType.methodType(CHAT_FORMATTING_CLASS, char.class), "getByCode", "a");
 
   public static final Object NAME_TAG_VISIBILITY_ALWAYS = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "ALWAYS");
   public static final Object NAME_TAG_VISIBILITY_NEVER = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "NEVER");
@@ -239,5 +237,9 @@ public final class PacketAccessors {
     ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, int.class);
 
   private PacketAccessors() {
+  }
+
+  public static @NotNull Object fromAdventureComponent(@NotNull Component component) {
+    return Objects.requireNonNull(PacketAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
   }
 }
