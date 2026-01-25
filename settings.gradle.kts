@@ -4,6 +4,7 @@ include(":api")
 include(":commons")
 include(":implementation")
 include(":extra-kotlin")
+include(":test-plugin")
 
 include(":packet-adapter-base")
 project(":packet-adapter-base").projectDir = file("versions/packet-adapter-base")
