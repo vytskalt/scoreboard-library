@@ -1,21 +1,18 @@
 package net.megavex.scoreboardlibrary.implementation.objective;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveScore;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.api.objective.ScoreboardObjective;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 import static net.kyori.adventure.text.Component.empty;
 
@@ -29,6 +26,7 @@ public class ScoreboardObjectiveImpl implements ScoreboardObjective {
   private ObjectiveRenderType renderType = ObjectiveRenderType.INTEGER;
   private ScoreFormat defaultScoreFormat;
   private boolean closed;
+  private boolean wasDisplayed;
 
   public ScoreboardObjectiveImpl(@NotNull ObjectivePacketAdapter packetAdapter, @NotNull Queue<ObjectiveManagerTask> taskQueue, @NotNull String name) {
     this.packetAdapter = packetAdapter;
@@ -137,5 +135,13 @@ public class ScoreboardObjectiveImpl implements ScoreboardObjective {
 
   public void sendProperties(@NotNull Collection<Player> players, @NotNull PropertiesPacketType packetType) {
     packetAdapter.sendProperties(players, packetType, value, renderType, defaultScoreFormat);
+  }
+
+  public boolean wasDisplayed() {
+    return wasDisplayed;
+  }
+
+  public void wasDisplayed(boolean wasDisplayed) {
+    this.wasDisplayed = wasDisplayed;
   }
 }
