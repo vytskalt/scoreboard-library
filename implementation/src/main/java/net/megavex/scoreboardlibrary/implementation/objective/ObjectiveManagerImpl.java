@@ -168,6 +168,7 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
       } else if (task instanceof ObjectiveManagerTask.AddObjective) {
         ScoreboardObjectiveImpl objective = ((ObjectiveManagerTask.AddObjective) task).objective();
         objective.sendProperties(displayingPlayers, PropertiesPacketType.CREATE);
+        objective.wasDisplayed(true);
       } else if (task instanceof ObjectiveManagerTask.RemoveObjective) {
         ScoreboardObjectiveImpl objective = ((ObjectiveManagerTask.RemoveObjective) task).objective();
         objective.packetAdapter().remove(displayingPlayers);
@@ -200,6 +201,10 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
     Collection<Player> singleton = Collections.singleton(player);
 
     for (ScoreboardObjectiveImpl objective : objectives.values()) {
+      if (!objective.wasDisplayed()) {
+        continue;
+      }
+
       objective.sendProperties(singleton, PropertiesPacketType.CREATE);
       for (Map.Entry<String, ObjectiveScore> entry : objective.scores().entrySet()) {
         ObjectiveScore score = entry.getValue();
@@ -208,6 +213,9 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
     }
 
     for (Map.Entry<ObjectiveDisplaySlot, ScoreboardObjectiveImpl> entry : displaySlots.entrySet()) {
+      if (!entry.getValue().wasDisplayed()) {
+        continue;
+      }
       entry.getValue().packetAdapter().display(singleton, entry.getKey());
     }
   }
