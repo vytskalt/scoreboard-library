@@ -21,4 +21,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: ./gradlew build
-        run: nix develop -i -c sh -c "./gradlew build"
+        run: nix develop .#jdk25 -i -c sh -c "./gradlew build"

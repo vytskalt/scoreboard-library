@@ -1,4 +1,4 @@
-package net.megavex.scoreboardlibrary.testplugin;
+package net.megavex.scoreboardlibrary.testplugin.module;
 
 public interface Module {
   default void onEnable() {
