@@ -8,3 +8,5 @@ build/
 .project
 .settings/
 bin/
+
+test-env/servers
