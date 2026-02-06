@@ -1,0 +1,13 @@
+diff --git i/src/main/java/org/bukkit/craftbukkit/Main.java w/src/main/java/org/bukkit/craftbukkit/Main.java
+index 02e5090db..5f4215b35 100644
+--- i/src/main/java/org/bukkit/craftbukkit/Main.java
++++ w/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -161,7 +161,7 @@ public class Main {
+                 System.err.println("Unsupported Java detected (" + javaVersion + "). This version of Minecraft requires at least Java 16. Check your Java version with the command 'java -version'.");
+                 return;
+             }
+-            if (javaVersion > 60.0) {
++            if (javaVersion > 60.0 && false) {
+                 System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 16 is supported.");
+                 return;
+             }

@@ -7,6 +7,7 @@ import net.megavex.scoreboardlibrary.testplugin.module.Module;
 import net.megavex.scoreboardlibrary.testplugin.module.ObjectivesModule;
 import net.megavex.scoreboardlibrary.testplugin.module.SidebarModule;
 import net.megavex.scoreboardlibrary.testplugin.module.TeamsModule;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -49,15 +50,16 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
     for (final Module module : this.modules) {
       module.onDisable();
     }
-    this.modules = null;
     this.lib.close();
-    this.lib = null;
     GlobalTranslator.get().removeSource(this.translator);
   }
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
-    event.getPlayer().setOp(true);
+    final Player player = event.getPlayer();
+    player.setOp(true);
+    player.sendMessage("Server software: " + this.getServer().getName());
+    player.sendMessage("Server version: " + this.getServer().getVersion());
   }
 
   public ScoreboardLibrary scoreboardLibrary() {

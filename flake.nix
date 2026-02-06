@@ -22,6 +22,18 @@
         ];
       };
 
+      jdk21 = pkgs.mkShellNoCC {
+        buildInputs = with pkgs; [
+          jdk21_headless
+        ];
+      };
+
+      jdk17 = pkgs.mkShellNoCC {
+        buildInputs = with pkgs; [
+          jdk17_headless
+        ];
+      };
+
       jdk8 = pkgs.mkShellNoCC {
         buildInputs = with pkgs; [
           jdk8_headless
