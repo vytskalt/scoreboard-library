@@ -8,3 +8,6 @@ build/
 .project
 .settings/
 bin/
+
+test-env/servers
+test-env/cache

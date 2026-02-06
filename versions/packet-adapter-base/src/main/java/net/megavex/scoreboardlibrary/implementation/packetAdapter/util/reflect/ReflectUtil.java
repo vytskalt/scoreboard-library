@@ -77,27 +77,28 @@ public class ReflectUtil {
       try {
         //noinspection unchecked,rawtypes
         return Enum.valueOf((Class<? extends Enum>) clazz, name);
-      } catch (IllegalArgumentException ignored){
+      } catch (IllegalArgumentException ignored) {
       }
     }
     throw new IllegalStateException("Enum " + clazz.getName() + " instance with names either of  " + String.join(",", names) + " not found");
   }
 
-  public static <T, V> @NotNull FieldAccessor<T, V> findField(@NotNull Class<T> clazz, int index, @NotNull Class<V> valueClass) {
-    return findFieldUnchecked(clazz, index, valueClass);
+  public static <T, V> @NotNull FieldAccessor<T, V> findFieldUnchecked(@NotNull Class<?> clazz, int index, @NotNull Class<?> valueClass) {
+    return findFieldUnchecked(clazz, index, valueClass, false);
   }
 
-  public static <T, V> @NotNull FieldAccessor<T, V> findFieldUnchecked(@NotNull Class<?> clazz, int index, @NotNull Class<?> valueClass) {
+  public static <T, V> @NotNull FieldAccessor<T, V> findFieldUnchecked(@NotNull Class<?> clazz, int index, @NotNull Class<?> valueClass, boolean isStatic) {
     int i = 0;
     for (Field field : clazz.getDeclaredFields()) {
-      if (Modifier.isStatic(field.getModifiers()) || field.getType() != valueClass) {
+      if (Modifier.isStatic(field.getModifiers()) != isStatic || field.getType() != valueClass) {
         continue;
       }
 
       if (i == index) {
         try {
-          MethodHandle setter = LOOKUP.unreflectSetter(field);
-          return new FieldAccessor<>(setter.asType(VIRTUAL_FIELD_SETTER));
+          MethodHandle getter = LOOKUP.unreflectGetter(field);
+          MethodHandle setter = !isStatic || !Modifier.isFinal(field.getModifiers()) ? LOOKUP.unreflectSetter(field).asType(VIRTUAL_FIELD_SETTER) : null;
+          return new FieldAccessor<>(getter, setter);
         } catch (IllegalAccessException e) {
           throw new RuntimeException("failed to unreflect field setter", e);
         }
@@ -150,6 +151,35 @@ public class ReflectUtil {
         throw new IllegalStateException("couldn't allocate packet instance using Unsafe", e);
       }
     };
+  }
+
+  public static @NotNull MethodAccessor findMethod(@NotNull Class<?> clazz, boolean isStatic, @NotNull MethodType methodType, @NotNull String... names) {
+    MethodAccessor accessor = findOptionalMethod(clazz, isStatic, methodType, names);
+    if (accessor == null) {
+      throw new RuntimeException("Method " + String.join(",", names) + " for class " + clazz.getName() + " not found");
+    }
+    return accessor;
+  }
+
+  public static <T> @Nullable MethodAccessor findOptionalMethod(@NotNull Class<T> clazz, boolean isStatic, @NotNull MethodType methodType, @NotNull String... names) {
+    if (names.length == 0) {
+      throw new IllegalArgumentException("no method names passed");
+    }
+    for (String name : names) {
+      MethodHandle handle;
+      try {
+        if (isStatic) {
+          handle = LOOKUP.findStatic(clazz, name, methodType);
+        } else {
+          handle = LOOKUP.findVirtual(clazz, name, methodType);
+        }
+        return new MethodAccessor(convertToGeneric(handle));
+      } catch (NoSuchMethodException ignored) {
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return null;
   }
 
   private static @NotNull MethodHandle convertToGeneric(@NotNull MethodHandle handle) {

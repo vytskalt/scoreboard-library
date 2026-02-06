@@ -3,18 +3,12 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
-import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters;
-import net.minecraft.world.scores.Team;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,21 +17,17 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.util.*;
 
 public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapter {
-  protected final PacketSender<Packet<?>> sender;
-  protected final ComponentProvider componentProvider;
   protected final String teamName;
-  private ClientboundSetPlayerTeamPacket removePacket;
+  private Object removePacket;
 
-  public AbstractTeamsPacketAdapterImpl(@NotNull PacketSender<Packet<?>> sender, @NotNull ComponentProvider componentProvider, @NotNull String teamName) {
-    this.sender = sender;
-    this.componentProvider = componentProvider;
+  public AbstractTeamsPacketAdapterImpl(@NotNull String teamName) {
     this.teamName = teamName;
   }
 
-  public static ClientboundSetPlayerTeamPacket createTeamsPacket(
+  public static Object createTeamsPacket(
     int method,
     @NotNull String name,
-    @Nullable Parameters parameters,
+    @Nullable Object parameters,
     @Nullable Collection<String> entries
   ) {
     return PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
@@ -53,7 +43,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
     if (removePacket == null) {
       removePacket = createTeamsPacket(TeamConstants.MODE_REMOVE, teamName, null, null);
     }
-    sender.sendPacket(players, removePacket);
+    ModernPacketSender.INSTANCE.sendPacket(players, removePacket);
   }
 
   public abstract class TeamDisplayPacketAdapterImpl implements TeamDisplayPacketAdapter {
@@ -65,16 +55,52 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      sender.sendPacket(players, createTeamsPacket(TeamConstants.mode(packetType), teamName, null, entries));
+      ModernPacketSender.INSTANCE.sendPacket(players, createTeamsPacket(TeamConstants.mode(packetType), teamName, null, entries));
     }
 
-    protected void fillParameters(@NotNull Parameters parameters, @UnknownNullability Locale locale) {
+    protected void fillParameters(@NotNull Object parameters, @UnknownNullability Locale locale) {
       if (PacketAccessors.IS_1_21_5_OR_ABOVE) {
+        Object nameTagVisibility;
+        switch (properties.nameTagVisibility()){
+          case NEVER:
+            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_NEVER;
+            break;
+          case ALWAYS:
+            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_ALWAYS;
+            break;
+          case HIDE_FOR_OTHER_TEAMS:
+            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OTHER_TEAMS;
+            break;
+          case HIDE_FOR_OWN_TEAM:
+            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OWN_TEAM;
+            break;
+          default:
+            throw new IllegalStateException("unknown name tag visibility " + properties.nameTagVisibility().name());
+        }
+
         Objects.requireNonNull(PacketAccessors.NAME_TAG_VISIBILITY_FIELD_1_21_5)
-          .set(parameters, Team.Visibility.valueOf(properties.nameTagVisibility().name()));
+          .set(parameters, nameTagVisibility);
+
+        Object collisionRule;
+        switch (properties.collisionRule()){
+          case NEVER:
+            collisionRule = PacketAccessors.COLLISION_RULE_NEVER;
+            break;
+          case ALWAYS:
+            collisionRule = PacketAccessors.COLLISION_RULE_ALWAYS;
+            break;
+          case PUSH_OTHER_TEAMS:
+            collisionRule = PacketAccessors.COLLISION_RULE_PUSH_OTHER_TEAMS;
+            break;
+          case PUSH_OWN_TEAM:
+            collisionRule = PacketAccessors.COLLISION_RULE_PUSH_OWN_TEAM;
+            break;
+          default:
+            throw new IllegalStateException("unknown collision rule " + properties.collisionRule().name());
+        }
 
         Objects.requireNonNull(PacketAccessors.COLLISION_RULE_FIELD_1_21_5)
-          .set(parameters, Team.CollisionRule.valueOf(properties.collisionRule().name()));
+          .set(parameters, collisionRule);
       } else {
         Objects.requireNonNull(PacketAccessors.NAME_TAG_VISIBILITY_FIELD_1_21_4)
           .set(parameters, properties.nameTagVisibility().key());
@@ -84,7 +110,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
       }
 
       char legacyChar = LegacyFormatUtil.getChar(properties.playerColor());
-      PacketAccessors.COLOR_FIELD.set(parameters, ChatFormatting.getByCode(legacyChar));
+      PacketAccessors.COLOR_FIELD.set(parameters, PacketAccessors.CHAT_FORMATTING_GET_BY_CODE.invoke(legacyChar));
 
       int options = properties.packOptions();
       PacketAccessors.OPTIONS_FIELD.set(parameters, options);

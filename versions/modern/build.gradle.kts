@@ -1,31 +1,17 @@
 plugins {
   id("net.megavex.scoreboardlibrary.base-conventions")
-  alias(libs.plugins.paperweight)
+  //id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
 dependencies {
   compileOnly(project(":scoreboard-library-packet-adapter-base")) {
-    exclude(group = "org.spigotmc", module = "spigot-api")
+    //exclude(group = "org.spigotmc", module = "spigot-api")
   }
-  paperweight.paperDevBundle(libs.versions.devBundle.get())
+  compileOnly(libs.spigotApi)
+  //paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }
 
 tasks {
-  compileJava {
-    // Workaround to get it to compile targeting Java 8 while using NMS which targets 17
-    // Why does this work? I have no idea
-    options.release = null
-  }
-
-  // https://github.com/unnamed/hephaestus-engine/blob/db6deabe1ddb0a549306b0c4b519c3e79e6f1ea8/runtime-bukkit/adapt-v1_20_R3/build.gradle.kts#L25
-  reobfJar {
-    outputJar = file("build/libs/scoreboard-library-modern-$version-reobf.jar")
-  }
-
-  assemble {
-    dependsOn(reobfJar)
-  }
-
   javadoc {
     exclude("**")
   }
@@ -41,11 +27,12 @@ indra {
 
 publishing {
   publications.getByName<MavenPublication>("maven") {
+    // Kept for backwards compatibility
     artifact(tasks.jar) {
       classifier = "mojmap"
     }
 
-    artifact(tasks.reobfJar)
+    artifact(tasks.jar)
     artifact(tasks.javadocJar)
     artifact(tasks.sourcesJar)
   }
