@@ -21,6 +21,12 @@
           jdk25_headless
         ];
       };
+
+      jdk8 = pkgs.mkShellNoCC {
+        buildInputs = with pkgs; [
+          jdk8_headless
+        ];
+      };
     });
   };
 }
