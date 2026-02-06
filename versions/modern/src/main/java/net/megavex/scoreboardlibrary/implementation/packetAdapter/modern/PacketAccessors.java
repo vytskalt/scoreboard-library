@@ -2,12 +2,73 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.*;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodType;
 import java.util.*;
 
 public final class PacketAccessors {
+  public static final boolean IS_1_17_OR_ABOVE, IS_1_20_2_OR_ABOVE, IS_1_20_3_OR_ABOVE, IS_1_20_5_OR_ABOVE, IS_1_21_5_OR_ABOVE, IS_1_21_6_OR_ABOVE;
+  private static final String OLD_NMS_VERSION_STRING;
+
+  static {
+    boolean is1_17OrAbove = false;
+    try {
+      Class.forName("net.minecraft.world.item.BundleItem");
+      is1_17OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_17_OR_ABOVE = is1_17OrAbove;
+
+    if (!is1_17OrAbove) {
+      OLD_NMS_VERSION_STRING = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    } else {
+      OLD_NMS_VERSION_STRING = null;
+    }
+
+    boolean is1_20_2OrAbove = false;
+    try {
+      Class.forName("net.minecraft.world.scores.DisplaySlot");
+      is1_20_2OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_20_2_OR_ABOVE = is1_20_2OrAbove;
+
+    boolean is1_20_3OrAbove = false;
+    try {
+      Class.forName("net.minecraft.network.chat.numbers.NumberFormat");
+      is1_20_3OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_20_3_OR_ABOVE = is1_20_3OrAbove;
+
+    boolean is1_20_5OrAbove = false;
+    try {
+      Class.forName("net.minecraft.network.protocol.common.ClientboundTransferPacket");
+      is1_20_5OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_20_5_OR_ABOVE = is1_20_5OrAbove;
+
+    boolean is1_21_5OrAbove = false;
+    try {
+      Class.forName("net.minecraft.world.item.component.BlocksAttacks");
+      is1_21_5OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_21_5_OR_ABOVE = is1_21_5OrAbove;
+
+    boolean is1_21_6OrAbove = false;
+    try {
+      Class.forName("net.minecraft.server.dialog.Dialog");
+      is1_21_6OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_1_21_6_OR_ABOVE = is1_21_6OrAbove;
+  }
+
   public static final Class<?> PKT_CLASS,
     SET_OBJECTIVE_PKT_CLASS,
     SET_DISPLAY_OBJECTIVE_PKT_CLASS,
@@ -36,8 +97,7 @@ public final class PacketAccessors {
     ADVENTURE_COMPONENT_CLASS;
 
   static {
-    // TODO: spigot mapping names
-    PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.Packet");
+    PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.Packet", oldSpigotClassName("Packet"));
     SET_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective");
     SET_DISPLAY_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardDisplayObjective");
     SET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
@@ -65,50 +125,8 @@ public final class PacketAccessors {
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
   }
 
-  public static final boolean IS_1_20_2_OR_ABOVE, IS_1_20_3_OR_ABOVE, IS_1_20_5_OR_ABOVE, IS_1_21_5_OR_ABOVE, IS_1_21_6_OR_ABOVE;
-
   static {
-    boolean is1_20_2OrAbove = false;
-    try {
-      Class.forName("net.minecraft.world.scores.DisplaySlot");
-      is1_20_2OrAbove = true;
-    } catch (ClassNotFoundException ignored) {
-    }
-    IS_1_20_2_OR_ABOVE = is1_20_2OrAbove;
-
-    boolean is1_20_3OrAbove = false;
-    try {
-      Class.forName("net.minecraft.network.chat.numbers.NumberFormat");
-      is1_20_3OrAbove = true;
-    } catch (ClassNotFoundException ignored) {
-    }
-    IS_1_20_3_OR_ABOVE = is1_20_3OrAbove;
-
-    boolean is1_20_5OrAbove = false;
-    try {
-      Class.forName("net.minecraft.network.protocol.common.ClientboundTransferPacket"); // Random 1.20.5 class
-      is1_20_5OrAbove = true;
-    } catch (ClassNotFoundException ignored) {
-    }
-    IS_1_20_5_OR_ABOVE = is1_20_5OrAbove;
-
-    boolean is1_21_5OrAbove = false;
-    try {
-      Class.forName("net.minecraft.world.item.component.BlocksAttacks"); // Random 1.21.5 class
-      is1_21_5OrAbove = true;
-    } catch (ClassNotFoundException ignored) {
-    }
-    IS_1_21_5_OR_ABOVE = is1_21_5OrAbove;
-
-    boolean is1_21_6OrAbove = false;
-    try {
-      Class.forName("net.minecraft.server.dialog.Dialog"); // Random 1.21.6 class
-      is1_21_6OrAbove = true;
-    } catch (ClassNotFoundException ignored) {
-    }
-    IS_1_21_6_OR_ABOVE = is1_21_6OrAbove;
-
-    if (is1_21_5OrAbove) {
+    if (IS_1_21_5_OR_ABOVE) {
       NAME_TAG_VISIBILITY_FIELD_1_21_5 = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, TEAM_VISIBILITY_CLASS);
       COLLISION_RULE_FIELD_1_21_5 = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, TEAM_COLLISION_RULE_CLASS);
       NAME_TAG_VISIBILITY_FIELD_1_21_4 = null;
@@ -119,9 +137,7 @@ public final class PacketAccessors {
       NAME_TAG_VISIBILITY_FIELD_1_21_5 = null;
       COLLISION_RULE_FIELD_1_21_5 = null;
     }
-  }
 
-  static {
     if (IS_1_20_3_OR_ABOVE) {
       RESET_SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(Objects.requireNonNull(RESET_SCORE_PKT_CLASS), String.class, String.class);
     } else {
@@ -241,5 +257,12 @@ public final class PacketAccessors {
 
   public static @NotNull Object fromAdventureComponent(@NotNull Component component) {
     return Objects.requireNonNull(PacketAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
+  }
+
+  public static @Nullable String oldSpigotClassName(String clazz) {
+    if (OLD_NMS_VERSION_STRING != null) {
+      return "net.minecraft.server." + OLD_NMS_VERSION_STRING + "." + clazz;
+    }
+    return null;
   }
 }

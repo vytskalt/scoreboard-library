@@ -48,10 +48,14 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
 
   @Override
   public void onDisable() {
-    for (final Module module : this.modules) {
-      module.onDisable();
+    if (this.modules != null){
+      for (final Module module : this.modules) {
+        module.onDisable();
+      }
     }
-    this.lib.close();
+    if (this.lib != null) {
+      this.lib.close();
+    }
     GlobalTranslator.get().removeSource(this.translator);
   }
 

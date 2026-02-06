@@ -64,6 +64,7 @@ public class ReflectUtil {
 
   public static @Nullable Class<?> getOptionalClass(String... names) {
     for (String name : names) {
+      if (name == null) continue;
       try {
         return Class.forName(name);
       } catch (ClassNotFoundException ignored) {
