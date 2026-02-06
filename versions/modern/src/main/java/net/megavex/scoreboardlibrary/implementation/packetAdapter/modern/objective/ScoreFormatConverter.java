@@ -20,16 +20,23 @@ public final class ScoreFormatConverter {
   private static final ConstructorAccessor<?> FIXED_CONSTRUCTOR;
 
   static {
-    STYLE_CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.STYLE_SERIALIZER_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
+    if (PacketAccessors.IS_1_20_3_OR_ABOVE) {
+      STYLE_CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.STYLE_SERIALIZER_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
 
-    Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
-    BLANK = ReflectUtil.findFieldUnchecked(blankFormatClass, 0, blankFormatClass, true).get(null);
+      Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
+      BLANK = ReflectUtil.findFieldUnchecked(blankFormatClass, 0, blankFormatClass, true).get(null);
 
-    Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
-    STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, PacketAccessors.STYLE_CLASS);
+      Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
+      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, PacketAccessors.STYLE_CLASS);
 
-    Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
-    FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, PacketAccessors.COMPONENT_CLASS);
+      Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
+      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, PacketAccessors.COMPONENT_CLASS);
+    } else {
+      STYLE_CODEC = null;
+      BLANK = null;
+      STYLED_CONSTRUCTOR = null;
+      FIXED_CONSTRUCTOR = null;
+    }
   }
 
   private ScoreFormatConverter() {

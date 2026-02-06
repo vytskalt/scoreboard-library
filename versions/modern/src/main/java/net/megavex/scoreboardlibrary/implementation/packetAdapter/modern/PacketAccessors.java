@@ -41,15 +41,15 @@ public final class PacketAccessors {
     SET_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective");
     SET_DISPLAY_OBJECTIVE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardDisplayObjective");
     SET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
-    RESET_SCORE_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundResetScorePacket");
+    RESET_SCORE_PKT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundResetScorePacket");
     SET_PLAYER_TEAM_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam");
     TEAM_PARAMETERS_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket$Parameters", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam$b");
     COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component", "net.minecraft.network.chat.IChatBaseComponent");
     MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent", "net.minecraft.network.chat.IChatMutableComponent");
-    COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.ComponentSerialization");
+    COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.ComponentSerialization");
     STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style", "net.minecraft.network.chat.ChatModifier");
     STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer");
-    NUMBER_FORMAT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.NumberFormat");
+    NUMBER_FORMAT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.numbers.NumberFormat");
     DISPLAY_SLOT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.DisplaySlot");
     OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective", "net.minecraft.world.scores.ScoreboardObjective");
     TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility");
@@ -122,8 +122,8 @@ public final class PacketAccessors {
   }
 
   static {
-    if (IS_1_20_2_OR_ABOVE) {
-      RESET_SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(RESET_SCORE_PKT_CLASS, String.class, String.class);
+    if (IS_1_20_3_OR_ABOVE) {
+      RESET_SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(Objects.requireNonNull(RESET_SCORE_PKT_CLASS), String.class, String.class);
     } else {
       RESET_SCORE_CONSTRUCTOR = null;
     }
@@ -167,7 +167,7 @@ public final class PacketAccessors {
   public static final Object JSON_OPS;
 
   public static final MethodAccessor CHAT_FORMATTING_GET_BY_CODE =
-    ReflectUtil.findMethod(CHAT_FORMATTING_CLASS,true, MethodType.methodType(CHAT_FORMATTING_CLASS, char.class), "getByCode", "a");
+    ReflectUtil.findMethod(CHAT_FORMATTING_CLASS, true, MethodType.methodType(CHAT_FORMATTING_CLASS, char.class), "getByCode", "a");
 
   public static final Object NAME_TAG_VISIBILITY_ALWAYS = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "ALWAYS");
   public static final Object NAME_TAG_VISIBILITY_NEVER = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "NEVER");
@@ -201,7 +201,7 @@ public final class PacketAccessors {
     ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, int.class);
 
   public static final ConstructorAccessor<?> DISPLAY_1_20_2_CONSTRUCTOR =
-    ReflectUtil.findOptionalConstructor(SET_DISPLAY_OBJECTIVE_PKT_CLASS, DISPLAY_SLOT_CLASS, OBJECTIVE_CLASS);
+    DISPLAY_SLOT_CLASS != null ? ReflectUtil.findOptionalConstructor(SET_DISPLAY_OBJECTIVE_PKT_CLASS, DISPLAY_SLOT_CLASS, OBJECTIVE_CLASS) : null;
   public static final ConstructorAccessor<?> DISPLAY_1_20_1_CONSTRUCTOR =
     ReflectUtil.findOptionalConstructor(SET_DISPLAY_OBJECTIVE_PKT_CLASS, int.class, OBJECTIVE_CLASS);
   public static final FieldAccessor<Object, String> DISPLAY_OBJECTIVE_NAME =
