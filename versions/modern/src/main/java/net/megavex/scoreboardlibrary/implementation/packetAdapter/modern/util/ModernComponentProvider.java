@@ -36,7 +36,7 @@ public final class ModernComponentProvider {
     // The native adventure optimisations only work when the adventure library isn't relocated
     IS_NATIVE_ADVENTURE = PacketAccessors.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
 
-    if (PacketAccessors.IS_1_21_6_OR_ABOVE) {
+    if (PacketAccessors.IS_1_20_5_OR_ABOVE) {
       Class<?> craftRegistry;
       try {
         craftRegistry = Class.forName(MinecraftClasses.craftBukkit("CraftRegistry"));
@@ -47,11 +47,15 @@ public final class ModernComponentProvider {
       try {
         Method method = craftRegistry.getMethod("getMinecraftRegistry");
         MINECRAFT_REGISTRY = method.invoke(null);
-        CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.COMPONENT_SERIALIZATION_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
       } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
         throw new RuntimeException(e);
       }
+    } else {
+      MINECRAFT_REGISTRY = null;
+    }
 
+    if (PacketAccessors.IS_1_21_6_OR_ABOVE) {
+      CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.COMPONENT_SERIALIZATION_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
       FROM_JSON_METHOD = null;
     } else {
       Class<?> serializerClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer");
@@ -76,7 +80,6 @@ public final class ModernComponentProvider {
       }
 
       FROM_JSON_METHOD = handle;
-      MINECRAFT_REGISTRY = null;
       CODEC = null;
     }
   }
@@ -100,7 +103,7 @@ public final class ModernComponentProvider {
     }
 
     Object[] args;
-    if (PacketAccessors.IS_1_20_5_OR_ABOVE) {
+    if (MINECRAFT_REGISTRY != null) {
       args = new Object[]{json, MINECRAFT_REGISTRY};
     } else {
       args = new Object[]{json};
