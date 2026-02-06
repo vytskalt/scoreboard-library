@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
   };
 
   outputs = { nixpkgs, ... }: let
@@ -16,27 +16,9 @@
         }));
   in {
     devShells = forAllSystems (pkgs: {
-      jdk25 = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [
-          jdk25_headless
-        ];
-      };
-
-      jdk21 = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [
-          jdk21_headless
-        ];
-      };
-
-      jdk17 = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [
-          jdk17_headless
-        ];
-      };
-
-      jdk8 = pkgs.mkShellNoCC {
-        buildInputs = with pkgs; [
-          jdk8_headless
+      default = pkgs.mkShell {
+        buildInputs = [
+          pkgs.temurin-bin-21
         ];
       };
     });

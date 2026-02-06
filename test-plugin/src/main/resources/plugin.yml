@@ -1,4 +1,0 @@
-name: scoreboard-library-test
-version: 0.1.0
-main: net.megavex.scoreboardlibrary.testplugin.ScoreboardPlugin
-api-version: 1.13

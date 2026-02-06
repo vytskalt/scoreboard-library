@@ -53,9 +53,7 @@ public class SidebarLineHandler {
 
   public void updateScore(int line) {
     LocaleLine localeLine = lines[line];
-    if (localeLine != null) {
-      localeLine.sendScore(players);
-    }
+    localeLine.sendScore(players);
   }
 
   public void setLine(int line, Component renderedLine) {

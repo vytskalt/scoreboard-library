@@ -3,11 +3,15 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.NativeAdventureUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnknownNullability;
@@ -16,8 +20,8 @@ import java.util.Collection;
 import java.util.Locale;
 
 public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl {
-  public PaperTeamsPacketAdapterImpl(@NotNull String teamName) {
-    super(teamName);
+  public PaperTeamsPacketAdapterImpl(@NotNull PacketSender<Packet<?>> sender, @NotNull ComponentProvider componentProvider, @NotNull String teamName) {
+    super(sender, componentProvider, teamName);
   }
 
   @Override
@@ -26,9 +30,9 @@ public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl 
   }
 
   private class TeamDisplayPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl.TeamDisplayPacketAdapterImpl {
-    private final Object parameters = PacketAccessors.PARAMETERS_CONSTRUCTOR.invoke();
-    private Object createPacket = null;
-    private Object updatePacket = null;
+    private final ClientboundSetPlayerTeamPacket.Parameters parameters = PacketAccessors.PARAMETERS_CONSTRUCTOR.invoke();
+    private ClientboundSetPlayerTeamPacket createPacket = null;
+    private ClientboundSetPlayerTeamPacket updatePacket = null;
     private Component displayName, prefix, suffix;
 
     public TeamDisplayPacketAdapterImpl(@NotNull ImmutableTeamProperties<Component> properties) {
@@ -52,32 +56,32 @@ public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl 
 
       switch (packetType) {
         case CREATE:
-          ModernPacketSender.INSTANCE.sendPacket(players, createPacket);
+          sender.sendPacket(players, createPacket);
           break;
         case UPDATE:
-          ModernPacketSender.INSTANCE.sendPacket(players, updatePacket);
+          sender.sendPacket(players, updatePacket);
           break;
       }
     }
 
     @Override
-    protected void fillParameters(@NotNull Object parameters, @UnknownNullability Locale locale) {
+    protected void fillParameters(ClientboundSetPlayerTeamPacket.@NotNull Parameters parameters, @UnknownNullability Locale locale) {
       super.fillParameters(parameters, locale);
 
       if (properties.displayName() != displayName) {
-        Object vanilla = PacketAccessors.fromAdventureComponent(properties.displayName());
+        net.minecraft.network.chat.Component vanilla = NativeAdventureUtil.fromAdventureComponent(properties.displayName());
         PacketAccessors.DISPLAY_NAME_FIELD.set(parameters, vanilla);
         displayName = properties.displayName();
       }
 
       if (properties.prefix() != prefix) {
-        Object vanilla = PacketAccessors.fromAdventureComponent(properties.prefix());
+        net.minecraft.network.chat.Component vanilla = NativeAdventureUtil.fromAdventureComponent(properties.prefix());
         PacketAccessors.PREFIX_FIELD.set(parameters, vanilla);
         prefix = properties.prefix();
       }
 
       if (properties.suffix() != suffix) {
-        Object vanilla = PacketAccessors.fromAdventureComponent(properties.suffix());
+        net.minecraft.network.chat.Component vanilla = NativeAdventureUtil.fromAdventureComponent(properties.suffix());
         PacketAccessors.SUFFIX_FIELD.set(parameters, vanilla);
         suffix = properties.suffix();
       }
