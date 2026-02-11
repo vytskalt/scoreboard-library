@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +16,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Optional;
 
 public class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
   public SpigotTeamsPacketAdapter(@NotNull String teamName) {
@@ -39,9 +40,30 @@ public class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
         ModernPacketSender.INSTANCE,
         players,
         locale -> {
-          Object parameters = PacketAccessors.PARAMETERS_CONSTRUCTOR.invoke();
-          fillParameters(parameters, locale);
-          return createTeamsPacket(TeamConstants.mode(packetType), teamName, parameters, entries);
+
+          if (PacketAccessors.IS_1_17_OR_ABOVE) {
+            assert PacketAccessors.PARAMETERS_CONSTRUCTOR != null;
+            Object parameters = PacketAccessors.PARAMETERS_CONSTRUCTOR.invoke();
+            fillParameters(parameters, locale);
+
+            return PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+              teamName,
+              TeamConstants.mode(packetType),
+              Optional.of(parameters),
+              entries
+            );
+          } else {
+            assert PacketAccessors.TEAM_NAME_FIELD != null;
+            assert PacketAccessors.TEAM_MODE_FIELD != null;
+            assert PacketAccessors.TEAM_ENTRIES_FIELD != null;
+
+            Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+            PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
+            PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
+            PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+            fillParameters(packet, locale);
+            return packet;
+          }
         }
       );
     }

@@ -48,7 +48,7 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
 
   @Override
   public void onDisable() {
-    if (this.modules != null){
+    if (this.modules != null) {
       for (final Module module : this.modules) {
         module.onDisable();
       }

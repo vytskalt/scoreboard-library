@@ -58,9 +58,8 @@ public final class ModernComponentProvider {
       CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.COMPONENT_SERIALIZATION_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
       FROM_JSON_METHOD = null;
     } else {
-      Class<?> serializerClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer");
       MethodHandle handle = null;
-      for (Method method : serializerClass.getMethods()) {
+      for (Method method : PacketAccessors.COMPONENT_SERIALIZATION_CLASS.getMethods()) {
         if (method.getReturnType() == PacketAccessors.MUTABLE_COMPONENT_CLASS &&
           method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&

@@ -50,7 +50,7 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
       packet = Objects.requireNonNull(PacketAccessors.RESET_SCORE_CONSTRUCTOR)
         .invoke(entry, objectiveName);
     } else {
-      packet = Objects.requireNonNull(PacketAccessors.SCORE_1_20_2_CONSTRUCTOR)
+      packet = Objects.requireNonNull(PacketAccessors.SCORE_CONSTRUCTOR)
         .invoke(PacketAccessors.SCORE_1_20_2_METHOD_REMOVE, objectiveName, entry, 0);
     }
     ModernPacketSender.INSTANCE.sendPacket(players, packet);
@@ -59,11 +59,15 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
   protected @NotNull Object createDisplayPacket(@NotNull ObjectiveDisplaySlot displaySlot) {
     Object packet;
     if (PacketAccessors.IS_1_20_2_OR_ABOVE) {
-      packet = Objects.requireNonNull(PacketAccessors.DISPLAY_1_20_2_CONSTRUCTOR)
+      packet = Objects.requireNonNull(PacketAccessors.DISPLAY_CONSTRUCTOR)
         .invoke(PacketAccessors.DISPLAY_SLOT_VALUES.get(ObjectiveConstants.displaySlotIndex(displaySlot)), null);
-    } else {
-      packet = Objects.requireNonNull(PacketAccessors.DISPLAY_1_20_1_CONSTRUCTOR)
+    } else if (PacketAccessors.IS_1_17_OR_ABOVE){
+      packet = Objects.requireNonNull(PacketAccessors.DISPLAY_CONSTRUCTOR)
         .invoke(ObjectiveConstants.displaySlotIndex(displaySlot), null);
+    } else {
+      assert PacketAccessors.DISPLAY_SLOT != null;
+      packet = Objects.requireNonNull(PacketAccessors.DISPLAY_CONSTRUCTOR).invoke();
+      PacketAccessors.DISPLAY_SLOT.set(packet, ObjectiveConstants.displaySlotIndex(displaySlot));
     }
     PacketAccessors.DISPLAY_OBJECTIVE_NAME.set(packet, objectiveName);
     return packet;
@@ -76,13 +80,13 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
     @Nullable Object numberFormat
   ) {
     if (PacketAccessors.IS_1_20_5_OR_ABOVE) {
-      return Objects.requireNonNull(PacketAccessors.SCORE_1_20_5_CONSTRUCTOR)
+      return Objects.requireNonNull(PacketAccessors.SCORE_CONSTRUCTOR)
         .invoke(entry, objectiveName, value, Optional.ofNullable(nmsDisplay), Optional.ofNullable(numberFormat));
     } else if (PacketAccessors.IS_1_20_3_OR_ABOVE) {
-      return Objects.requireNonNull(PacketAccessors.SCORE_1_20_3_CONSTRUCTOR)
+      return Objects.requireNonNull(PacketAccessors.SCORE_CONSTRUCTOR)
         .invoke(entry, objectiveName, value, nmsDisplay, numberFormat);
     } else {
-      return Objects.requireNonNull(PacketAccessors.SCORE_1_20_2_CONSTRUCTOR)
+      return Objects.requireNonNull(PacketAccessors.SCORE_CONSTRUCTOR)
         .invoke(PacketAccessors.SCORE_1_20_2_METHOD_CHANGE, objectiveName, entry, value);
     }
   }
