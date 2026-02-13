@@ -84,7 +84,7 @@ public final class PacketAccessors {
     SET_PLAYER_TEAM_PKT_CLASS,
     TEAM_PARAMETERS_PKT_CLASS, // 1.17
     COMPONENT_CLASS,
-    MUTABLE_COMPONENT_CLASS,
+    CHAT_SERIALIZER_CLASS,
     COMPONENT_SERIALIZATION_CLASS,
     STYLE_CLASS,
     STYLE_SERIALIZER_CLASS,
@@ -112,8 +112,8 @@ public final class PacketAccessors {
     SET_PLAYER_TEAM_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam", oldSpigotClassName("PacketPlayOutScoreboardTeam"));
     TEAM_PARAMETERS_PKT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket$Parameters", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam$b");
     COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component", "net.minecraft.network.chat.IChatBaseComponent", oldSpigotClassName("IChatBaseComponent"));
-    MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent", "net.minecraft.network.chat.IChatMutableComponent", oldSpigotClassName("IChatMutableComponent"), oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
-    COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.ComponentSerialization", "net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
+    CHAT_SERIALIZER_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
+    COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.ComponentSerialization");
     STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style", "net.minecraft.network.chat.ChatModifier", oldSpigotClassName("ChatModifier"));
     STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer", oldSpigotClassName("ChatModifier$ChatModifierSerializer"));
     NUMBER_FORMAT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.numbers.NumberFormat");

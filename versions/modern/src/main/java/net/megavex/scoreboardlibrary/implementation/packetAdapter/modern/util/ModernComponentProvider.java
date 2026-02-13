@@ -59,9 +59,8 @@ public final class ModernComponentProvider {
       FROM_JSON_METHOD = null;
     } else {
       MethodHandle handle = null;
-      for (Method method : PacketAccessors.COMPONENT_SERIALIZATION_CLASS.getMethods()) {
-        if (method.getReturnType().isAssignableFrom(PacketAccessors.COMPONENT_CLASS) &&
-          method.getParameterCount() >= 1 &&
+      for (Method method : PacketAccessors.CHAT_SERIALIZER_CLASS.getMethods()) {
+        if (method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&
           method.getParameterTypes()[0] == JsonElement.class
         ) {

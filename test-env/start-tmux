@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo ERROR: tmux not found, install it >&2
+  exit 67
+fi
+
+sesh="sl"
+
+if tmux has-session -t "$sesh" 2>/dev/null; then
+  echo already exists
+  #tmux a -t "$sesh"
+  exit 0
+fi
+
+tmux new-session -d -s "$sesh" -n "shell"
+
+for dir in servers/*; do
+  window=$(basename $dir | tr '.' '-')
+
+  pushd "$dir" &> /dev/null
+  tmux new-window -t "$sesh" -n "$window"
+  popd &> /dev/null
+
+  tmux send-keys -t "$sesh:$window" "./start" C-m
+done
+
+tmux a -t "$sesh"

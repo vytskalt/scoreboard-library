@@ -16,6 +16,7 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 
 public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapter {
   protected final String teamName;
@@ -60,7 +61,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
         Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
           teamName,
           TeamConstants.mode(packetType),
-          entries,
+          Optional.empty(),
           entries
         );
         ModernPacketSender.INSTANCE.sendPacket(players, packet);

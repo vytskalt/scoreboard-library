@@ -44,8 +44,10 @@ public final class ObjectivesModule implements Module, Listener {
   @EventHandler
   public void onJoin(final PlayerJoinEvent event) {
     final Player player = event.getPlayer();
-    this.manager.addPlayer(player);
     this.objective.score(player.getName(), 5);
+    this.manager.addPlayer(player);
+    this.objective.removeScore(player.getName());
+    this.objective.score(player.getName(), 6);
   }
 
   @EventHandler
