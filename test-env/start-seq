@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+total=$(ls servers | wc -l)
+i=1
+for dir in servers/*; do
+  echo
+  echo "--- Starting server $(basename "$dir") [$i/$total]"
+  echo
+  (( i++ ))
+  sleep 1
+
+  pushd "$dir" &> /dev/null
+  bash ./start
+  popd &> /dev/null
+done

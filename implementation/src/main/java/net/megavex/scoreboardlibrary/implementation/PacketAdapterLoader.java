@@ -68,6 +68,23 @@ public final class PacketAdapterLoader {
       case "1.12.1":
       case "1.12.2":
         return tryLoadImplementationClass(LEGACY);
+      case "1.13":
+      case "1.13.1":
+      case "1.13.2":
+      case "1.14":
+      case "1.14.1":
+      case "1.14.2":
+      case "1.14.3":
+      case "1.14.4":
+      case "1.15":
+      case "1.15.1":
+      case "1.15.2":
+      case "1.16":
+      case "1.16.1":
+      case "1.16.2":
+      case "1.16.3":
+      case "1.16.4":
+      case "1.16.5":
       case "1.17":
       case "1.17.1":
       case "1.18":

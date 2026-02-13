@@ -71,7 +71,9 @@ public final class TeamsModule implements Module, Listener {
   @EventHandler
   public void onJoin(final PlayerJoinEvent event) {
     final Player player = event.getPlayer();
+    this.team.defaultDisplay().addEntry(player.getName());
     this.manager.addPlayer(player);
+    this.team.defaultDisplay().removeEntry(player.getName());
     this.team.defaultDisplay().addEntry(player.getName());
   }
 

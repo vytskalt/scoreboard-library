@@ -1,7 +1,7 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
 
 import net.kyori.adventure.text.Component;
-import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
@@ -11,10 +11,12 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDispl
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Optional;
 
 public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapter {
   protected final String teamName;
@@ -24,24 +26,24 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
     this.teamName = teamName;
   }
 
-  public static Object createTeamsPacket(
-    int method,
-    @NotNull String name,
-    @Nullable Object parameters,
-    @Nullable Collection<String> entries
-  ) {
-    return PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
-      name,
-      method,
-      Optional.ofNullable(parameters),
-      entries == null ? Collections.emptyList() : entries
-    );
-  }
-
   @Override
   public void removeTeam(@NotNull Iterable<Player> players) {
     if (removePacket == null) {
-      removePacket = createTeamsPacket(TeamConstants.MODE_REMOVE, teamName, null, null);
+      if (PacketAccessors.IS_1_17_OR_ABOVE) {
+        removePacket = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+          teamName,
+          TeamConstants.MODE_REMOVE,
+          null,
+          Collections.emptyList()
+        );
+      } else {
+        assert PacketAccessors.TEAM_NAME_FIELD != null;
+        assert PacketAccessors.TEAM_MODE_FIELD != null;
+
+        removePacket = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+        PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
+        PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
+      }
     }
     ModernPacketSender.INSTANCE.sendPacket(players, removePacket);
   }
@@ -55,65 +57,39 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      ModernPacketSender.INSTANCE.sendPacket(players, createTeamsPacket(TeamConstants.mode(packetType), teamName, null, entries));
+      if (PacketAccessors.IS_1_17_OR_ABOVE) {
+        Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+          teamName,
+          TeamConstants.mode(packetType),
+          Optional.empty(),
+          entries
+        );
+        ModernPacketSender.INSTANCE.sendPacket(players, packet);
+      } else {
+        assert PacketAccessors.TEAM_NAME_FIELD != null;
+        assert PacketAccessors.TEAM_MODE_FIELD != null;
+        assert PacketAccessors.TEAM_ENTRIES_FIELD != null;
+
+        Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+        PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
+        PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
+        PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+        ModernPacketSender.INSTANCE.sendPacket(players, packet);
+      }
     }
 
     protected void fillParameters(@NotNull Object parameters, @UnknownNullability Locale locale) {
       if (PacketAccessors.IS_1_21_5_OR_ABOVE) {
-        Object nameTagVisibility;
-        switch (properties.nameTagVisibility()){
-          case NEVER:
-            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_NEVER;
-            break;
-          case ALWAYS:
-            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_ALWAYS;
-            break;
-          case HIDE_FOR_OTHER_TEAMS:
-            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OTHER_TEAMS;
-            break;
-          case HIDE_FOR_OWN_TEAM:
-            nameTagVisibility = PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OWN_TEAM;
-            break;
-          default:
-            throw new IllegalStateException("unknown name tag visibility " + properties.nameTagVisibility().name());
-        }
-
-        Objects.requireNonNull(PacketAccessors.NAME_TAG_VISIBILITY_FIELD_1_21_5)
-          .set(parameters, nameTagVisibility);
-
-        Object collisionRule;
-        switch (properties.collisionRule()){
-          case NEVER:
-            collisionRule = PacketAccessors.COLLISION_RULE_NEVER;
-            break;
-          case ALWAYS:
-            collisionRule = PacketAccessors.COLLISION_RULE_ALWAYS;
-            break;
-          case PUSH_OTHER_TEAMS:
-            collisionRule = PacketAccessors.COLLISION_RULE_PUSH_OTHER_TEAMS;
-            break;
-          case PUSH_OWN_TEAM:
-            collisionRule = PacketAccessors.COLLISION_RULE_PUSH_OWN_TEAM;
-            break;
-          default:
-            throw new IllegalStateException("unknown collision rule " + properties.collisionRule().name());
-        }
-
-        Objects.requireNonNull(PacketAccessors.COLLISION_RULE_FIELD_1_21_5)
-          .set(parameters, collisionRule);
+        PacketAccessors.NAME_TAG_VISIBILITY_FIELD.set(parameters, PacketAccessors.nameTagVisibility(properties.nameTagVisibility()));
+        PacketAccessors.COLLISION_RULE_FIELD.set(parameters, PacketAccessors.collisionRule(properties.collisionRule()));
       } else {
-        Objects.requireNonNull(PacketAccessors.NAME_TAG_VISIBILITY_FIELD_1_21_4)
-          .set(parameters, properties.nameTagVisibility().key());
-
-        Objects.requireNonNull(PacketAccessors.COLLISION_RULE_FIELD_1_21_4)
-          .set(parameters, properties.collisionRule().key());
+        PacketAccessors.NAME_TAG_VISIBILITY_FIELD.set(parameters, properties.nameTagVisibility().key());
+        PacketAccessors.COLLISION_RULE_FIELD.set(parameters, properties.collisionRule().key());
       }
 
-      char legacyChar = LegacyFormatUtil.getChar(properties.playerColor());
-      PacketAccessors.COLOR_FIELD.set(parameters, PacketAccessors.CHAT_FORMATTING_GET_BY_CODE.invoke(legacyChar));
-
-      int options = properties.packOptions();
-      PacketAccessors.OPTIONS_FIELD.set(parameters, options);
+      Object color = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(properties.playerColor() != null ? properties.playerColor() : NamedTextColor.WHITE);
+      PacketAccessors.COLOR_FIELD.set(parameters, color);
+      PacketAccessors.OPTIONS_FIELD.set(parameters, properties.packOptions());
     }
   }
 }

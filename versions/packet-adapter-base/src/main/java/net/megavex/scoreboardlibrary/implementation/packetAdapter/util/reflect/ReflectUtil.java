@@ -64,6 +64,7 @@ public class ReflectUtil {
 
   public static @Nullable Class<?> getOptionalClass(String... names) {
     for (String name : names) {
+      if (name == null) continue;
       try {
         return Class.forName(name);
       } catch (ClassNotFoundException ignored) {
@@ -156,7 +157,7 @@ public class ReflectUtil {
   public static @NotNull MethodAccessor findMethod(@NotNull Class<?> clazz, boolean isStatic, @NotNull MethodType methodType, @NotNull String... names) {
     MethodAccessor accessor = findOptionalMethod(clazz, isStatic, methodType, names);
     if (accessor == null) {
-      throw new RuntimeException("Method " + String.join(",", names) + " for class " + clazz.getName() + " not found");
+      throw new RuntimeException("Method with the names either of " + String.join(",", names) + " for class " + clazz.getName() + " not found");
     }
     return accessor;
   }
