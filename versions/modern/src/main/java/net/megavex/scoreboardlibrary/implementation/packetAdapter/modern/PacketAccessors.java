@@ -111,8 +111,8 @@ public final class PacketAccessors {
     RESET_SCORE_PKT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundResetScorePacket");
     SET_PLAYER_TEAM_PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam", oldSpigotClassName("PacketPlayOutScoreboardTeam"));
     TEAM_PARAMETERS_PKT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket$Parameters", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam$b");
-    COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component", "net.minecraft.network.chat.IChatBaseComponent", oldSpigotClassName("IChatBaseComponent"), oldSpigotClassName("ChatBaseComponent"));
-    MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent", "net.minecraft.network.chat.IChatMutableComponent", oldSpigotClassName("IChatMutableComponent"));
+    COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Component", "net.minecraft.network.chat.IChatBaseComponent", oldSpigotClassName("IChatBaseComponent"));
+    MUTABLE_COMPONENT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.MutableComponent", "net.minecraft.network.chat.IChatMutableComponent", oldSpigotClassName("IChatMutableComponent"), oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
     COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.ComponentSerialization", "net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
     STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style", "net.minecraft.network.chat.ChatModifier", oldSpigotClassName("ChatModifier"));
     STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer", oldSpigotClassName("ChatModifier$ChatModifierSerializer"));
@@ -123,10 +123,10 @@ public final class PacketAccessors {
     TEAM_COLLISION_RULE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
     CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat", oldSpigotClassName("EnumChatFormat"));
     OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
-    DATA_RESULT_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.DataResult");
-    DYNAMIC_OPS_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.DynamicOps");
-    JSON_OPS_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.JsonOps");
-    CODEC_CLASS = ReflectUtil.getClassOrThrow("com.mojang.serialization.Codec");
+    DATA_RESULT_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DataResult");
+    DYNAMIC_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DynamicOps");
+    JSON_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.JsonOps");
+    CODEC_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.Codec");
     SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer", oldSpigotClassName("EntityPlayer"));
     PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection", oldSpigotClassName("PlayerConnection"));
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
@@ -145,6 +145,7 @@ public final class PacketAccessors {
       SCORE_1_20_2_METHOD_CHANGE = null;
       SCORE_1_20_2_METHOD_REMOVE = null;
     } else if (IS_1_20_3_OR_ABOVE) {
+      assert NUMBER_FORMAT_CLASS != null;
       OBJECTIVE_NUMBER_FORMAT_FIELD = ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, NUMBER_FORMAT_CLASS);
       SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, String.class, String.class, int.class, COMPONENT_CLASS, NUMBER_FORMAT_CLASS);
       SCORE_1_20_2_METHOD_CHANGE = null;
@@ -158,13 +159,19 @@ public final class PacketAccessors {
       SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, methodClass, String.class, String.class, int.class);
     }
 
-    RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(PacketAccessors.DATA_RESULT_CLASS, false, MethodType.methodType(Optional.class), "result");
-    try {
-      JSON_OPS = PacketAccessors.JSON_OPS_CLASS.getField("INSTANCE").get(null);
-    } catch (IllegalAccessException | NoSuchFieldException e) {
-      throw new RuntimeException(e);
+    if (PacketAccessors.DATA_RESULT_CLASS != null) {
+      RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(PacketAccessors.DATA_RESULT_CLASS, false, MethodType.methodType(Optional.class), "result");
+      try {
+        JSON_OPS = PacketAccessors.JSON_OPS_CLASS.getField("INSTANCE").get(null);
+      } catch (IllegalAccessException | NoSuchFieldException e) {
+        throw new RuntimeException(e);
+      }
+      CODEC_PARSE = ReflectUtil.findMethod(PacketAccessors.CODEC_CLASS, false, MethodType.methodType(PacketAccessors.DATA_RESULT_CLASS, PacketAccessors.DYNAMIC_OPS_CLASS, Object.class), "parse");
+    } else {
+      RESULT_UNWRAP_METHOD = null;
+      JSON_OPS = null;
+      CODEC_PARSE = null;
     }
-    CODEC_PARSE = ReflectUtil.findMethod(PacketAccessors.CODEC_CLASS, false, MethodType.methodType(PacketAccessors.DATA_RESULT_CLASS, PacketAccessors.DYNAMIC_OPS_CLASS, Object.class), "parse");
   }
 
   public static final MethodAccessor RESULT_UNWRAP_METHOD;
@@ -229,6 +236,7 @@ public final class PacketAccessors {
 
   static {
     if (IS_1_20_2_OR_ABOVE) {
+      assert DISPLAY_SLOT_CLASS != null;
       DISPLAY_CONSTRUCTOR = ReflectUtil.findConstructor(SET_DISPLAY_OBJECTIVE_PKT_CLASS, DISPLAY_SLOT_CLASS, OBJECTIVE_CLASS);
       DISPLAY_SLOT = null;
     } else if (IS_1_17_OR_ABOVE) {

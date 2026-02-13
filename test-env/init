@@ -152,8 +152,14 @@ create_server "paper-1.16.5" "25569" "jdk8"
 
 create_spigot_server "1.16.5" "25568" "jdk8"
 
+# --- 1.15.2 ---
+download_file "paper-1.15.2.jar" "https://fill-data.papermc.io/v1/objects/bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34/paper-1.15.2-393.jar" "bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34"
+create_server "paper-1.15.2" "25567" "jdk8"
+
+create_spigot_server "1.15.2" "25566" "jdk8"
+
 # --- 1.13 ---
 download_file "paper-1.13.jar" "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar" "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"
-create_server "paper-1.13" "25567" "jdk8"
+create_server "paper-1.13" "25566" "jdk8"
 
-create_spigot_server "1.13" "25566" "jdk8"
+create_spigot_server "1.13" "25565" "jdk8"

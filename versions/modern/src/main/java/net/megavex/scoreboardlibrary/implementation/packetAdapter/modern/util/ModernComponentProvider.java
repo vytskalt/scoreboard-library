@@ -60,7 +60,7 @@ public final class ModernComponentProvider {
     } else {
       MethodHandle handle = null;
       for (Method method : PacketAccessors.COMPONENT_SERIALIZATION_CLASS.getMethods()) {
-        if (method.getReturnType() == PacketAccessors.MUTABLE_COMPONENT_CLASS &&
+        if (method.getReturnType().isAssignableFrom(PacketAccessors.COMPONENT_CLASS) &&
           method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&
           method.getParameterTypes()[0] == JsonElement.class
