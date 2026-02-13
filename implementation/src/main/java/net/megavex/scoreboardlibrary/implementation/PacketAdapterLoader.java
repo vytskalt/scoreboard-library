@@ -9,9 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 
 public final class PacketAdapterLoader {
-  private static final String MODERN = "modern",
-    LEGACY = "legacy",
-    PACKET_EVENTS = "packetevents";
+  private static final String MODERN = "modern", LEGACY = "legacy";
 
   private PacketAdapterLoader() {
   }
@@ -36,12 +34,7 @@ public final class PacketAdapterLoader {
       version = version.substring(0, dashIndex);
     }
 
-    Class<?> nmsClass = tryLoadVersion(version);
-    if (nmsClass != null) {
-      return nmsClass;
-    }
-
-    return tryLoadPacketEvents();
+    return tryLoadVersion(version);
   }
 
   private static @Nullable Class<?> tryLoadVersion(@NotNull String serverVersion) {
@@ -123,20 +116,6 @@ public final class PacketAdapterLoader {
         }
 
         return null;
-    }
-  }
-
-  private static @Nullable Class<?> tryLoadPacketEvents() {
-    Class<?> nmsClass = tryLoadImplementationClass(PACKET_EVENTS);
-    if (nmsClass == null) {
-      return null;
-    }
-
-    try {
-      Class.forName("com.github.retrooper.packetevents.PacketEvents");
-      return nmsClass;
-    } catch (ClassNotFoundException ignored) {
-      return null;
     }
   }
 

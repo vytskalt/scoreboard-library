@@ -17,7 +17,6 @@ dependencies {
 
   // Add packet adapter implementations you want:
   runtimeOnly("net.megavex:scoreboard-library-modern:$scoreboardLibraryVersion") // 1.17+
-  runtimeOnly("net.megavex:scoreboard-library-packetevents:$scoreboardLibraryVersion") // 1.8+
   runtimeOnly("net.megavex:scoreboard-library-legacy:$scoreboardLibraryVersion") // 1.7.10-1.12.2
 
   // If using the PacketEvents implementation, scoreboard-library expects PacketEvents to be in the classpath.
