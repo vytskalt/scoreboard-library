@@ -66,7 +66,7 @@ create_spigot_server() {
 
     mv "spigot-$version.jar" "../$version-spigot.jar"
     popd &> /dev/null
-    #rm -rf "$version-spigot"
+    rm -rf "$version-spigot"
 
     popd &> /dev/null
   fi
@@ -96,6 +96,42 @@ download_file() {
 }
 
 download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/197/artifact/target/BuildTools.jar" "9a5b059ace22eaef28fb62f96970f0abe1490f06c860229b94627cd72eaf6ea5"
+
+# --- 1.7.10 ---
+download_file "1.7.10-paper.jar" "https://fill-data.papermc.io/v1/objects/33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185/paper-1.7.10-2025.jar" "33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185"
+create_server "1.7.10-paper" "jdk8"
+
+# buildtools cannot build 1.7.10
+
+# --- 1.8.8 ---
+download_file "1.8.8-paper.jar" "https://fill-data.papermc.io/v1/objects/7ff6d2cec671ef0d95b3723b5c92890118fb882d73b7f8fa0a2cd31d97c55f86/paper-1.8.8-445.jar" "7ff6d2cec671ef0d95b3723b5c92890118fb882d73b7f8fa0a2cd31d97c55f86"
+create_server "1.8.8-paper" "jdk8"
+
+create_spigot_server "1.8.8" "jdk8"
+
+# --- 1.9.4 ---
+download_file "1.9.4-paper.jar" "https://fill-data.papermc.io/v1/objects/15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81/paper-1.9.4-775.jar" "15a5821ddeacc596432c3fbf24262a2d264f556060ecd6f1838fb01ab5629a81"
+create_server "1.9.4-paper" "jdk8"
+
+create_spigot_server "1.9.4" "jdk8"
+
+# --- 1.10.2 ---
+download_file "1.10.2-paper.jar" "https://fill-data.papermc.io/v1/objects/83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2/paper-1.10.2-918.jar" "83354d24a22b6265e76c089b3d17a568abb446c0ccd12c2452f5e148412b16c2"
+create_server "1.10.2-paper" "jdk8"
+
+create_spigot_server "1.10.2" "jdk8"
+
+# --- 1.11.2 ---
+download_file "1.11.2-paper.jar" "https://fill-data.papermc.io/v1/objects/3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d/paper-1.11.2-1106.jar" "3d0f40ec1f9630dfdbafa626cc20c266d7fb90fc22583dc1b995e7fbfb76830d"
+create_server "1.11.2-paper" "jdk8"
+
+create_spigot_server "1.11.2" "jdk8"
+
+# --- 1.12.2 ---
+download_file "1.12.2-paper.jar" "https://fill-data.papermc.io/v1/objects/3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210/paper-1.12.2-1620.jar" "3a2041807f492dcdc34ebb324a287414946e3e05ec3df6fd03f5b5f7d9afc210"
+create_server "1.12.2-paper" "jdk8"
+
+create_spigot_server "1.12.2" "jdk8"
 
 # --- 1.13 ---
 download_file "1.13-paper.jar" "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar" "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"

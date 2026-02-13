@@ -38,7 +38,7 @@ try {
 } catch (NoPacketAdapterAvailableException e) {
   // If server version is not yet supported, you can fallback to the no-op implementation:
   scoreboardLibrary = new NoopScoreboardLibrary();
-  plugin.getLogger().warning("Server version unsupported, scoreboards will not display!");
+  plugin.getLogger().warning("Server version unsupported, scoreboard functionality will not be visible!");
 }
 
 // On plugin shutdown:
