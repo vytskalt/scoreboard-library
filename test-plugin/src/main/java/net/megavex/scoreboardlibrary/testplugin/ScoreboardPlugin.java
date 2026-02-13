@@ -3,7 +3,6 @@ package net.megavex.scoreboardlibrary.testplugin;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
 import net.megavex.scoreboardlibrary.testplugin.module.Module;
 import net.megavex.scoreboardlibrary.testplugin.module.ObjectivesModule;
 import net.megavex.scoreboardlibrary.testplugin.module.SidebarModule;
@@ -79,7 +78,14 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
     player.setGameMode(GameMode.CREATIVE);
     player.sendMessage("Server software: " + this.getServer().getName());
     player.sendMessage("Server version: " + this.getServer().getVersion());
-    player.sendMessage("Is native adventure: " + ModernComponentProvider.IS_NATIVE_ADVENTURE);
+
+    boolean isNativeAdventure = false;
+    try {
+      Class.forName("io.papermc.paper.adventure.AdventureComponent");
+      isNativeAdventure = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    player.sendMessage("Is native adventure: " + isNativeAdventure);
   }
 
   @EventHandler

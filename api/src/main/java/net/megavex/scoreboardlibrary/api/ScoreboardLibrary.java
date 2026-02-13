@@ -27,7 +27,7 @@ public interface ScoreboardLibrary {
    * Creates an instance of {@link ScoreboardLibrary}.
    *
    * @param plugin your plugin instance
-   * @throws NoPacketAdapterAvailableException if there is no packet adapter available for the current server version
+   * @throws NoPacketAdapterAvailableException if server version is not supported
    */
   static @NotNull ScoreboardLibrary loadScoreboardLibrary(@NotNull Plugin plugin) throws NoPacketAdapterAvailableException {
     Class<?> implClass;
