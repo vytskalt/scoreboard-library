@@ -13,6 +13,7 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamP
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,13 +59,32 @@ public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Com
 
   @Override
   public boolean addEntry(@NotNull String entry) {
-    if (!entries.contains(entry)) {
-      entries.add(entry);
-      team.teamManager().taskQueue().add(new TeamManagerTask.AddEntries(this, Collections.singleton(entry)));
-      return true;
+    for (Player viewer : players) {
+      for (ScoreboardTeam otherTeam : team.teamManager().teams()) {
+        if (otherTeam == team) continue;
+
+        TeamDisplay otherDisplay = otherTeam.display(viewer);
+        if (otherDisplay.entries().contains(entry)) {
+          otherDisplay.removeEntry(entry);
+        }
+      }
     }
 
-    return false;
+    if (players.isEmpty()) {
+      for (ScoreboardTeam otherTeam : team.teamManager().teams()) {
+        if (otherTeam == team) continue;
+
+        TeamDisplay defaultDisplay = otherTeam.defaultDisplay();
+        if (defaultDisplay.entries().contains(entry)) {
+          defaultDisplay.removeEntry(entry);
+        }
+      }
+    }
+
+    entries.add(entry);
+    team.teamManager().taskQueue().add(new TeamManagerTask.AddEntries(this, Collections.singleton(entry)));
+    return true;
+
   }
 
   @Override

@@ -248,6 +248,10 @@ teamDisplay.displayName(Component.text("Team Display Name"));
 teamDisplay.prefix(Component.text("[Prefix] "));
 teamDisplay.suffix(Component.text(" [Suffix]"));
 teamDisplay.playerColor(NamedTextColor.RED);
+
+// Due to internal Minecraft limitations, a player can only be assigned to one team at a time.
+// To prevent client crashes, calling addEntry() will remove the player from any
+// other teams they are on.
 teamDisplay.addEntry(player.getName());
 
 teamManager.addPlayer(player); // Player will be added to the default TeamDisplay of each ScoreboardTeam
