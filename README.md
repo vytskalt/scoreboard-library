@@ -21,14 +21,9 @@ Join the [Discord](https://discord.gg/v7nmTDTW8W) or create an issue for support
 - Automatically works with `TranslatableComponent`s. All components are translated using `GlobalTranslator` for
   each player's client locale and automatically update whenever the player changes it in their settings
 
-## Available Packet Adapters
+## Supported server versions
 
-- **modern.** Supports 1.17-1.21.11. Can take advantage of [Paper](https://papermc.io)'s native adventure support to be more efficient.
-- **legacy.** Supports 1.7.10-1.12.2.
-- **PacketEvents.** Supports 1.8+. Requires [PacketEvents 2.0](https://github.com/retrooper/packetevents/tree/2.0) to be shaded or installed as a plugin.
-
-> [!NOTE]  
-> You can add multiple packet adapters, the best one will automatically be picked depending on the server version.
+All Paper and Spigot versions from 1.7.10 to 1.21.11 are now natively supported.
 
 ## Installation
 
@@ -41,9 +36,9 @@ ScoreboardLibrary scoreboardLibrary;
 try {
   scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
 } catch (NoPacketAdapterAvailableException e) {
-  // If no packet adapter was found, you can fallback to the no-op implementation:
+  // If server version is not yet supported, you can fallback to the no-op implementation:
   scoreboardLibrary = new NoopScoreboardLibrary();
-  plugin.getLogger().warning("No scoreboard packet adapter available!");
+  plugin.getLogger().warning("Server version unsupported, scoreboard functionality will not be visible!");
 }
 
 // On plugin shutdown:

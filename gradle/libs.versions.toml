@@ -3,7 +3,6 @@ adventure = "4.25.0"
 
 [libraries]
 spigotApi = "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT" # do not update
-packetEvents = "com.github.retrooper:packetevents-spigot:2.11.0"
 buildIndra = { module = "net.kyori:indra-common", version = "4.0.0" }
 buildNmcp = "com.gradleup.nmcp:com.gradleup.nmcp.gradle.plugin:0.0.9"
 

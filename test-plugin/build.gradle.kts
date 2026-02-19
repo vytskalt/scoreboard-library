@@ -8,7 +8,6 @@ dependencies {
 
   implementation(project(":scoreboard-library-api"))
   implementation(project(":scoreboard-library-implementation"))
-  implementation(project(":scoreboard-library-modern"))
 
   compileOnly(libs.adventureApi)
   compileOnly(libs.adventureTextSerializerGson)
