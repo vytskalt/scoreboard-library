@@ -3,6 +3,7 @@ package net.megavex.scoreboardlibrary.implementation;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,14 +17,14 @@ public final class PacketAdapterLoader {
   private PacketAdapterLoader() {
   }
 
-  public static @NotNull PacketAdapterProvider loadPacketAdapter() throws NoPacketAdapterAvailableException {
+  public static @NotNull PacketAdapterProvider loadPacketAdapter(Plugin plugin) throws NoPacketAdapterAvailableException {
     Class<?> nmsClass = findAndLoadImplementationClass();
     if (nmsClass == null) {
       throw new NoPacketAdapterAvailableException();
     }
 
     try {
-      return (PacketAdapterProvider) nmsClass.getConstructors()[0].newInstance();
+      return (PacketAdapterProvider) nmsClass.getConstructors()[0].newInstance(plugin);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException("couldn't initialize packet adapter", e);
     }

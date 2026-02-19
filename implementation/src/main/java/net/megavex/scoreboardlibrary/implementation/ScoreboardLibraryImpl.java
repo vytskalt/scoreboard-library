@@ -59,7 +59,7 @@ public class ScoreboardLibraryImpl implements ScoreboardLibrary {
     }
 
     this.plugin = plugin;
-    this.packetAdapter = PacketAdapterLoader.loadPacketAdapter();
+    this.packetAdapter = PacketAdapterLoader.loadPacketAdapter(plugin);
     this.taskScheduler = TaskScheduler.create(plugin);
 
     boolean localeEventExists = false;

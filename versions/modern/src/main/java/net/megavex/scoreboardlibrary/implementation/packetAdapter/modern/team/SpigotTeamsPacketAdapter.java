@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
@@ -19,8 +20,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
-  public SpigotTeamsPacketAdapter(@NotNull String teamName) {
-    super(teamName);
+  public SpigotTeamsPacketAdapter(PacketAdapterProviderImpl provider, @NotNull String teamName) {
+    super(provider, teamName);
   }
 
   @Override

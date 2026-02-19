@@ -97,6 +97,10 @@ download_file() {
 
 download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/197/artifact/target/BuildTools.jar" "9a5b059ace22eaef28fb62f96970f0abe1490f06c860229b94627cd72eaf6ea5"
 
+download_file "viaversion.jar" "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.7.1/PAPER/ViaVersion-5.7.1.jar" "0cd2dc443c75b3e4226f029d8b020a3776168da5563239cc96f1acd1ee7ea95a"
+download_file "viabackwards.jar" "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/5.7.1/PAPER/ViaBackwards-5.7.1.jar" "c2c3aab6d8ac9c132c2f3a18573602a0214af159dfc2981cb4c0d26b1f91b0c8"
+download_file "viarewind.jar" "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/4.0.14/PAPER/ViaRewind-4.0.14.jar" "b0a9a21c022605b5adbd235c3727194dfd101ba4b90934ed51a988ab7db6c0d1"
+
 # --- 1.13 ---
 download_file "1.13-paper.jar" "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar" "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"
 create_server "1.13-paper" "jdk8"
@@ -186,6 +190,10 @@ create_spigot_server "1.21.10" "jdk25"
 # --- 1.21.11 ---
 download_file "1.21.11-paper.jar" "https://fill-data.papermc.io/v1/objects/4a558a00005d33dafa4c4d5f9e47b3bd47d92311fceccd9c9754ee6b913f8649/paper-1.21.11-100.jar" "4a558a00005d33dafa4c4d5f9e47b3bd47d92311fceccd9c9754ee6b913f8649"
 create_server "1.21.11-paper" "jdk25"
+
+ln -sf $PWD/cache/viaversion.jar ./servers/1.21.11-paper/plugins/viaversion.jar
+ln -sf $PWD/cache/viabackwards.jar ./servers/1.21.11-paper/plugins/viabackwards.jar
+ln -sf $PWD/cache/viarewind.jar ./servers/1.21.11-paper/plugins/viarewind.jar
 
 create_spigot_server "1.21.11" "jdk25"
 

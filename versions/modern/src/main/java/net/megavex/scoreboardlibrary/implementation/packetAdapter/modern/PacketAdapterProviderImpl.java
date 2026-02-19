@@ -1,5 +1,8 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.PaperObjectivePacketAdapter;
@@ -10,11 +13,24 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.Mo
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
 public class PacketAdapterProviderImpl implements PacketAdapterProvider {
-  public PacketAdapterProviderImpl() {
+  private final ViaAPI<Player> via;
+
+  public PacketAdapterProviderImpl(Plugin plugin) {
+    final String via = "ViaVersion";
+    boolean isViaEnabled = plugin.getServer().getPluginManager().isPluginEnabled(via);
+    boolean isViaAllowed = plugin.getDescription().getSoftDepend().contains(via) || plugin.getDescription().getDepend().contains(via);
+    if (isViaEnabled && isViaAllowed) {
+      //noinspection unchecked
+      this.via = (ViaAPI<Player>) Via.getAPI();
+    } else {
+      this.via = null;
+    }
   }
 
   @Override
@@ -27,12 +43,27 @@ public class PacketAdapterProviderImpl implements PacketAdapterProvider {
   @Override
   public @NotNull TeamsPacketAdapter createTeamPacketAdapter(@NotNull String teamName) {
     return ModernComponentProvider.IS_NATIVE_ADVENTURE
-      ? new PaperTeamsPacketAdapterImpl(teamName)
-      : new SpigotTeamsPacketAdapter(teamName);
+      ? new PaperTeamsPacketAdapterImpl(this, teamName)
+      : new SpigotTeamsPacketAdapter(this, teamName);
   }
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
+    if (this.via != null) {
+      final ProtocolVersion ver = this.via.getPlayerProtocolVersion(player);
+      if (ver.olderThan(ProtocolVersion.v1_13)) {
+        // didn't test older versions yet
+        if (ver.newerThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+          System.out.println("[DEBUG] " + player.getName() + " is legacy player");
+          return LineRenderingStrategy.LEGACY;
+        }
+      }
+    }
+    System.out.println("[DEBUG] is modern player");
     return LineRenderingStrategy.MODERN;
+  }
+
+  public @Nullable ViaAPI<Player> via() {
+    return via;
   }
 }

@@ -17,17 +17,16 @@ import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializ
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.parseChar;
 
 public final class LegacyFormatUtil {
-  private static final Map<NamedTextColor, Character> legacyMap;
+  private static final Map<NamedTextColor, ChatColor> chatColorMap;
 
   static {
     ChatColor[] values = ChatColor.values();
-    legacyMap = CollectionProvider.map(values.length);
+    chatColorMap = CollectionProvider.map(values.length);
     for (ChatColor value : values) {
       if (!value.isColor()) continue;
 
-      char c = value.getChar();
-      LegacyFormat format = Objects.requireNonNull(parseChar(c));
-      legacyMap.put((NamedTextColor) format.color(), c);
+      LegacyFormat format = Objects.requireNonNull(parseChar(value.getChar()));
+      chatColorMap.put((NamedTextColor) format.color(), value);
     }
   }
 
@@ -63,6 +62,12 @@ public final class LegacyFormatUtil {
   public static char getChar(@Nullable NamedTextColor color) {
     if (color == null) return 'r';
 
-    return legacyMap.getOrDefault(color, '\0');
+    ChatColor chatColor = chatColorMap.getOrDefault(color, ChatColor.WHITE);
+    return chatColor.getChar();
+  }
+
+  public static int getIndex(@Nullable NamedTextColor color) {
+    ChatColor chatColor = chatColorMap.getOrDefault(color == null ? NamedTextColor.WHITE : color, ChatColor.WHITE);
+    return chatColor.ordinal();
   }
 }
