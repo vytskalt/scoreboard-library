@@ -173,11 +173,9 @@ public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
 
       if (task instanceof TeamManagerTask.Close) {
         for (ScoreboardTeamImpl team : teams.values()) {
-          Set<Player> removePlayers = CollectionProvider.set(internalPlayers.size());
           for (TeamDisplayImpl value : team.displayMap().values()) {
-            removePlayers.addAll(value.players());
+            value.packetAdapter().removeTeam(value.players());
           }
-          team.packetAdapter().removeTeam(removePlayers);
         }
 
         for (Player player : internalPlayers) {
@@ -216,16 +214,9 @@ public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
         }
       } else if (task instanceof TeamManagerTask.RemoveTeam) {
         TeamManagerTask.RemoveTeam removeTeamTask = (TeamManagerTask.RemoveTeam) task;
-        List<Player> playersInTeam = CollectionProvider.list(removeTeamTask.team().displayMap().size());
-        for (Map.Entry<Player, TeamDisplayImpl> entry : removeTeamTask.team().displayMap().entrySet()) {
-          Player player = entry.getKey();
-          TeamDisplayImpl teamDisplay = entry.getValue();
-          if (teamDisplay.players().contains(player)) {
-            playersInTeam.add(player);
-          }
+        for (TeamDisplayImpl value : removeTeamTask.team().displayMap().values()) {
+          value.packetAdapter().removeTeam(value.players());
         }
-
-        removeTeamTask.team().packetAdapter().removeTeam(playersInTeam);
       } else if (task instanceof TeamManagerTask.UpdateTeamDisplay) {
         TeamManagerTask.UpdateTeamDisplay updateTeamDisplayTask = (TeamManagerTask.UpdateTeamDisplay) task;
         @NotNull TeamDisplayImpl teamDisplay = updateTeamDisplayTask.teamDisplay();

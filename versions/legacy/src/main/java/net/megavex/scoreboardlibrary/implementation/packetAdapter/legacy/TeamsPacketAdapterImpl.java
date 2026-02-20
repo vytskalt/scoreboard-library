@@ -28,17 +28,6 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
   }
 
   @Override
-  public void removeTeam(@NotNull Iterable<Player> players) {
-    if (removePacket == null) {
-      removePacket = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
-      PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
-      PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
-    }
-
-    LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
-  }
-
-  @Override
   public @NotNull TeamDisplayPacketAdapter createTeamDisplayAdapter(@NotNull ImmutableTeamProperties<Component> properties) {
     return new AdventureTeamDisplayPacketAdapter(properties);
   }
@@ -53,6 +42,17 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
 
     public AbstractTeamDisplayPacketAdapter(@NotNull ImmutableTeamProperties<C> properties) {
       this.properties = properties;
+    }
+
+    @Override
+    public void removeTeam(@NotNull Iterable<Player> players) {
+      if (removePacket == null) {
+        removePacket = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
+        PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
+        PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
+      }
+
+      LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
     }
 
     @Override

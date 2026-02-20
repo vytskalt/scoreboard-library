@@ -157,7 +157,7 @@ public class LegacyLocaleLine implements LocaleLine, ImmutableTeamProperties<Str
     }
 
     pd.removeScore(players, player);
-    info.packetAdapter().removeTeam(players);
+    packetAdapter.removeTeam(players);
   }
 }
 

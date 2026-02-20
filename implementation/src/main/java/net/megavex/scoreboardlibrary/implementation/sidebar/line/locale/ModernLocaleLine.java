@@ -61,7 +61,7 @@ public class ModernLocaleLine implements LocaleLine, ImmutableTeamProperties<Com
   @Override
   public void hide(@NotNull Collection<Player> players) {
     handler.localeLineHandler().sidebar().packetAdapter().removeScore(players, info.player());
-    info.packetAdapter().removeTeam(players);
+    packetAdapter.removeTeam(players);
   }
 
   @Override

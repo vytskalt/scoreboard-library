@@ -35,9 +35,54 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
     this.properties = properties;
   }
 
+  // have to send every team packet from viaversion otherwise it won't work on 1.7 players
+  // because ViaRewind's 1.8->1.7 conversion cancels team packets it doesn't recognize and fucks everything up
+  // https://github.com/ViaVersion/ViaRewind/blob/e0c1f5311521bf062bbdae9f96dc9149d8c13e28/common/src/main/java/com/viaversion/viarewind/protocol/v1_8to1_7_6_10/rewriter/ScoreboardPacketRewriter1_8.java#L179
+
+  @Override
+  public void removeTeam(@NotNull Iterable<Player> players) {
+    ViaAPI<Player> via = provider.via();
+    assert via != null;
+    for (final Player player : players) {
+      final UserConnection conn = via.getConnection(player.getUniqueId());
+      if (conn == null) continue;
+
+      final ByteBuf buf = Unpooled.buffer(128);
+      Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
+      Types.STRING.write(buf, teamName);
+      Types.BYTE.writePrimitive(buf, (byte) TeamConstants.MODE_REMOVE);
+
+      via.sendRawPacket(player.getUniqueId(), buf);
+    }
+  }
+
   @Override
   public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-    ModernTeamPackets.sendEntries(provider.packetSender(), this.teamName, packetType, players, entries);
+    ViaAPI<Player> via = provider.via();
+    assert via != null;
+    for (final Player player : players) {
+      final UserConnection conn = via.getConnection(player.getUniqueId());
+      if (conn == null) continue;
+
+      final ByteBuf buf = Unpooled.buffer(128);
+      Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
+
+      Types.STRING.write(buf, teamName);
+
+      Types.BYTE.writePrimitive(buf, (byte) TeamConstants.mode(packetType));
+
+      if (conn.getProtocolInfo().protocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+        Types.SHORT.writePrimitive(buf, (short) properties.syncedEntries().size());
+      } else {
+        Types.VAR_INT.writePrimitive(buf, properties.syncedEntries().size());
+      }
+
+      for (final String entry : entries) {
+        Types.STRING.write(buf, entry);
+      }
+
+      via.sendRawPacket(player.getUniqueId(), buf);
+    }
   }
 
   @Override
@@ -46,26 +91,10 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
     assert via != null;
     for (final Player player : players) {
       final UserConnection conn = via.getConnection(player.getUniqueId());
-      if (conn == null) return;
-
-      Integer teamsPacketId = this.provider.viaTeamPacketIds().get(player);
-      if (teamsPacketId == null) {
-        for (final Protocol<?, ?, ?, ?> proto : conn.getProtocolInfo().getPipeline().pipes()) {
-          final PacketTypeMap<?> map = proto.getPacketTypesProvider().mappedClientboundPacketTypes().get(State.PLAY);
-          if (map == null) continue;
-          final PacketType type = map.typeByName("SET_PLAYER_TEAM");
-          if (type == null) continue;
-          teamsPacketId = type.getId();
-          break;
-        }
-        if (teamsPacketId == null) {
-          throw new IllegalStateException("team packet id for " + conn.getProtocolInfo().protocolVersion() + " not found");
-        }
-        this.provider.viaTeamPacketIds().put(player, teamsPacketId);
-      }
+      if (conn == null) continue;
 
       final ByteBuf buf = Unpooled.buffer(128);
-      Types.VAR_INT.writePrimitive(buf, teamsPacketId);
+      Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
 
       Types.STRING.write(buf, teamName);
 
@@ -107,5 +136,27 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
 
       via.sendRawPacket(player.getUniqueId(), buf);
     }
+  }
+
+  private @NotNull Integer teamsPacketId(final Player player, final UserConnection conn) {
+    ViaAPI<Player> via = provider.via();
+    assert via != null;
+
+    Integer teamsPacketId = this.provider.viaTeamPacketIds().get(player);
+    if (teamsPacketId != null) return teamsPacketId;
+
+    for (final Protocol<?, ?, ?, ?> proto : conn.getProtocolInfo().getPipeline().pipes()) {
+      final PacketTypeMap<?> map = proto.getPacketTypesProvider().mappedClientboundPacketTypes().get(State.PLAY);
+      if (map == null) continue;
+      final PacketType type = map.typeByName("SET_PLAYER_TEAM");
+      if (type == null) continue;
+      teamsPacketId = type.getId();
+      break;
+    }
+    if (teamsPacketId == null) {
+      throw new IllegalStateException("team packet id for " + conn.getProtocolInfo().protocolVersion() + " not found");
+    }
+    this.provider.viaTeamPacketIds().put(player, teamsPacketId);
+    return teamsPacketId;
   }
 }

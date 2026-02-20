@@ -58,11 +58,11 @@ public class PacketAdapterProviderImpl implements PacketAdapterProvider {
     if (this.via != null) {
       final ProtocolVersion ver = this.via.getPlayerProtocolVersion(player);
       if (ver.olderThan(ProtocolVersion.v1_13)) {
-        System.out.println("[DEBUG] " + player.getName() + " is legacy player");
+        //System.out.println("[DEBUG] " + player.getName() + " is legacy player");
         return LineRenderingStrategy.LEGACY;
       }
     }
-    System.out.println("[DEBUG] is modern player");
+    //System.out.println("[DEBUG] is modern player");
     return LineRenderingStrategy.MODERN;
   }
 
