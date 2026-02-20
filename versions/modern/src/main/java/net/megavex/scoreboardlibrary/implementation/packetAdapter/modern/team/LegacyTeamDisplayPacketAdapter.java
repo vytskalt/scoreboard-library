@@ -10,7 +10,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
@@ -22,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+
+import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
 public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAdapter {
   private final PacketAdapterProviderImpl provider;
@@ -70,26 +71,27 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
 
       Types.BYTE.writePrimitive(buf, (byte) TeamConstants.mode(packetType));
 
-      Types.STRING.write(buf, properties.displayName());
-      Types.STRING.write(buf, properties.prefix());
-      Types.STRING.write(buf, properties.suffix());
+      final String displayName = limitLegacyText(properties.displayName(), TeamConstants.DISPLAY_NAME_LEGACY_LIMIT);
+      final String prefix = limitLegacyText(properties.prefix(), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
+      final String suffix = limitLegacyText(properties.suffix(), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
+      Types.STRING.write(buf, displayName);
+      Types.STRING.write(buf, prefix);
+      Types.STRING.write(buf, suffix);
 
       Types.BYTE.writePrimitive(buf, (byte) properties.packOptions());
 
       final boolean is1_7 = conn.getProtocolInfo().protocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6);
-      if (is1_7) {
-        System.out.println("1.7 TODO");
-        Types.STRING.write(buf, NameTagVisibility.ALWAYS.key());
-        Types.BYTE.writePrimitive(buf, (byte) 15);
+      if (!is1_7) {
+        Types.STRING.write(buf, properties.nameTagVisibility().key());
       }
 
-      Types.STRING.write(buf, properties.nameTagVisibility().key());
       if (conn.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_9)) {
-        System.out.println("1.9 shit");
         Types.STRING.write(buf, properties.collisionRule().key());
       }
 
-      Types.BYTE.writePrimitive(buf, (byte) LegacyFormatUtil.getIndex(properties.playerColor()));
+      if (!is1_7) {
+        Types.BYTE.writePrimitive(buf, (byte) LegacyFormatUtil.getIndex(properties.playerColor()));
+      }
 
       if (packetType == PropertiesPacketType.CREATE) {
         if (is1_7) {

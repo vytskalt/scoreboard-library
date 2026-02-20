@@ -70,9 +70,9 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
         LegacyPacketSender.INSTANCE,
         players,
         locale -> {
-          String displayName = limitLegacyText(toLegacy(properties.displayName(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
-          String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
-          String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
+          String displayName = limitLegacyText(toLegacy(properties.displayName(), locale), TeamConstants.DISPLAY_NAME_LEGACY_LIMIT);
+          String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
+          String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
 
           Object packet = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
           PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
