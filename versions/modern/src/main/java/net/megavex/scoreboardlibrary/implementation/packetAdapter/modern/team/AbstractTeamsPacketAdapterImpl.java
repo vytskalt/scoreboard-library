@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -17,10 +16,9 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Objects;
 
 public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapter {
-  private final PacketAdapterProviderImpl provider;
+  protected final PacketAdapterProviderImpl provider;
   protected final String teamName;
   private Object removePacket;
 
@@ -31,7 +29,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
   @Override
   public @NotNull TeamDisplayPacketAdapter createLegacyTeamDisplayAdapter(@NotNull ImmutableTeamProperties<String> properties) {
-    return new LegacyTeamDisplayPacketAdapter(Objects.requireNonNull(provider.via()), teamName, properties);
+    return new LegacyTeamDisplayPacketAdapter(provider, teamName, properties);
   }
 
   @Override
@@ -53,7 +51,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
         PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
       }
     }
-    ModernPacketSender.INSTANCE.sendPacket(players, removePacket);
+    provider.packetSender().sendPacket(players, removePacket);
   }
 
   public abstract class TeamDisplayPacketAdapterImpl implements TeamDisplayPacketAdapter {
@@ -65,7 +63,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      ModernTeamPackets.sendEntries(teamName, packetType, players, entries);
+      ModernTeamPackets.sendEntries(provider.packetSender(), teamName, packetType, players, entries);
     }
 
     protected void fillParameters(@NotNull Object parameters, @UnknownNullability Locale locale) {

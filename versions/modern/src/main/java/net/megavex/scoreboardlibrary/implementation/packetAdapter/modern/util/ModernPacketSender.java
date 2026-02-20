@@ -1,5 +1,8 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
 
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
@@ -11,13 +14,14 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
 public final class ModernPacketSender implements PacketSender<Object> {
-  public static final ModernPacketSender INSTANCE = new ModernPacketSender();
-
   private static final MethodHandle GET_HANDLE;
   private static final MethodHandle PLAYER_CONNECTION;
   private static final MethodHandle SEND_PACKET;
 
-  private ModernPacketSender() {
+  private final ViaAPI<Player> via;
+
+  public ModernPacketSender(final ViaAPI<Player> via) {
+    this.via = via;
   }
 
   static {
@@ -46,7 +50,7 @@ public final class ModernPacketSender implements PacketSender<Object> {
         }
       }
     }
-    
+
     if (playerConnection == null) {
       throw new ExceptionInInitializerError("failed to find player connection field");
     }
@@ -74,10 +78,27 @@ public final class ModernPacketSender implements PacketSender<Object> {
 
   @Override
   public void sendPacket(Player player, Object packet) {
+    if (this.via != null) {
+      final UserConnection conn = this.via.getConnection(player.getUniqueId());
+      if (conn != null) {
+        final Channel channel = conn.getChannel();
+        if (channel != null) {
+          // Paper has some "network optimization" patch that makes the NMS sendPacket method
+          // not always send the packet immediately to the player's netty channel,
+          // and this is a problem when we send some packets using ViaVersion API because it always sends
+          // the packet to the channel immediately, so the packet order between NMS and ViaVersion API can
+          // get messed up. So for ViaVersion players we send the packet directly to the player's channel
+          // bypassing Paper logic to work around this. Fortunately ViaVersion provides easy access to the player's channel.
+          channel.eventLoop().execute(() -> channel.writeAndFlush(packet));
+          return;
+        }
+      }
+    }
+
     try {
-        Object handle = GET_HANDLE.invoke(player);
-        Object connection = PLAYER_CONNECTION.invoke(handle);
-        SEND_PACKET.invoke(connection, packet);
+      Object handle = GET_HANDLE.invoke(player);
+      Object connection = PLAYER_CONNECTION.invoke(handle);
+      SEND_PACKET.invoke(connection, packet);
     } catch (Throwable e) {
       throw new IllegalStateException("couldn't send packet to player", e);
     }

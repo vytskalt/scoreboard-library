@@ -21,7 +21,7 @@ create_server() {
   printf "Creating server \033[32m$name\033[0m on port \033[32m$port\033[0m\n"
 
   echo "eula=true" > eula.txt
-  printf "server-port=$port\ndifficulty=peaceful\ngenerate-structures=false\nlevel-type=flat\nallow-nether=false" > server.properties
+  printf "server-port=$port\ndifficulty=peaceful\ngenerate-structures=false\nlevel-type=flat\nallow-nether=false\nonline-mode=false" > server.properties
   cp "$root/bukkit.yml" .
 
   mkdir -p config
@@ -232,4 +232,8 @@ ln -sf $PWD/cache/viabackwards.jar ./servers/1.21.11-paper/plugins/viabackwards.
 ln -sf $PWD/cache/viarewind.jar ./servers/1.21.11-paper/plugins/viarewind.jar
 
 create_spigot_server "1.21.11" "jdk25"
+
+ln -sf $PWD/cache/viaversion.jar ./servers/1.21.11-spigot/plugins/viaversion.jar
+ln -sf $PWD/cache/viabackwards.jar ./servers/1.21.11-spigot/plugins/viabackwards.jar
+ln -sf $PWD/cache/viarewind.jar ./servers/1.21.11-spigot/plugins/viarewind.jar
 

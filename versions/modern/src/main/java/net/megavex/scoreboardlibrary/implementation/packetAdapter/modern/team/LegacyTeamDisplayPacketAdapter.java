@@ -14,6 +14,7 @@ import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -23,42 +24,46 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAdapter {
-  private final ViaAPI<Player> via;
+  private final PacketAdapterProviderImpl provider;
   private final String teamName;
   private final ImmutableTeamProperties<String> properties;
 
-  public LegacyTeamDisplayPacketAdapter(final ViaAPI<Player> via, final String teamName, final ImmutableTeamProperties<String> properties) {
-    this.via = via;
+  public LegacyTeamDisplayPacketAdapter(final PacketAdapterProviderImpl provider, final String teamName, final ImmutableTeamProperties<String> properties) {
+    this.provider = provider;
     this.teamName = teamName;
     this.properties = properties;
   }
 
   @Override
   public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-    ModernTeamPackets.sendEntries(this.teamName, packetType, players, entries);
+    ModernTeamPackets.sendEntries(provider.packetSender(), this.teamName, packetType, players, entries);
   }
 
   @Override
   public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
+    ViaAPI<Player> via = provider.via();
+    assert via != null;
     for (final Player player : players) {
       final UserConnection conn = via.getConnection(player.getUniqueId());
-      if (conn == null) {
-        throw new IllegalStateException("player conn doesnt exist");
-      }
-      int teamsPacketId = -1;
-      for (final Protocol<?, ?, ?, ?> proto : conn.getProtocolInfo().getPipeline().pipes()) {
-        final PacketTypeMap<?> map = proto.getPacketTypesProvider().mappedClientboundPacketTypes().get(State.PLAY);
-        if (map == null) continue;
-        final PacketType type = map.typeByName("SET_PLAYER_TEAM");
-        if (type == null) continue;
-        teamsPacketId = type.getId();
-        break;
-      }
-      if (teamsPacketId == -1) {
-        throw new IllegalStateException("team packet id for " + conn.getProtocolInfo().protocolVersion() + " not found");
+      if (conn == null) return;
+
+      Integer teamsPacketId = this.provider.viaTeamPacketIds().get(player);
+      if (teamsPacketId == null) {
+        for (final Protocol<?, ?, ?, ?> proto : conn.getProtocolInfo().getPipeline().pipes()) {
+          final PacketTypeMap<?> map = proto.getPacketTypesProvider().mappedClientboundPacketTypes().get(State.PLAY);
+          if (map == null) continue;
+          final PacketType type = map.typeByName("SET_PLAYER_TEAM");
+          if (type == null) continue;
+          teamsPacketId = type.getId();
+          break;
+        }
+        if (teamsPacketId == null) {
+          throw new IllegalStateException("team packet id for " + conn.getProtocolInfo().protocolVersion() + " not found");
+        }
+        this.provider.viaTeamPacketIds().put(player, teamsPacketId);
       }
 
-      ByteBuf buf = Unpooled.buffer(128);
+      final ByteBuf buf = Unpooled.buffer(128);
       Types.VAR_INT.writePrimitive(buf, teamsPacketId);
 
       Types.STRING.write(buf, teamName);
@@ -71,7 +76,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
 
       Types.BYTE.writePrimitive(buf, (byte) properties.packOptions());
 
-      boolean is1_7 = conn.getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_8);
+      final boolean is1_7 = conn.getProtocolInfo().protocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6);
       if (is1_7) {
         System.out.println("1.7 TODO");
         Types.STRING.write(buf, NameTagVisibility.ALWAYS.key());
@@ -79,7 +84,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
       }
 
       Types.STRING.write(buf, properties.nameTagVisibility().key());
-      if (conn.getProtocolInfo().protocolVersion().newerThan(ProtocolVersion.v1_9)) {
+      if (conn.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_9)) {
         System.out.println("1.9 shit");
         Types.STRING.write(buf, properties.collisionRule().key());
       }
@@ -98,10 +103,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
         }
       }
 
-      conn.scheduleSendRawPacket(buf);
-      if (packetType == PropertiesPacketType.CREATE) {
-        System.out.println("sent create packet");
-      }
+      via.sendRawPacket(player.getUniqueId(), buf);
     }
   }
 }

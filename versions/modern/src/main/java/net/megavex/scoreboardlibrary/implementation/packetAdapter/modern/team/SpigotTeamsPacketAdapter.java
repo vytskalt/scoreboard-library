@@ -7,7 +7,6 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPack
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -38,7 +37,7 @@ public class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
     public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
       Collection<String> entries = ImmutableList.copyOf(properties.syncedEntries());
       LocalePacketUtil.sendLocalePackets(
-        ModernPacketSender.INSTANCE,
+        provider.packetSender(),
         players,
         locale -> {
 

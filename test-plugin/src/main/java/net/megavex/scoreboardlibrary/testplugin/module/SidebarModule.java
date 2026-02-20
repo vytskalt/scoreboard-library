@@ -7,13 +7,18 @@ import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout;
 import net.megavex.scoreboardlibrary.api.sidebar.component.LineDrawable;
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
+import net.megavex.scoreboardlibrary.implementation.sidebar.PlayerDependantLocaleSidebar;
+import net.megavex.scoreboardlibrary.implementation.sidebar.SidebarTask;
 import net.megavex.scoreboardlibrary.testplugin.ScoreboardPlugin;
 import net.megavex.scoreboardlibrary.testplugin.TestTranslator;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,6 +76,15 @@ public final class SidebarModule implements Module, Listener, SidebarComponent {
   @EventHandler
   public void onQuit(final PlayerQuitEvent event) {
     sidebar.removePlayer(event.getPlayer());
+  }
+
+  @EventHandler
+  public void onSneak(PlayerToggleSneakEvent event) {
+    if (!event.isSneaking()) return;
+    for (final Player player : Bukkit.getOnlinePlayers()) {
+      player.sendMessage("Reloading you");
+      ((PlayerDependantLocaleSidebar) this.sidebar).taskQueue().add(new SidebarTask.ReloadPlayer(player));
+    }
   }
 
   @Override

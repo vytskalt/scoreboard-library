@@ -6,7 +6,6 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamP
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import org.bukkit.entity.Player;
@@ -88,10 +87,10 @@ public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl 
 
       switch (packetType) {
         case CREATE:
-          ModernPacketSender.INSTANCE.sendPacket(players, createPacket);
+          provider.packetSender().sendPacket(players, createPacket);
           break;
         case UPDATE:
-          ModernPacketSender.INSTANCE.sendPacket(players, updatePacket);
+          provider.packetSender().sendPacket(players, updatePacket);
           break;
       }
     }

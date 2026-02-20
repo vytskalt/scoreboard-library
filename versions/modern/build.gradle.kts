@@ -14,6 +14,7 @@ dependencies {
   compileOnly(libs.spigotApi)
   compileOnly("com.viaversion:viaversion-api:5.7.1")
   compileOnly("io.netty:netty-buffer:4.2.10.Final")
+  compileOnly("io.netty:netty-handler:4.2.10.Final")
   //paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }
 

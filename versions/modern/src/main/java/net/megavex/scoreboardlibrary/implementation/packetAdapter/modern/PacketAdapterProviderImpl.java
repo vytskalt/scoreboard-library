@@ -10,6 +10,7 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objecti
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.PaperTeamsPacketAdapterImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.SpigotTeamsPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
@@ -17,27 +18,32 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.WeakHashMap;
+
 @SuppressWarnings("unused")
 public class PacketAdapterProviderImpl implements PacketAdapterProvider {
   private final ViaAPI<Player> via;
+  private final ModernPacketSender packetSender;
+  private final WeakHashMap<Player, Integer> viaTeamPacketIds = new WeakHashMap<>();
 
   public PacketAdapterProviderImpl(Plugin plugin) {
-    final String via = "ViaVersion";
-    boolean isViaEnabled = plugin.getServer().getPluginManager().isPluginEnabled(via);
-    boolean isViaAllowed = plugin.getDescription().getSoftDepend().contains(via) || plugin.getDescription().getDepend().contains(via);
+    final String viaPlugin = "ViaVersion";
+    boolean isViaEnabled = plugin.getServer().getPluginManager().isPluginEnabled(viaPlugin);
+    boolean isViaAllowed = plugin.getDescription().getSoftDepend().contains(viaPlugin) || plugin.getDescription().getDepend().contains(viaPlugin);
     if (isViaEnabled && isViaAllowed) {
       //noinspection unchecked
       this.via = (ViaAPI<Player>) Via.getAPI();
     } else {
       this.via = null;
     }
+    this.packetSender = new ModernPacketSender(this.via);
   }
 
   @Override
   public @NotNull ObjectivePacketAdapter createObjectiveAdapter(@NotNull String objectiveName) {
     return ModernComponentProvider.IS_NATIVE_ADVENTURE
-      ? new PaperObjectivePacketAdapter(objectiveName)
-      : new SpigotObjectivePacketAdapter(objectiveName);
+      ? new PaperObjectivePacketAdapter(this, objectiveName)
+      : new SpigotObjectivePacketAdapter(this, objectiveName);
   }
 
   @Override
@@ -65,5 +71,13 @@ public class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   public @Nullable ViaAPI<Player> via() {
     return via;
+  }
+
+  public @NotNull ModernPacketSender packetSender() {
+    return packetSender;
+  }
+
+  public @NotNull WeakHashMap<Player, Integer> viaTeamPacketIds() {
+    return viaTeamPacketIds;
   }
 }
