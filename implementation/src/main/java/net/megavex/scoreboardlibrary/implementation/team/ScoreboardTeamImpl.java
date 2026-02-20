@@ -97,7 +97,7 @@ public class ScoreboardTeamImpl implements ScoreboardTeam {
   public void removePlayer(@NotNull Player player) {
     TeamDisplayImpl teamDisplay = Objects.requireNonNull(displayMap.remove(player));
     if (teamDisplay.players().remove(player)) {
-      packetAdapter.removeTeam(Collections.singleton(player));
+      teamDisplay.packetAdapter().removeTeam(Collections.singleton(player));
     }
   }
 

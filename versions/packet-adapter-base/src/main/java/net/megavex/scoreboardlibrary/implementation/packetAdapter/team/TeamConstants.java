@@ -4,7 +4,8 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPack
 import org.jetbrains.annotations.NotNull;
 
 public final class TeamConstants {
-  public static final int LEGACY_CHAR_LIMIT = 16;
+  public static final int DISPLAY_NAME_LEGACY_LIMIT = 32;
+  public static final int PREFIX_SUFFIX_LEGACY_LIMIT = 16;
 
   public static final int MODE_CREATE = 0,
     MODE_REMOVE = 1,

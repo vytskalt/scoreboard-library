@@ -3,11 +3,18 @@ plugins {
   //id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
+repositories {
+  maven("https://repo.viaversion.com")
+}
+
 dependencies {
   compileOnly(project(":scoreboard-library-packet-adapter-base")) {
     //exclude(group = "org.spigotmc", module = "spigot-api")
   }
   compileOnly(libs.spigotApi)
+  compileOnly("com.viaversion:viaversion-api:5.7.1")
+  compileOnly("io.netty:netty-buffer:4.2.10.Final")
+  compileOnly("io.netty:netty-handler:4.2.10.Final")
   //paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
 }
 

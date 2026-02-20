@@ -28,17 +28,6 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
   }
 
   @Override
-  public void removeTeam(@NotNull Iterable<Player> players) {
-    if (removePacket == null) {
-      removePacket = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
-      PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
-      PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
-    }
-
-    LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
-  }
-
-  @Override
   public @NotNull TeamDisplayPacketAdapter createTeamDisplayAdapter(@NotNull ImmutableTeamProperties<Component> properties) {
     return new AdventureTeamDisplayPacketAdapter(properties);
   }
@@ -56,6 +45,17 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
     }
 
     @Override
+    public void removeTeam(@NotNull Iterable<Player> players) {
+      if (removePacket == null) {
+        removePacket = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
+        PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
+        PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
+      }
+
+      LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
+    }
+
+    @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
       Object packet = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
       PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
@@ -70,9 +70,9 @@ public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
         LegacyPacketSender.INSTANCE,
         players,
         locale -> {
-          String displayName = limitLegacyText(toLegacy(properties.displayName(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
-          String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
-          String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.LEGACY_CHAR_LIMIT);
+          String displayName = limitLegacyText(toLegacy(properties.displayName(), locale), TeamConstants.DISPLAY_NAME_LEGACY_LIMIT);
+          String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
+          String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
 
           Object packet = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
           PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);

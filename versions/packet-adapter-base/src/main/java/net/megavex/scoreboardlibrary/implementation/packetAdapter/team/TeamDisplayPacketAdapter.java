@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public interface TeamDisplayPacketAdapter {
+  void removeTeam(@NotNull Iterable<Player> players);
+
   default void updateTeamPackets() {
   }
 

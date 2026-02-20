@@ -21,7 +21,7 @@ create_server() {
   printf "Creating server \033[32m$name\033[0m on port \033[32m$port\033[0m\n"
 
   echo "eula=true" > eula.txt
-  printf "server-port=$port\ndifficulty=peaceful\ngenerate-structures=false\nlevel-type=flat\nallow-nether=false" > server.properties
+  printf "server-port=$port\ndifficulty=peaceful\ngenerate-structures=false\nlevel-type=flat\nallow-nether=false\nonline-mode=false" > server.properties
   cp "$root/bukkit.yml" .
 
   mkdir -p config
@@ -29,6 +29,10 @@ create_server() {
 
   ln -sf "$plugin_path" plugins/test.jar
   ln -sf "$jar_path" server.jar
+
+  ln -sf $root/cache/viaversion.jar plugins/viaversion.jar
+  ln -sf $root/cache/viabackwards.jar plugins/viabackwards.jar
+  ln -sf $root/cache/viarewind.jar plugins/viarewind.jar
 
   local flags="-DPaper.IgnoreJavaVersion=true -Xms512M -Xmx1024M -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20"
 
@@ -96,6 +100,10 @@ download_file() {
 }
 
 download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/197/artifact/target/BuildTools.jar" "9a5b059ace22eaef28fb62f96970f0abe1490f06c860229b94627cd72eaf6ea5"
+
+download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion/1328/artifact/build/libs/ViaVersion-5.7.2-SNAPSHOT.jar" "ddb25eb56ddf1f89388ba654f6da09ba4162f55c291f9b5c2249ef1e8330b260"
+download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards/707/artifact/build/libs/ViaBackwards-5.7.2-SNAPSHOT.jar" "f59125c704bc3b2b7d0acd2946b2c35024cce2517a3bbb0b38b439c75d65edb0"
+download_file "viarewind.jar" "https://ci.viaversion.com/view/ViaRewind/job/ViaRewind/209/artifact/build/libs/ViaRewind-4.0.15-SNAPSHOT.jar" "dd8b0db2e5469a7d8d9754b9a42bb8b81681bbe8805ddd733f2c4931dd86cbab"
 
 # --- 1.7.10 ---
 download_file "1.7.10-paper.jar" "https://fill-data.papermc.io/v1/objects/33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185/paper-1.7.10-2025.jar" "33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185"

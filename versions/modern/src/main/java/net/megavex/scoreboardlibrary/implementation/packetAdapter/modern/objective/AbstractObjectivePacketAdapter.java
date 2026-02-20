@@ -4,7 +4,7 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveDisplaySlot;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectiveConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import org.bukkit.entity.Player;
@@ -16,10 +16,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketAdapter {
+  protected final PacketAdapterProviderImpl provider;
   protected final String objectiveName;
   private Object removePacket;
 
-  public AbstractObjectivePacketAdapter(@NotNull String objectiveName) {
+  public AbstractObjectivePacketAdapter(@NotNull PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
+    this.provider = provider;
     this.objectiveName = objectiveName;
   }
 
@@ -30,7 +32,7 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
 
   @Override
   public void display(@NotNull Collection<Player> players, @NotNull ObjectiveDisplaySlot slot) {
-    ModernPacketSender.INSTANCE.sendPacket(players, createDisplayPacket(slot));
+    provider.packetSender().sendPacket(players, createDisplayPacket(slot));
   }
 
   @Override
@@ -40,7 +42,7 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
       PacketAccessors.OBJECTIVE_NAME_FIELD.set(removePacket, objectiveName);
       PacketAccessors.OBJECTIVE_MODE_FIELD.set(removePacket, ObjectiveConstants.MODE_REMOVE);
     }
-    ModernPacketSender.INSTANCE.sendPacket(players, removePacket);
+    provider.packetSender().sendPacket(players, removePacket);
   }
 
   @Override
@@ -53,7 +55,7 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
       packet = Objects.requireNonNull(PacketAccessors.SCORE_CONSTRUCTOR)
         .invoke(PacketAccessors.SCORE_1_20_2_METHOD_REMOVE, objectiveName, entry, 0);
     }
-    ModernPacketSender.INSTANCE.sendPacket(players, packet);
+    provider.packetSender().sendPacket(players, packet);
   }
 
   protected @NotNull Object createDisplayPacket(@NotNull ObjectiveDisplaySlot displaySlot) {
