@@ -22,6 +22,6 @@ dependencies {
 }
 
 tasks.shadowJar {
-  relocate("com.google.gson", "net.megavex.scoreboardlibrary.testplugin.lib.gson")
-  relocate("net.kyori", "net.megavex.scoreboardlibrary.testplugin.lib.kyori")
+//  relocate("com.google.gson", "net.megavex.scoreboardlibrary.testplugin.lib.gson")
+//  relocate("net.kyori", "net.megavex.scoreboardlibrary.testplugin.lib.kyori")
 }

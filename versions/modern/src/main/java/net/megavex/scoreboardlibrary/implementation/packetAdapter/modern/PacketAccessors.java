@@ -1,6 +1,5 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
 
-import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.enums.CollisionRule;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public final class PacketAccessors {
@@ -76,35 +74,6 @@ public final class PacketAccessors {
     } catch (ClassNotFoundException ignored) {
     }
     IS_1_21_6_OR_ABOVE = is1_21_6OrAbove;
-  }
-
-  public static final String GSON_PKG = "com.go".concat("ogle.gson");
-  public static final boolean IS_GSON_RELOCATED;
-  public static final Object JSON_PARSER;
-  public static final MethodAccessor PARSE_STRING_METHOD;
-
-  static {
-    IS_GSON_RELOCATED = !JsonElement.class.getName().equals(GSON_PKG + ".JsonElement");
-
-    try {
-      Class<?> jsonElementClass = Class.forName(GSON_PKG + ".JsonElement");
-      Class<?> jsonParserClass = Class.forName(GSON_PKG + ".JsonParser");
-      JSON_PARSER = jsonParserClass.getConstructors()[0].newInstance();
-      MethodAccessor parseStringMethod = ReflectUtil.findOptionalMethod(jsonParserClass, false, MethodType.methodType(jsonElementClass, String.class), "parse");
-      if (parseStringMethod == null) {
-        parseStringMethod = ReflectUtil.findMethod(jsonParserClass, true, MethodType.methodType(jsonElementClass, String.class), "parse");
-        //new JsonParser().parse("{}");
-        //System.out.println("found via method 1");
-      } else {
-        //System.out.println("found via method 2");
-      }
-      PARSE_STRING_METHOD = parseStringMethod;
-      //System.out.println(JSON_PARSER);
-    } catch (ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-    //(new JsonParser()).parse("");
-    //System.out.println("GSON RELOCATED = " + IS_GSON_RELOCATED);
   }
 
   public static final Class<?> PKT_CLASS,
@@ -215,10 +184,11 @@ public final class PacketAccessors {
     Object[] chatFormattings = CHAT_FORMATTING_CLASS.getEnumConstants();
     FieldAccessor<Object, Object> charField = ReflectUtil.findFieldUnchecked(CHAT_FORMATTING_CLASS, 0, char.class);
 
-    outer: for (NamedTextColor color : NamedTextColor.NAMES.values()) {
+    outer:
+    for (NamedTextColor color : NamedTextColor.NAMES.values()) {
       char c = LegacyFormatUtil.getChar(color);
       for (Object chatFormatting : chatFormattings) {
-        if (c == (char)charField.get(chatFormatting)) {
+        if (c == (char) charField.get(chatFormatting)) {
           NMS_CHAT_FORMATTING_MAP.put(color, chatFormatting);
           continue outer;
         }

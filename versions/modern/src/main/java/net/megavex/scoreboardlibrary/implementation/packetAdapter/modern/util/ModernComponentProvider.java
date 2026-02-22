@@ -3,6 +3,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +62,7 @@ public final class ModernComponentProvider {
       for (Method method : PacketAccessors.CHAT_SERIALIZER_CLASS.getMethods()) {
         if (method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&
-          method.getParameterTypes()[0].getName().equals(PacketAccessors.GSON_PKG + ".JsonElement")
+          method.getParameterTypes()[0].getName().equals(RelocatedGson.SERVER_GSON_PKG + ".JsonElement")
         ) {
           try {
             handle = MethodHandles.lookup().unreflect(method);
@@ -90,13 +91,8 @@ public final class ModernComponentProvider {
     if (locale != null) {
       translated = GlobalTranslator.render(adventure, locale);
     }
-    Object json = gson().serializeToTree(translated);
 
-    if (PacketAccessors.IS_GSON_RELOCATED) {
-      //System.out.println("working around " + json.getClass().getName());
-      json = PacketAccessors.PARSE_STRING_METHOD.invoke(PacketAccessors.JSON_PARSER, json.toString());
-      //System.out.println("worked around " + json.getClass().getName());
-    }
+    Object json = RelocatedGson.convertToServerGson(gson().serializeToTree(translated));
 
     if (FROM_JSON_METHOD == null) {
       // 1.21.6+

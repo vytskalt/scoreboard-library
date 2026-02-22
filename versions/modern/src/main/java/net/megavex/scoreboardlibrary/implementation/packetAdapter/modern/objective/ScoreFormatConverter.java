@@ -2,6 +2,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.object
 
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
@@ -49,13 +50,7 @@ public final class ScoreFormatConverter {
     if (format == ScoreFormat.blank()) {
       return BLANK;
     } else if (format instanceof ScoreFormat.Styled) {
-      Object json = gson().serializer().toJsonTree(((ScoreFormat.Styled) format).style());
-      if (PacketAccessors.IS_GSON_RELOCATED) {
-        //System.out.println("working around 2 " + json.getClass().getName());
-        json = PacketAccessors.PARSE_STRING_METHOD.invoke(PacketAccessors.JSON_PARSER, json.toString());
-        //System.out.println("worked around 2 " + json.getClass().getName());
-      }
-
+      Object json = RelocatedGson.convertToServerGson(gson().serializer().toJsonTree(((ScoreFormat.Styled) format).style()));
       Object result = PacketAccessors.CODEC_PARSE.invoke(STYLE_CODEC, PacketAccessors.JSON_OPS, json);
       //noinspection OptionalGetWithoutIsPresent
       Object style = ((Optional<?>) PacketAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
