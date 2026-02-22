@@ -15,6 +15,13 @@ dependencies {
 
   // bundled adventure:
   implementation(libs.adventureApi)
-  implementation(libs.adventureTextSerializerGson)
+  implementation(libs.adventureTextSerializerGson) {
+    //exclude("com.google.code.gson")
+  }
   implementation(libs.adventureTextSerializerLegacy)
+}
+
+tasks.shadowJar {
+  relocate("com.google.gson", "net.megavex.scoreboardlibrary.testplugin.lib.gson")
+  relocate("net.kyori", "net.megavex.scoreboardlibrary.testplugin.lib.kyori")
 }
