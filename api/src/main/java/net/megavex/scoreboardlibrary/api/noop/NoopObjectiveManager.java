@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 class NoopObjectiveManager implements ObjectiveManager {
   private final Map<String, ScoreboardObjective> objectives = new HashMap<>();
@@ -40,6 +41,12 @@ class NoopObjectiveManager implements ObjectiveManager {
   @Override
   public boolean removePlayer(@NotNull Player player) {
     return players.remove(player);
+  }
+
+  @Override
+  public CompletableFuture<Void> removePlayerFuture(@NotNull Player player) {
+    players.remove(player);
+    return CompletableFuture.completedFuture(null);
   }
 
   @Override

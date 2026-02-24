@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a group of {@link ScoreboardObjective}s.
@@ -84,6 +85,14 @@ public interface ObjectiveManager {
       removePlayer(player);
     }
   }
+
+  /**
+   * Removes a viewer from this ObjectiveManager.
+   *
+   * @param player viewer to remove
+   * @return future that will be completed once all removal packets have been sent in an async task
+   */
+  CompletableFuture<Void> removePlayerFuture(@NotNull Player player);
 
   /**
    * Closes this ObjectiveManager.

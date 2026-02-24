@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -104,7 +105,7 @@ public interface TeamManager {
    * The TeamManager will internally be added to a queue for this player who
    * will start seeing it once they are removed from all previous TeamManagers.
    *
-   * @param player player to add
+   * @param player              player to add
    * @param teamDisplayFunction a function that provides the team display to set for each team
    * @return whether the player was added
    */
@@ -151,6 +152,14 @@ public interface TeamManager {
       removePlayer(player);
     }
   }
+
+  /**
+   * Removes a viewer from this TeamManager.
+   *
+   * @param player viewer to remove
+   * @return future that will be completed once all removal packets have been sent in an async task
+   */
+  CompletableFuture<Void> removePlayerFuture(@NotNull Player player);
 
   // Close
 

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiFunction;
@@ -144,9 +145,24 @@ public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
       return false;
     }
 
-    TeamManagerTask.RemovePlayer task = new TeamManagerTask.RemovePlayer(player);
+    TeamManagerTask.RemovePlayer task = new TeamManagerTask.RemovePlayer(player, null);
     taskQueue.add(task);
     return true;
+  }
+
+  @Override
+  public CompletableFuture<Void> removePlayerFuture(@NotNull Player player) {
+    Preconditions.checkNotNull(player);
+    checkClosed();
+
+    if (!players.remove(player)) {
+      return CompletableFuture.completedFuture(null);
+    }
+
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    TeamManagerTask.RemovePlayer task = new TeamManagerTask.RemovePlayer(player, future);
+    taskQueue.add(task);
+    return future;
   }
 
   public @NotNull ScoreboardLibraryImpl scoreboardLibrary() {
@@ -195,6 +211,9 @@ public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
 
         internalPlayers.remove(removePlayerTask.player());
         Objects.requireNonNull(scoreboardLibrary.getPlayer(removePlayerTask.player())).teamManagerQueue().remove(this);
+        if (removePlayerTask.future() != null) {
+          removePlayerTask.future().complete(null);
+        }
       } else if (task instanceof TeamManagerTask.ReloadPlayer) {
         TeamManagerTask.ReloadPlayer reloadPlayerTask = (TeamManagerTask.ReloadPlayer) task;
         for (ScoreboardTeamImpl team : teams.values()) {

@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ObjectiveManagerTask {
   private ObjectiveManagerTask() {
   }
@@ -31,13 +33,19 @@ public class ObjectiveManagerTask {
 
   public static final class RemovePlayer extends ObjectiveManagerTask {
     private final Player player;
+    private final CompletableFuture<Void> future;
 
-    public RemovePlayer(@NotNull Player player) {
+    public RemovePlayer(@NotNull Player player, @Nullable CompletableFuture<Void> future) {
       this.player = player;
+      this.future = future;
     }
 
     public @NotNull Player player() {
       return player;
+    }
+
+    public @Nullable CompletableFuture<Void> future() {
+      return future;
     }
   }
 

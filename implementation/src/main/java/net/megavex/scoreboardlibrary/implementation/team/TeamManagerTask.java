@@ -2,8 +2,10 @@ package net.megavex.scoreboardlibrary.implementation.team;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 public class TeamManagerTask {
   private TeamManagerTask() {
@@ -30,13 +32,19 @@ public class TeamManagerTask {
 
   public static final class RemovePlayer extends TeamManagerTask {
     private final Player player;
+    private final CompletableFuture<Void> future;
 
-    public RemovePlayer(@NotNull Player player) {
+    public RemovePlayer(@NotNull Player player, @Nullable CompletableFuture<Void> future) {
       this.player = player;
+      this.future = future;
     }
 
     public @NotNull Player player() {
       return player;
+    }
+
+    public @Nullable CompletableFuture<Void> future() {
+      return future;
     }
   }
 

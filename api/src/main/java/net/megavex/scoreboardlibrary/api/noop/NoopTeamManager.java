@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -49,6 +50,12 @@ class NoopTeamManager implements TeamManager {
   }
 
   @Override
+  public CompletableFuture<Void> removePlayerFuture(@NotNull Player player) {
+    this.removePlayer(player);
+    return CompletableFuture.completedFuture(null);
+  }
+
+  @Override
   public @NotNull Collection<ScoreboardTeam> teams() {
     return closed ? Collections.emptySet() : Collections.unmodifiableCollection(teams.values());
   }
@@ -80,6 +87,7 @@ class NoopTeamManager implements TeamManager {
       validateTeamDisplay(team, teamDisplay);
       team.displayMap().put(player, teamDisplay);
     }
+    teams.put(name, team);
 
     return team;
   }
