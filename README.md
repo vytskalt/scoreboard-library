@@ -13,17 +13,19 @@ Join the [Discord](https://discord.gg/v7nmTDTW8W) or create an issue for support
   players
 - Objectives.
 - Full support for new 1.20.4 features (score display names, custom score formats)
-- Doesn't require extra dependencies (assuming you're targeting modern versions of Paper)
+- No extra dependencies (assuming you're targeting modern versions of Paper)
 - Packet-level, meaning it works with other scoreboard plugins
 - Supports [Folia](https://github.com/PaperMC/Folia)
 - Fully async. All packet work is done asynchronously, so you can use the library from the main
   thread without sacrificing any performance
 - Automatically works with `TranslatableComponent`s. All components are translated using `GlobalTranslator` for
   each player's client locale and automatically update whenever the player changes it in their settings
+- ViaVersion awareness: automatically detects 1.12.2- on 1.13+ servers connected through ViaVersion and sends them
+  the optimal packets to maximise sidebar line lengths
 
 ## Supported server versions
 
-All Paper and Spigot versions from 1.7.10 to 1.21.11 are now natively supported.
+All Paper and Spigot versions from 1.7.10 to 1.21.11 are natively supported.
 
 ## Installation
 

@@ -55,3 +55,14 @@ like [Shadow](https://gradleup.com/shadow/).
 ```
 
 You will need to shade these dependencies and relocate them with [maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/).
+
+## ViaVersion awareness
+
+For [ViaVersion awareness](https://github.com/vytskalt/scoreboard-library?tab=readme-ov-file#features) to be enabled, make sure to add `ViaVersion`
+to `softdepend` or `depend` of your `plugin.yml`:
+
+```yaml
+softdepend: ["ViaVersion"]
+# or
+depend: ["ViaVersion"]
+```
