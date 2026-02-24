@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -108,8 +109,21 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
       return false;
     }
 
-    taskQueue.add(new ObjectiveManagerTask.RemovePlayer(player));
+    taskQueue.add(new ObjectiveManagerTask.RemovePlayer(player, null));
     return true;
+  }
+
+  @Override
+  public CompletableFuture<Void> removePlayerFuture(@NotNull Player player) {
+    Preconditions.checkNotNull(player);
+    checkClosed();
+    if (!players.remove(player)) {
+      return CompletableFuture.completedFuture(null);
+    }
+
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    taskQueue.add(new ObjectiveManagerTask.RemovePlayer(player, future));
+    return future;
   }
 
   @Override
@@ -146,14 +160,17 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
         @NotNull ScoreboardLibraryPlayer slPlayer = library.getOrCreatePlayer(player);
         slPlayer.objectiveManagerQueue().add(this);
       } else if (task instanceof ObjectiveManagerTask.RemovePlayer) {
-        Player player = ((ObjectiveManagerTask.RemovePlayer) task).player();
-        Collection<Player> singleton = Collections.singleton(player);
+        ObjectiveManagerTask.RemovePlayer removePlayerTask = (ObjectiveManagerTask.RemovePlayer) task;
+        Collection<Player> singleton = Collections.singleton(removePlayerTask.player());
         for (ScoreboardObjectiveImpl objective : objectives.values()) {
           objective.packetAdapter().remove(singleton);
         }
 
-        displayingPlayers.remove(player);
-        Objects.requireNonNull(library.getPlayer(player)).objectiveManagerQueue().remove(this);
+        displayingPlayers.remove(removePlayerTask.player());
+        Objects.requireNonNull(library.getPlayer(removePlayerTask.player())).objectiveManagerQueue().remove(this);
+        if (removePlayerTask.future() != null) {
+          removePlayerTask.future().complete(null);
+        }
       } else if (task instanceof ObjectiveManagerTask.ReloadPlayer) {
         Player player = ((ObjectiveManagerTask.ReloadPlayer) task).player();
         Collection<Player> singleton = Collections.singleton(player);
