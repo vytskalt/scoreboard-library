@@ -69,9 +69,12 @@ public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Com
 
   @Override
   public boolean addEntries(@NotNull Collection<String> entries) {
-    if (!new HashSet<>(this.entries).containsAll(entries)) {
-      this.entries.addAll(entries);
-      team.teamManager().taskQueue().add(new TeamManagerTask.AddEntries(this, entries));
+    Set<String> existing = new HashSet<>(this.entries);
+    List<String> toAdd = new ArrayList<>(entries);
+    toAdd.removeIf(existing::contains);
+    if (!toAdd.isEmpty()) {
+      this.entries.addAll(toAdd);
+      team.teamManager().taskQueue().add(new TeamManagerTask.AddEntries(this, toAdd));
       return true;
     }
 
@@ -90,8 +93,11 @@ public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Com
 
   @Override
   public boolean removeEntries(@NotNull Collection<String> entries) {
-    if (this.entries.removeAll(entries)) {
-      team.teamManager().taskQueue().add(new TeamManagerTask.RemoveEntries(this, entries));
+    List<String> toRemove = new ArrayList<>(entries);
+    toRemove.retainAll(this.entries);
+    if (!toRemove.isEmpty()) {
+      this.entries.removeAll(toRemove);
+      team.teamManager().taskQueue().add(new TeamManagerTask.RemoveEntries(this, toRemove));
       return true;
     }
 
