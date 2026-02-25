@@ -43,6 +43,15 @@ public interface TeamDisplay {
   boolean addEntry(@NotNull String entry);
 
   /**
+   * Adds multiple entries.
+   *
+   * @param entries entries to add
+   * @return whether any entry was added
+   * @see #entries
+   */
+  boolean addEntries(@NotNull Collection<String> entries);
+
+  /**
    * Removes an entry.
    *
    * @param entry entry to remove
@@ -50,6 +59,15 @@ public interface TeamDisplay {
    * @see #entries
    */
   boolean removeEntry(@NotNull String entry);
+
+  /**
+   * Removes multiple entries.
+   *
+   * @param entries entries to remove
+   * @return whether any entry was removed
+   * @see #entries
+   */
+  boolean removeEntries(@NotNull Collection<String> entries);
 
   // Properties
 

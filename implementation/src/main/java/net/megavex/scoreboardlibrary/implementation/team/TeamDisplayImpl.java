@@ -68,9 +68,36 @@ public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Com
   }
 
   @Override
+  public boolean addEntries(@NotNull Collection<String> entries) {
+    Set<String> existing = new HashSet<>(this.entries);
+    List<String> toAdd = new ArrayList<>(entries);
+    toAdd.removeIf(existing::contains);
+    if (!toAdd.isEmpty()) {
+      this.entries.addAll(toAdd);
+      team.teamManager().taskQueue().add(new TeamManagerTask.AddEntries(this, toAdd));
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
   public boolean removeEntry(@NotNull String entry) {
     if (entries.remove(entry)) {
       team.teamManager().taskQueue().add(new TeamManagerTask.RemoveEntries(this, Collections.singleton(entry)));
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean removeEntries(@NotNull Collection<String> entries) {
+    List<String> toRemove = new ArrayList<>(entries);
+    toRemove.retainAll(this.entries);
+    if (!toRemove.isEmpty()) {
+      this.entries.removeAll(toRemove);
+      team.teamManager().taskQueue().add(new TeamManagerTask.RemoveEntries(this, toRemove));
       return true;
     }
 

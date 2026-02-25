@@ -49,8 +49,18 @@ class NoopTeamDisplay implements TeamDisplay {
   }
 
   @Override
+  public boolean addEntries(@NotNull final Collection<String> entries) {
+    return this.entries.addAll(entries);
+  }
+
+  @Override
   public boolean removeEntry(@NotNull String entry) {
     return entries.remove(entry);
+  }
+
+  @Override
+  public boolean removeEntries(@NotNull final Collection<String> entries) {
+    return this.entries.removeAll(entries);
   }
 
   @Override
