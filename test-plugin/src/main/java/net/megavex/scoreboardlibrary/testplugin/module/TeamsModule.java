@@ -16,9 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.format.NamedTextColor.AQUA;
@@ -74,14 +72,16 @@ public final class TeamsModule implements Module, Listener {
     this.team.defaultDisplay().addEntry(player.getName());
     this.manager.addPlayer(player);
     this.team.defaultDisplay().removeEntry(player.getName());
-    this.team.defaultDisplay().addEntry(player.getName());
+    this.team.defaultDisplay().addEntries(Collections.singletonList(player.getName()));
   }
 
   @EventHandler
   public void onQuit(final PlayerQuitEvent event) {
     final Player player = event.getPlayer();
-    this.manager.removePlayer(player);
-    this.team.defaultDisplay().removeEntry(player.getName());
+    this.manager.removePlayerFuture(player).whenComplete((v, t) -> {
+      this.plugin.getLogger().info("Removed player from team " + this.plugin.getServer().isPrimaryThread());
+    });
+    this.team.defaultDisplay().removeEntries(Collections.singletonList(player.getName()));
   }
 
   private NamedTextColor randomNamedColor() {

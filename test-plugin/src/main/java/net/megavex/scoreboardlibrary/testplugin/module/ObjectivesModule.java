@@ -53,7 +53,9 @@ public final class ObjectivesModule implements Module, Listener {
   @EventHandler
   public void onQuit(final PlayerQuitEvent event) {
     final Player player = event.getPlayer();
-    this.manager.removePlayer(player);
+    this.manager.removePlayerFuture(player).whenComplete((v, t) -> {
+      this.plugin.getLogger().info("Removed player from objective " + this.plugin.getServer().isPrimaryThread());
+    });
     this.objective.removeScore(player.getName());
   }
 }

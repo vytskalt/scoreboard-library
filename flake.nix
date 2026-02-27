@@ -15,7 +15,9 @@
           inherit system;
         }));
   in {
-    devShells = forAllSystems (pkgs: {
+    devShells = forAllSystems (pkgs: rec {
+      default = jdk25;
+
       jdk25 = pkgs.mkShellNoCC {
         buildInputs = with pkgs; [
           jdk25_headless

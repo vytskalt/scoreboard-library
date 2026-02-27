@@ -78,6 +78,7 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
     player.setGameMode(GameMode.CREATIVE);
     player.sendMessage("Server software: " + this.getServer().getName());
     player.sendMessage("Server version: " + this.getServer().getVersion());
+    player.sendMessage("ViaVersion enabled: " + this.getServer().getPluginManager().isPluginEnabled("ViaVersion"));
 
     boolean isNativeAdventure = false;
     try {

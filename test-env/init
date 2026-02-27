@@ -6,6 +6,7 @@ port_cursor=25570
 create_server() {
   local name=$1
   local nixshell=$2
+  local enable_via=$3
 
   local root=$(pwd)
 
@@ -30,9 +31,11 @@ create_server() {
   ln -sf "$plugin_path" plugins/test.jar
   ln -sf "$jar_path" server.jar
 
-  ln -sf $root/cache/viaversion.jar plugins/viaversion.jar
-  ln -sf $root/cache/viabackwards.jar plugins/viabackwards.jar
-  ln -sf $root/cache/viarewind.jar plugins/viarewind.jar
+  if [ "$enable_via" = "true" ]; then
+    ln -sf $root/cache/viaversion.jar plugins/viaversion.jar
+    ln -sf $root/cache/viabackwards.jar plugins/viabackwards.jar
+    ln -sf $root/cache/viarewind.jar plugins/viarewind.jar
+  fi
 
   local flags="-DPaper.IgnoreJavaVersion=true -Xms512M -Xmx1024M -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20"
 
@@ -86,13 +89,13 @@ download_file() {
   local path="cache/$name"
   mkdir -p cache
 
-  if [ ! -f "$path" ]; then
+  if [ ! -f "$path" ] || [ "$(sha256sum "$path" | cut -f 1 -d ' ')" != "$expected_sha256_hash" ]; then
     echo "Downloading $name..."
     curl --silent --location --output "$path" "$url"
   fi
 
-  local actual_hash=$(sha256sum "$path" | cut -f 1 -d ' ')
-  if [ "$expected_sha256_hash" != "$actual_hash" ]; then
+  local actual_hash="$(sha256sum "$path" | cut -f 1 -d ' ')"
+  if [ "$actual_hash" != "$expected_sha256_hash" ]; then
     echo "ERROR: hashes for $name do not match! expected: $expected_sha256_hash, but got $actual_hash"
     rm "$path"
     exit 1
@@ -101,9 +104,9 @@ download_file() {
 
 download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/197/artifact/target/BuildTools.jar" "9a5b059ace22eaef28fb62f96970f0abe1490f06c860229b94627cd72eaf6ea5"
 
-download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion/1328/artifact/build/libs/ViaVersion-5.7.2-SNAPSHOT.jar" "ddb25eb56ddf1f89388ba654f6da09ba4162f55c291f9b5c2249ef1e8330b260"
-download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards/707/artifact/build/libs/ViaBackwards-5.7.2-SNAPSHOT.jar" "f59125c704bc3b2b7d0acd2946b2c35024cce2517a3bbb0b38b439c75d65edb0"
-download_file "viarewind.jar" "https://ci.viaversion.com/view/ViaRewind/job/ViaRewind/209/artifact/build/libs/ViaRewind-4.0.15-SNAPSHOT.jar" "dd8b0db2e5469a7d8d9754b9a42bb8b81681bbe8805ddd733f2c4931dd86cbab"
+download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion-Java8/38/artifact/build/libs/ViaVersion-5.7.1-downgraded.jar" "dcce3d30e195de9a3372616298bac1acd29196e5c3676a0fba745be9e3d91808"
+download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards-Java8/31/artifact/build/libs/ViaBackwards-5.7.1-downgraded.jar" "9727fd246d3566bffc3f71e1bda0e6db71bf5814a254e7ab5a2941ca0e94ecd6"
+download_file "viarewind.jar" "https://ci.viaversion.com/view/ViaRewind/job/ViaRewind-Java8/28/artifact/build/libs/ViaRewind-4.0.14-downgraded.jar" "e84c7afa696b898a99747edba2458dd9e9f5d7c1ee2f604c409964dd4d4d784d"
 
 # --- 1.7.10 ---
 download_file "1.7.10-paper.jar" "https://fill-data.papermc.io/v1/objects/33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185/paper-1.7.10-2025.jar" "33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185"
@@ -143,7 +146,7 @@ create_spigot_server "1.12.2" "jdk8"
 
 # --- 1.13 ---
 download_file "1.13-paper.jar" "https://fill-data.papermc.io/v1/objects/00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129/paper-1.13-173.jar" "00db82d214242c9345266d44ff8d11a8e857a1a02edf7cb5fcc2d1d973283129"
-create_server "1.13-paper" "jdk8"
+create_server "1.13-paper" "jdk8" "true"
 
 create_spigot_server "1.13" "jdk8"
 
@@ -151,11 +154,11 @@ create_spigot_server "1.13" "jdk8"
 download_file "1.14.4-paper.jar" "https://fill-data.papermc.io/v1/objects/bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8/paper-1.14.4-245.jar" "bd8ec5cdb22370d37816a6de26798df3d2b0d6f9c7c96c88ca45a1303fea50e8"
 create_server "1.14.4-paper" "jdk8"
 
-create_spigot_server "1.14.4" "jdk8"
+create_spigot_server "1.14.4" "jdk8" "true"
 
 # --- 1.15.2 ---
 download_file "1.15.2-paper.jar" "https://fill-data.papermc.io/v1/objects/bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34/paper-1.15.2-393.jar" "bd2dd6f2cc489cf9e2bb800cb4fb6d63e9d293945d3ac10b09dd9c6098fa9f34"
-create_server "1.15.2-paper" "jdk8"
+create_server "1.15.2-paper" "jdk8" "true"
 
 create_spigot_server "1.15.2" "jdk8"
 
@@ -163,11 +166,11 @@ create_spigot_server "1.15.2" "jdk8"
 download_file "1.16.5-paper.jar" "https://fill-data.papermc.io/v1/objects/e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276/paper-1.16.5-794.jar" "e67da4851d08cde378ab2b89be58849238c303351ed2482181a99c2c2b489276"
 create_server "1.16.5-paper" "jdk8"
 
-create_spigot_server "1.16.5" "jdk8"
+create_spigot_server "1.16.5" "jdk8" "true"
 
 # --- 1.17 ---
 download_file "1.17-paper.jar" "https://fill-data.papermc.io/v1/objects/760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871/paper-1.17-79.jar" "760a93b94a58d619bd647d71af84688617d0444d22b716500bc6b343858dc871"
-create_server "1.17-paper" "jdk17"
+create_server "1.17-paper" "jdk17" "true"
 
 create_spigot_server "1.17" "jdk17"
 
@@ -175,11 +178,11 @@ create_spigot_server "1.17" "jdk17"
 download_file "1.18.2-paper.jar" "https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar" "0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05"
 create_server "1.18.2-paper" "jdk17"
 
-create_spigot_server "1.18.2" "jdk17"
+create_spigot_server "1.18.2" "jdk17" "true"
 
 # --- 1.19.4 ---
 download_file "1.19.4-paper.jar" "https://fill-data.papermc.io/v1/objects/e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf/paper-1.19.4-550.jar" "e587d78cba3e99ef8c4bc24cf20cc3bdbbe89e33b0b572070446af4eb6be5ccf"
-create_server "1.19.4-paper" "jdk17"
+create_server "1.19.4-paper" "jdk17" "true"
 
 create_spigot_server "1.19.4" "jdk17"
 
@@ -187,11 +190,11 @@ create_spigot_server "1.19.4" "jdk17"
 download_file "1.20.2-paper.jar" "https://fill-data.papermc.io/v1/objects/07f57cdc5948dcf3cb3358e43b9a46fbbe8b595fa30c8749cfc102bf44897b69/paper-1.20.2-318-mojang.jar" "07f57cdc5948dcf3cb3358e43b9a46fbbe8b595fa30c8749cfc102bf44897b69"
 create_server "1.20.2-paper" "jdk21"
 
-create_spigot_server "1.20.2" "jdk21"
+create_spigot_server "1.20.2" "jdk21" "true"
 
 # --- 1.20.4 ---
 download_file "1.20.4-paper.jar" "https://fill-data.papermc.io/v1/objects/e84aa4943cc51d7545b1c9b669bb1e0b143323d248ebb89012182f5554bc13d7/paper-1.20.4-499-mojang.jar" "e84aa4943cc51d7545b1c9b669bb1e0b143323d248ebb89012182f5554bc13d7"
-create_server "1.20.4-paper" "jdk21"
+create_server "1.20.4-paper" "jdk21" "true"
 
 create_spigot_server "1.20.4" "jdk21"
 
@@ -200,11 +203,11 @@ download_file "1.20.5-paper.jar" "https://fill-data.papermc.io/v1/objects/3cd7da
 create_server "1.20.5-paper" "jdk21"
 
 # spigot doesn't have 1.20.5
-create_spigot_server "1.20.6" "jdk21"
+create_spigot_server "1.20.6" "jdk21" "true"
 
 # --- 1.21.3 ---
 download_file "1.21.3-paper.jar" "https://fill-data.papermc.io/v1/objects/87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e/paper-1.21.3-83.jar" "87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e"
-create_server "1.21.3-paper" "jdk21"
+create_server "1.21.3-paper" "jdk21" "true"
 
 create_spigot_server "1.21.3" "jdk21"
 
@@ -212,11 +215,11 @@ create_spigot_server "1.21.3" "jdk21"
 download_file "1.21.5-paper.jar" "https://fill-data.papermc.io/v1/objects/2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e/paper-1.21.5-114.jar" "2ae6ae22adf417699746e0f89fc2ef6cb6ee050a5f6608cee58f0535d60b509e"
 create_server "1.21.5-paper" "jdk21"
 
-create_spigot_server "1.21.5" "jdk21"
+create_spigot_server "1.21.5" "jdk21" "true"
 
 # --- 1.21.6 ---
 download_file "1.21.6-paper.jar" "https://fill-data.papermc.io/v1/objects/35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214/paper-1.21.6-48.jar" "35e2dfa66b3491b9d2f0bb033679fa5aca1e1fdf097e7a06a80ce8afeda5c214"
-create_server "1.21.6-paper" "jdk21"
+create_server "1.21.6-paper" "jdk21" "true"
 
 create_spigot_server "1.21.6" "jdk21"
 
@@ -225,11 +228,11 @@ download_file "1.21.9-paper.jar" "https://fill-data.papermc.io/v1/objects/aec002
 create_server "1.21.9-paper" "jdk25"
 
 # spigot doesnt have 1.21.9
-create_spigot_server "1.21.10" "jdk25"
+create_spigot_server "1.21.10" "jdk25" "true"
 
 # --- 1.21.11 ---
 download_file "1.21.11-paper.jar" "https://fill-data.papermc.io/v1/objects/4a558a00005d33dafa4c4d5f9e47b3bd47d92311fceccd9c9754ee6b913f8649/paper-1.21.11-100.jar" "4a558a00005d33dafa4c4d5f9e47b3bd47d92311fceccd9c9754ee6b913f8649"
-create_server "1.21.11-paper" "jdk25"
+create_server "1.21.11-paper" "jdk25" "true"
 
 create_spigot_server "1.21.11" "jdk25"
 
