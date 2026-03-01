@@ -1,12 +1,12 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.util;
 
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.commons.LocaleProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ public final class LocalePacketUtil {
       return;
     }
 
-    Map<Locale, P> map = CollectionProvider.map(1);
+    Map<Locale, P> map = new HashMap<>(1);
     for (Player player : players) {
       Locale locale = LocaleProvider.locale(player);
       P packet = map.computeIfAbsent(locale, i -> packetFunction.apply(locale));

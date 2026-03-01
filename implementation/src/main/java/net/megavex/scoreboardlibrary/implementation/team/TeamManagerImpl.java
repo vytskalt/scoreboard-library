@@ -5,7 +5,6 @@ import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
 import net.megavex.scoreboardlibrary.api.team.TeamDisplay;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import net.megavex.scoreboardlibrary.implementation.ScoreboardLibraryImpl;
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.player.PlayerDisplayable;
 import net.megavex.scoreboardlibrary.implementation.player.ScoreboardLibraryPlayer;
@@ -23,8 +22,8 @@ import java.util.function.Function;
 public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
   private final ScoreboardLibraryImpl scoreboardLibrary;
 
-  private final Set<Player> players = CollectionProvider.set(8);
-  private final List<Player> internalPlayers = CollectionProvider.list(8);
+  private final Set<Player> players = new HashSet<>(8);
+  private final List<Player> internalPlayers = new ArrayList<>(8);
 
   private final Map<String, ScoreboardTeamImpl> teams = new ConcurrentHashMap<>();
   private final Queue<TeamManagerTask> taskQueue = new ConcurrentLinkedQueue<>();

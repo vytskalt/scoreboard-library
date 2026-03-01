@@ -6,7 +6,6 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveScore;
 import net.megavex.scoreboardlibrary.api.objective.ScoreboardObjective;
 import net.megavex.scoreboardlibrary.implementation.ScoreboardLibraryImpl;
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.player.PlayerDisplayable;
@@ -24,8 +23,8 @@ public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable
   private final Map<String, ScoreboardObjectiveImpl> objectives = new ConcurrentHashMap<>();
   private final Map<ObjectiveDisplaySlot, ScoreboardObjectiveImpl> displaySlots = new HashMap<>();
 
-  private final Set<Player> players = CollectionProvider.set(8);
-  private final Set<Player> displayingPlayers = CollectionProvider.set(8);
+  private final Set<Player> players = new HashSet<>(8);
+  private final Set<Player> displayingPlayers = new HashSet<>(8);
   private final Queue<ObjectiveManagerTask> taskQueue = new ConcurrentLinkedQueue<>();
   private boolean closed;
 

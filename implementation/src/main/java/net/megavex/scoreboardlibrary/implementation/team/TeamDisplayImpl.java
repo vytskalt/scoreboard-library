@@ -8,7 +8,6 @@ import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
 import net.megavex.scoreboardlibrary.api.team.TeamDisplay;
 import net.megavex.scoreboardlibrary.api.team.enums.CollisionRule;
 import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
@@ -24,9 +23,9 @@ import static net.kyori.adventure.text.Component.empty;
 public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Component> {
   private final ScoreboardTeamImpl team;
   private final TeamDisplayPacketAdapter packetAdapter;
-  private final Set<Player> players = CollectionProvider.set(4);
-  private final List<String> entries = CollectionProvider.list(4);
-  private final List<String> syncedEntries = CollectionProvider.list(4);
+  private final Set<Player> players = new HashSet<>(4);
+  private final List<String> entries = new ArrayList<>(4);
+  private final List<String> syncedEntries = new ArrayList<>(4);
   private Component displayName = empty(),
     prefix = empty(),
     suffix = empty();

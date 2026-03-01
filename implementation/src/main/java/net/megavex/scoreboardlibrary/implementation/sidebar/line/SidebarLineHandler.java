@@ -2,7 +2,6 @@ package net.megavex.scoreboardlibrary.implementation.sidebar.line;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.sidebar.line.locale.LegacyLocaleLine;
 import net.megavex.scoreboardlibrary.implementation.sidebar.line.locale.LocaleLine;
@@ -12,12 +11,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class SidebarLineHandler {
   private final LineRenderingStrategy strategy;
   private final LocaleLineHandler localeLineHandler;
-  private final Set<Player> players = CollectionProvider.set(1);
+  private final Set<Player> players = new HashSet<>(1);
   private final LocaleLine[] lines;
 
   public SidebarLineHandler(@NotNull LineRenderingStrategy strategy, @NotNull LocaleLineHandler localeLineHandler) {

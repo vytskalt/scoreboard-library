@@ -1,17 +1,17 @@
 package net.megavex.scoreboardlibrary.implementation.player;
 
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class DisplayableQueue<T extends PlayerDisplayable> {
   private final UUID playerUuid;
-  private final List<T> queue = CollectionProvider.list(1);
+  private final List<T> queue = new ArrayList<>(1);
 
   public DisplayableQueue(@NotNull UUID playerUuid) {
     this.playerUuid = playerUuid;

@@ -10,8 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 
 public final class PacketAdapterLoader {
-  private static final String MODERN = "modern", LEGACY = "legacy";
-
   private PacketAdapterLoader() {
   }
 
@@ -61,7 +59,11 @@ public final class PacketAdapterLoader {
       case "1.12":
       case "1.12.1":
       case "1.12.2":
-        return tryLoadImplementationClass(LEGACY);
+        try {
+          return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.legacy.PacketAdapterProviderImpl");
+        } catch (ClassNotFoundException ignored) {
+          return null;
+        }
       case "1.13":
       case "1.13.1":
       case "1.13.2":
@@ -108,22 +110,21 @@ public final class PacketAdapterLoader {
       case "1.21.9":
       case "1.21.10":
       case "1.21.11":
-        return tryLoadImplementationClass(MODERN);
+        return tryLoadModern();
       default:
         // Hide from relocation checkers
         String property = "net.mega".concat("vex.scoreboardlibrary.forceModern");
         if (System.getProperty(property, "").equalsIgnoreCase("true")) {
-          return tryLoadImplementationClass(MODERN);
+          return tryLoadModern();
         }
 
         return null;
     }
   }
 
-  private static @Nullable Class<?> tryLoadImplementationClass(@NotNull String name) {
+  private static Class<?> tryLoadModern() {
     try {
-      String path = "net.megavex.scoreboardlibrary.implementation.packetAdapter." + name + ".PacketAdapterProviderImpl";
-      return Class.forName(path);
+      return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl");
     } catch (ClassNotFoundException ignored) {
       return null;
     }

@@ -6,18 +6,14 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import net.megavex.scoreboardlibrary.implementation.ScoreboardLibraryImpl;
-import net.megavex.scoreboardlibrary.implementation.commons.CollectionProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.player.PlayerDisplayable;
 import net.megavex.scoreboardlibrary.implementation.player.ScoreboardLibraryPlayer;
 import net.megavex.scoreboardlibrary.implementation.sidebar.line.GlobalLineInfo;
 import net.megavex.scoreboardlibrary.implementation.sidebar.line.LocaleLineHandler;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
@@ -38,7 +34,7 @@ public abstract class AbstractSidebar implements Sidebar, PlayerDisplayable {
   private final GlobalLineInfo[] lines;
   private Component title = empty();
 
-  private final Set<Player> players = CollectionProvider.set(8);
+  private final Set<Player> players = new HashSet<>(8);
 
   private boolean closed;
 

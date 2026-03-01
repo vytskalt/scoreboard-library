@@ -8,6 +8,7 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -21,7 +22,7 @@ public final class LegacyFormatUtil {
 
   static {
     ChatColor[] values = ChatColor.values();
-    chatColorMap = CollectionProvider.map(values.length);
+    chatColorMap = new HashMap<>(values.length);
     for (ChatColor value : values) {
       if (!value.isColor()) continue;
 
