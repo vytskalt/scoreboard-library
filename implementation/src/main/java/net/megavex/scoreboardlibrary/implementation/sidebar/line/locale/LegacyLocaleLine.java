@@ -21,7 +21,7 @@ import java.util.Set;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
 // Implementation for versions below 1.13
-public class LegacyLocaleLine implements LocaleLine, ImmutableTeamProperties<String> {
+public final class LegacyLocaleLine implements LocaleLine, ImmutableTeamProperties<String> {
   private final GlobalLineInfo info;
   private final SidebarLineHandler handler;
   private final TeamDisplayPacketAdapter packetAdapter;

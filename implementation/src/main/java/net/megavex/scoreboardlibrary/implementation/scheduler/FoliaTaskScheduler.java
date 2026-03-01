@@ -11,7 +11,7 @@ import java.lang.invoke.MethodType;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-class FoliaTaskScheduler implements TaskScheduler {
+final class FoliaTaskScheduler implements TaskScheduler {
   private static final Class<?> asyncSchedulerClass;
   private static final Class<?> scheduledTaskClass;
   private static final Class<?> cancelledStateClass;

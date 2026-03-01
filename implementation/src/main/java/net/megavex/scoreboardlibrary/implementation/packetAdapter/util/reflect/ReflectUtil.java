@@ -9,7 +9,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-public class ReflectUtil {
+public final class ReflectUtil {
   // Inspired by
   // https://github.com/dmulloy2/ProtocolLib/blob/02e917cd08cf5b37a52052e22b223272a040e0df/src/main/java/com/comphenix/protocol/reflect/accessors/MethodHandleHelper.java
 

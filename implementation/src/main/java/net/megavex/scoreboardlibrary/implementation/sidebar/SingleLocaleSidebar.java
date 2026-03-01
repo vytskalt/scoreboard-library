@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class SingleLocaleSidebar extends AbstractSidebar {
+public final class SingleLocaleSidebar extends AbstractSidebar {
   private final Locale locale;
   private final LocaleLineHandler sidebar;
   private final Set<Player> internalPlayers = new HashSet<>(8);

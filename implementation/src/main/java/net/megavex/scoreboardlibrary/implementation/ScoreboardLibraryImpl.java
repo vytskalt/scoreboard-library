@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScoreboardLibraryImpl implements ScoreboardLibrary {
+public final class ScoreboardLibraryImpl implements ScoreboardLibrary {
   private final Plugin plugin;
   private final PacketAdapterProvider packetAdapter;
   private final TaskScheduler taskScheduler;

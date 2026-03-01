@@ -12,10 +12,13 @@ import java.util.function.Function;
 
 public final class LocaleProvider {
   private static final Locale DEFAULT_LOCALE = Locale.US;
-  private static final Function<Player, Locale> provider = get();
+  private static final Function<Player, Locale> PROVIDER = get();
+
+  private LocaleProvider() {
+  }
 
   public static @NotNull Locale locale(Player player) {
-    return provider.apply(player);
+    return PROVIDER.apply(player);
   }
 
   private static @NotNull Function<Player, Locale> get() {

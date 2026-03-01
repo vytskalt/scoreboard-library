@@ -15,7 +15,7 @@ import java.util.Collection;
 import static net.kyori.adventure.text.Component.empty;
 
 // Implementation for versions above 1.13
-public class ModernLocaleLine implements LocaleLine, ImmutableTeamProperties<Component> {
+public final class ModernLocaleLine implements LocaleLine, ImmutableTeamProperties<Component> {
   private final GlobalLineInfo info;
   private final SidebarLineHandler handler;
   private final Collection<String> entries;

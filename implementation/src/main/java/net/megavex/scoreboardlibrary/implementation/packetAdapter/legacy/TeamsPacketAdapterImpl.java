@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
-public class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
+public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
   private final String teamName;
   private Object removePacket;
 

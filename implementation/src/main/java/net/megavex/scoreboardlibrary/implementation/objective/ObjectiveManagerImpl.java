@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable {
+public final class ObjectiveManagerImpl implements ObjectiveManager, PlayerDisplayable {
   private final ScoreboardLibraryImpl library;
   private final Map<String, ScoreboardObjectiveImpl> objectives = new ConcurrentHashMap<>();
   private final Map<ObjectiveDisplaySlot, ScoreboardObjectiveImpl> displaySlots = new HashMap<>();

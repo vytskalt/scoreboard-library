@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SidebarLineHandler {
+public final class SidebarLineHandler {
   private final LineRenderingStrategy strategy;
   private final LocaleLineHandler localeLineHandler;
   private final Set<Player> players = new HashSet<>(1);

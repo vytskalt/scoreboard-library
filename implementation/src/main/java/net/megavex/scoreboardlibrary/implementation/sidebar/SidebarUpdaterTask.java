@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-public class SidebarUpdaterTask implements Runnable {
+public final class SidebarUpdaterTask implements Runnable {
   private final ScoreboardLibraryImpl scoreboardLibrary;
   private final RunningTask task;
   private final Object lock = new Object();

@@ -3,7 +3,7 @@ package net.megavex.scoreboardlibrary.implementation.scheduler;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-class BukkitTaskScheduler implements TaskScheduler {
+final class BukkitTaskScheduler implements TaskScheduler {
   private final Plugin plugin;
 
   public BukkitTaskScheduler(@NotNull Plugin plugin) {

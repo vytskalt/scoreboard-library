@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.WeakHashMap;
 
 @SuppressWarnings("unused")
-public class PacketAdapterProviderImpl implements PacketAdapterProvider {
+public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
   private final ViaAPI<Player> via;
   private final ModernPacketSender packetSender;
   private final WeakHashMap<Player, Integer> viaTeamPacketIds = new WeakHashMap<>();

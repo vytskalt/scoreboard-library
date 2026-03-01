@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
-public class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl {
+public final class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapterImpl {
   public PaperTeamsPacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String teamName) {
     super(provider, teamName);
   }

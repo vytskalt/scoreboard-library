@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScoreboardTeamImpl implements ScoreboardTeam {
+public final class ScoreboardTeamImpl implements ScoreboardTeam {
   private final TeamManagerImpl teamManager;
   private final String name;
   private final TeamsPacketAdapter packetAdapter;

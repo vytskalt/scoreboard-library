@@ -15,7 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLocaleChangeEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class LocaleListener implements Listener {
+public final class LocaleListener implements Listener {
   private final ScoreboardLibraryImpl scoreboardLibrary;
 
   public LocaleListener(@NotNull ScoreboardLibraryImpl scoreboardLibrary) {

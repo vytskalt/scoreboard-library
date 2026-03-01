@@ -11,7 +11,7 @@ import java.util.Collection;
 // Implementation for versions 1.20.3+
 // This is not yet being used as it might break on servers with plugins such as ViaBackwards,
 // however it will once Mojang decides to remove legacy chat format support
-public class PostModernLocaleLine implements LocaleLine {
+public final class PostModernLocaleLine implements LocaleLine {
   private final GlobalLineInfo info;
   private final SidebarLineHandler handler;
 

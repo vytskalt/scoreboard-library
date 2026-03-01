@@ -5,7 +5,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.invoke.MethodHandle;
 
-public class ConstructorAccessor<T> {
+public final class ConstructorAccessor<T> {
   private final MethodHandle handle;
 
   public ConstructorAccessor(@NotNull MethodHandle handle) {

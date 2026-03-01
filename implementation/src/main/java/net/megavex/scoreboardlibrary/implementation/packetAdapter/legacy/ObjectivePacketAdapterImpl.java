@@ -18,7 +18,7 @@ import java.util.Collection;
 
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
-public class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter {
+public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter {
   private final String objectiveName;
   private Object removePacket;
 

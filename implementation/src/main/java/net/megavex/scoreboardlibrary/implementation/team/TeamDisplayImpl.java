@@ -20,7 +20,7 @@ import java.util.*;
 
 import static net.kyori.adventure.text.Component.empty;
 
-public class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Component> {
+public final class TeamDisplayImpl implements TeamDisplay, ImmutableTeamProperties<Component> {
   private final ScoreboardTeamImpl team;
   private final TeamDisplayPacketAdapter packetAdapter;
   private final Set<Player> players = new HashSet<>(4);

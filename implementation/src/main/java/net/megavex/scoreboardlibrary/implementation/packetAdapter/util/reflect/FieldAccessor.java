@@ -6,7 +6,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.invoke.MethodHandle;
 
-public class FieldAccessor<T, V> {
+public final class FieldAccessor<T, V> {
   private final MethodHandle getter, setter;
 
   public FieldAccessor(@NotNull MethodHandle getter, @Nullable MethodHandle setter) {

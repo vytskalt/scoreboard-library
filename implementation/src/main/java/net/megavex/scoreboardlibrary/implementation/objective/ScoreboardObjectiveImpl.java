@@ -16,7 +16,7 @@ import java.util.*;
 
 import static net.kyori.adventure.text.Component.empty;
 
-public class ScoreboardObjectiveImpl implements ScoreboardObjective {
+public final class ScoreboardObjectiveImpl implements ScoreboardObjective {
   private final ObjectivePacketAdapter packetAdapter;
   private final Queue<ObjectiveManagerTask> taskQueue;
   private final String name;

@@ -7,7 +7,7 @@ import net.megavex.scoreboardlibrary.implementation.sidebar.AbstractSidebar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GlobalLineInfo {
+public final class GlobalLineInfo {
   private final String player;
   private final int line;
   private final TeamsPacketAdapter packetAdapter;

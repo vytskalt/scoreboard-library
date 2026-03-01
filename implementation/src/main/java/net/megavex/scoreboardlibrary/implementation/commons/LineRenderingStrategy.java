@@ -9,7 +9,7 @@ public enum LineRenderingStrategy {
    */
   LEGACY,
   /**
-   * For versions 1.13-1.20.2, where team properties are stored as components with no limits.
+   * For versions 1.13+, where team properties are stored as components with no limits.
    */
   MODERN,
   /**

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class ScoreboardLibraryPlayer {
+public final class ScoreboardLibraryPlayer {
   private final DisplayableQueue<TeamManagerImpl> teamManagerQueue;
   private final DisplayableQueue<ObjectiveManagerImpl> objectiveManagerQueue;
   private final DisplayableQueue<AbstractSidebar> sidebarQueue;

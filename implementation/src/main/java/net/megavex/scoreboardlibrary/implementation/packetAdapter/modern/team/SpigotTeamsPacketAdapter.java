@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
-public class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
+public final class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterImpl {
   public SpigotTeamsPacketAdapter(PacketAdapterProviderImpl provider, @NotNull String teamName) {
     super(provider, teamName);
   }

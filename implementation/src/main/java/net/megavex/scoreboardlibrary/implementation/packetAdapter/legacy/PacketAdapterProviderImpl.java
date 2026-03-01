@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public class PacketAdapterProviderImpl implements PacketAdapterProvider {
+public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
   public PacketAdapterProviderImpl(Plugin plugin) {}
 
   @Override

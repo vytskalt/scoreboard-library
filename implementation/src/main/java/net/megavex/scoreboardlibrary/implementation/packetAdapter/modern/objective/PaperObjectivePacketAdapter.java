@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public class PaperObjectivePacketAdapter extends AbstractObjectivePacketAdapter {
+public final class PaperObjectivePacketAdapter extends AbstractObjectivePacketAdapter {
   public PaperObjectivePacketAdapter(@NotNull PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
     super(provider, objectiveName);
   }

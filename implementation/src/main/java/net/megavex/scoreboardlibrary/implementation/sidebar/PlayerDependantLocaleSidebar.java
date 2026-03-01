@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class PlayerDependantLocaleSidebar extends AbstractSidebar {
+public final class PlayerDependantLocaleSidebar extends AbstractSidebar {
   private final Map<Player, LocaleLineHandler> playerMap = new HashMap<>();
   private final Map<Locale, LocaleLineHandler> localeMap = new HashMap<>();
 

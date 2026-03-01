@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Locale;
 
-public class LocaleLineHandler {
+public final class LocaleLineHandler {
   private final AbstractSidebar sidebar;
   private final Locale locale;
   private final SidebarLineHandler[] lineHandlers;

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public class SpigotObjectivePacketAdapter extends AbstractObjectivePacketAdapter {
+public final class SpigotObjectivePacketAdapter extends AbstractObjectivePacketAdapter {
   public SpigotObjectivePacketAdapter(@NotNull PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
     super(provider, objectiveName);
   }

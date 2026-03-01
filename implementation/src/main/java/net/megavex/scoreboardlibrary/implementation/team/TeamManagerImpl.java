@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class TeamManagerImpl implements TeamManager, PlayerDisplayable {
+public final class TeamManagerImpl implements TeamManager, PlayerDisplayable {
   private final ScoreboardLibraryImpl scoreboardLibrary;
 
   private final Set<Player> players = new HashSet<>(8);

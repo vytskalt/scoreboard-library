@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DisplayableQueue<T extends PlayerDisplayable> {
+public final class DisplayableQueue<T extends PlayerDisplayable> {
   private final UUID playerUuid;
   private final List<T> queue = new ArrayList<>(1);
 
