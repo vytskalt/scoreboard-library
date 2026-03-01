@@ -17,44 +17,50 @@ public final class DisplayableQueue<T extends PlayerDisplayable> {
     this.playerUuid = playerUuid;
   }
 
-  public synchronized @Nullable T current() {
-    if (queue.isEmpty()) {
-      return null;
-    } else {
-      return queue.get(0);
-    }
-  }
-
-  public synchronized void add(@NotNull T displayable) {
-    if (queue.contains(displayable)) {
-      throw new IllegalStateException("displayable already registered");
-    }
-
-    queue.add(displayable);
-
-    if (current() == displayable) {
-      Player player = Bukkit.getPlayer(playerUuid);
-      if (player != null) {
-        displayable.display(player);
+  public @Nullable T current() {
+    synchronized (this) {
+      if (queue.isEmpty()) {
+        return null;
+      } else {
+        return queue.get(0);
       }
     }
   }
 
-  public synchronized void remove(@NotNull T displayable) {
-    boolean wasCurrent = displayable == current();
-    if (!queue.remove(displayable)) {
-      throw new IllegalStateException("displayable not registered");
-    }
+  public void add(@NotNull T displayable) {
+    synchronized (this) {
+      if (queue.contains(displayable)) {
+        throw new IllegalStateException("displayable already registered");
+      }
 
-    if (!wasCurrent) {
-      return;
-    }
+      queue.add(displayable);
 
-    T newDisplayable = current();
-    if (newDisplayable != null) {
-      Player player = Bukkit.getPlayer(playerUuid);
-      if (player != null) {
-        newDisplayable.display(player);
+      if (current() == displayable) {
+        Player player = Bukkit.getPlayer(playerUuid);
+        if (player != null) {
+          displayable.display(player);
+        }
+      }
+    }
+  }
+
+  public void remove(@NotNull T displayable) {
+    synchronized (this) {
+      boolean wasCurrent = displayable == current();
+      if (!queue.remove(displayable)) {
+        throw new IllegalStateException("displayable not registered");
+      }
+
+      if (!wasCurrent) {
+        return;
+      }
+
+      T newDisplayable = current();
+      if (newDisplayable != null) {
+        Player player = Bukkit.getPlayer(playerUuid);
+        if (player != null) {
+          newDisplayable.display(player);
+        }
       }
     }
   }
