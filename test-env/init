@@ -102,7 +102,7 @@ download_file() {
   fi
 }
 
-download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/197/artifact/target/BuildTools.jar" "9a5b059ace22eaef28fb62f96970f0abe1490f06c860229b94627cd72eaf6ea5"
+download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/198/artifact/target/BuildTools.jar" "23eefb5a08655fe83c40ddac7a4ca78b6b2583efccd9c98c58b27df0aa31fa35"
 
 download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion-Java8/38/artifact/build/libs/ViaVersion-5.7.1-downgraded.jar" "dcce3d30e195de9a3372616298bac1acd29196e5c3676a0fba745be9e3d91808"
 download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards-Java8/31/artifact/build/libs/ViaBackwards-5.7.1-downgraded.jar" "9727fd246d3566bffc3f71e1bda0e6db71bf5814a254e7ab5a2941ca0e94ecd6"
@@ -235,4 +235,8 @@ download_file "1.21.11-paper.jar" "https://fill-data.papermc.io/v1/objects/4a558
 create_server "1.21.11-paper" "jdk25" "true"
 
 create_spigot_server "1.21.11" "jdk25"
+
+# --- 26.1 ---
+
+create_spigot_server "26.1" "jdk25"
 
