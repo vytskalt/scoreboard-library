@@ -111,6 +111,7 @@ public final class PacketAdapterLoader {
       case "1.21.10":
       case "1.21.11":
       case "26.1":
+      case "26.1.1":
         return tryLoadModern();
       default:
         // Hide from relocation checkers
