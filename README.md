@@ -29,7 +29,7 @@ All Paper and Spigot versions from 1.7.10 to 26.1 are natively supported.
 
 ## Installation
 
-See installation instructions [here](https://github.com/MegavexNetwork/scoreboard-library/blob/dev/2.0/INSTALLATION.md)
+See installation instructions [here](https://github.com/vytskalt/scoreboard-library/blob/main/INSTALLATION.md)
 
 ### Getting started
 
