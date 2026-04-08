@@ -240,3 +240,9 @@ create_spigot_server "1.21.11" "jdk25"
 
 create_spigot_server "26.1" "jdk25"
 
+# --- 26.1.1 ---
+download_file "26.1.1-paper.jar" "https://fill-data.papermc.io/v1/objects/43d08ed52c7af4e9f72769122501a5c15f99c7ace0c428a3eef040fd3f6fdbc5/paper-26.1.1-29.jar" "43d08ed52c7af4e9f72769122501a5c15f99c7ace0c428a3eef040fd3f6fdbc5"
+create_server "26.1.1-paper" "jdk25" "true"
+
+create_spigot_server "26.1.1" "jdk25"
+

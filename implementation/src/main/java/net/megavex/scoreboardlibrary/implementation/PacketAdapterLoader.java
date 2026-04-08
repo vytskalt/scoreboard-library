@@ -33,6 +33,12 @@ public final class PacketAdapterLoader {
       version = version.substring(0, dashIndex);
     }
 
+    // New Paper 26.1.1+ versioning scheme: 26.1.1.build.29
+    int buildIndex = version.indexOf(".build");
+    if (buildIndex != -1) {
+      version = version.substring(0, buildIndex);
+    }
+
     return tryLoadVersion(version);
   }
 
