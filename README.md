@@ -25,7 +25,7 @@ Join the [Discord](https://discord.gg/v7nmTDTW8W) or create an issue for support
 
 ## Supported server versions
 
-All Paper and Spigot versions from 1.7.10 to 26.1.1 are natively supported.
+All Paper and Spigot versions from 1.7.10 to 26.1.2 are natively supported.
 
 ## Installation
 
