@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.enums.CollisionRule;
 import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.*;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ public final class PacketAccessors {
   private PacketAccessors() {
   }
 
-  public static final boolean IS_1_17_OR_ABOVE, IS_1_20_2_OR_ABOVE, IS_1_20_3_OR_ABOVE, IS_1_20_5_OR_ABOVE, IS_1_21_5_OR_ABOVE, IS_1_21_6_OR_ABOVE;
+  public static final boolean IS_1_17_OR_ABOVE, IS_1_20_2_OR_ABOVE, IS_1_20_3_OR_ABOVE, IS_1_20_5_OR_ABOVE, IS_1_21_5_OR_ABOVE, IS_1_21_6_OR_ABOVE, IS_26_2_OR_ABOVE;
   private static final String OLD_NMS_VERSION_STRING;
 
   static {
@@ -74,6 +75,14 @@ public final class PacketAccessors {
     } catch (ClassNotFoundException ignored) {
     }
     IS_1_21_6_OR_ABOVE = is1_21_6OrAbove;
+
+    boolean is26_2OrAbove = false;
+    try {
+      Class.forName("net.minecraft.world.scores.TeamColor");
+      is26_2OrAbove = true;
+    } catch (ClassNotFoundException ignored) {
+    }
+    IS_26_2_OR_ABOVE = is26_2OrAbove;
   }
 
   public static final Class<?> PKT_CLASS,
@@ -93,7 +102,7 @@ public final class PacketAccessors {
     OBJECTIVE_CLASS,
     TEAM_VISIBILITY_CLASS,
     TEAM_COLLISION_RULE_CLASS,
-    CHAT_FORMATTING_CLASS,
+    TEAM_COLOR_OR_CHAT_FORMATTING_CLASS,
     OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS,
     DATA_RESULT_CLASS,
     DYNAMIC_OPS_CLASS,
@@ -121,7 +130,7 @@ public final class PacketAccessors {
     OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective", "net.minecraft.world.scores.ScoreboardObjective", oldSpigotClassName("ScoreboardObjective"));
     TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility", oldSpigotClassName("ScoreboardTeamBase$EnumNameTagVisibility"));
     TEAM_COLLISION_RULE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
-    CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat", oldSpigotClassName("EnumChatFormat"));
+    TEAM_COLOR_OR_CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.TeamColor", "net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat", oldSpigotClassName("EnumChatFormat"));
     OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
     DATA_RESULT_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DataResult");
     DYNAMIC_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DynamicOps");
@@ -181,14 +190,14 @@ public final class PacketAccessors {
   public static final Map<NamedTextColor, Object> NMS_CHAT_FORMATTING_MAP = new HashMap<>();
 
   static {
-    Object[] chatFormattings = CHAT_FORMATTING_CLASS.getEnumConstants();
-    FieldAccessor<Object, Object> charField = ReflectUtil.findFieldUnchecked(CHAT_FORMATTING_CLASS, 0, char.class);
+    Object[] chatFormattings = TEAM_COLOR_OR_CHAT_FORMATTING_CLASS.getEnumConstants();
+    FieldAccessor<Object, Object> nameField = ReflectUtil.findFieldUnchecked(TEAM_COLOR_OR_CHAT_FORMATTING_CLASS, 0, String.class);
 
     outer:
     for (NamedTextColor color : NamedTextColor.NAMES.values()) {
       char c = LegacyFormatUtil.getChar(color);
       for (Object chatFormatting : chatFormattings) {
-        if (c == (char) charField.get(chatFormatting)) {
+        if (color.toString().equalsIgnoreCase((String) nameField.get(chatFormatting))) {
           NMS_CHAT_FORMATTING_MAP.put(color, chatFormatting);
           continue outer;
         }
@@ -217,7 +226,7 @@ public final class PacketAccessors {
 
   // --- OBJECTIVES ---
 
-  public static final PacketConstructor<?> OBJECTIVE_PACKET_CONSTRUCTOR =
+  public static final ConstructorAccessor<?> OBJECTIVE_PACKET_CONSTRUCTOR =
     ReflectUtil.getEmptyConstructor(SET_OBJECTIVE_PKT_CLASS);
   public static final FieldAccessor<Object, String> OBJECTIVE_NAME_FIELD =
     ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, String.class);
@@ -257,7 +266,7 @@ public final class PacketAccessors {
 
   // --- TEAMS ---
 
-  public static final PacketConstructor<?> PARAMETERS_CONSTRUCTOR;
+  public static final ConstructorAccessor<?> PARAMETERS_CONSTRUCTOR; // full record constructor on 26.2+, empty constructor for below
   public static final ConstructorAccessor<?> TEAM_PACKET_CONSTRUCTOR;
 
   public static final FieldAccessor<Object, String> TEAM_NAME_FIELD;
@@ -275,7 +284,21 @@ public final class PacketAccessors {
   public static final FieldAccessor<Object, Integer> OPTIONS_FIELD;
 
   static {
-    if (IS_1_17_OR_ABOVE) {
+    if (IS_26_2_OR_ABOVE) {
+      PARAMETERS_CONSTRUCTOR = ReflectUtil.findConstructor(TEAM_PARAMETERS_PKT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, TEAM_VISIBILITY_CLASS, TEAM_COLLISION_RULE_CLASS, Optional.class, byte.class);
+      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class); // same as below
+
+      TEAM_NAME_FIELD = null;
+      TEAM_MODE_FIELD = null;
+      TEAM_ENTRIES_FIELD = null;
+      DISPLAY_NAME_FIELD = null;
+      PREFIX_FIELD = null;
+      SUFFIX_FIELD = null;
+      NAME_TAG_VISIBILITY_FIELD = null;
+      COLLISION_RULE_FIELD = null;
+      COLOR_FIELD = null;
+      OPTIONS_FIELD = null;
+    } else if (IS_1_17_OR_ABOVE) {
       assert TEAM_PARAMETERS_PKT_CLASS != null;
       PARAMETERS_CONSTRUCTOR = ReflectUtil.getEmptyConstructor(TEAM_PARAMETERS_PKT_CLASS);
       TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class);
@@ -296,7 +319,7 @@ public final class PacketAccessors {
         COLLISION_RULE_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 1, String.class);
       }
 
-      COLOR_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, CHAT_FORMATTING_CLASS);
+      COLOR_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, int.class);
     } else {
       PARAMETERS_CONSTRUCTOR = null;
@@ -313,7 +336,7 @@ public final class PacketAccessors {
       NAME_TAG_VISIBILITY_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, String.class);
       COLLISION_RULE_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 2, String.class);
 
-      COLOR_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, CHAT_FORMATTING_CLASS);
+      COLOR_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, int.class);
     }
   }
@@ -346,6 +369,44 @@ public final class PacketAccessors {
       default:
         throw new IllegalStateException("unknown collision rule " + value.name());
     }
+  }
+
+  public static Object createTeamParameters(Object displayName, Object playerPrefix, Object playerSuffix, ImmutableTeamProperties<?> otherProps) {
+    if (IS_26_2_OR_ABOVE){
+      Object chatFormattingColor = null;
+      if (otherProps.playerColor() != null) {
+        chatFormattingColor = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor());
+      }
+      Object nmsNameTagVisibility = PacketAccessors.nameTagVisibility(otherProps.nameTagVisibility());
+      Object nmsCollisionRule = PacketAccessors.collisionRule(otherProps.collisionRule());
+      return PARAMETERS_CONSTRUCTOR.invoke(displayName, playerPrefix, playerSuffix, nmsNameTagVisibility, nmsCollisionRule, Optional.ofNullable(chatFormattingColor), (byte) otherProps.packOptions());
+    }
+
+    Object parameters = PARAMETERS_CONSTRUCTOR.invoke();
+    setupOldTeamPropertiesFields(parameters, displayName, playerPrefix, playerSuffix, otherProps);
+    return parameters;
+  }
+
+  public static void setupOldTeamPropertiesFields(Object teamPacket, Object displayName, Object playerPrefix, Object playerSuffix, ImmutableTeamProperties<?> otherProps) {
+    Object nmsNameTagVisibility;
+    Object nmsCollisionRule;
+    if (IS_1_21_5_OR_ABOVE) {
+      nmsNameTagVisibility = PacketAccessors.nameTagVisibility(otherProps.nameTagVisibility());
+      nmsCollisionRule = PacketAccessors.collisionRule(otherProps.collisionRule());
+    } else {
+      nmsNameTagVisibility = otherProps.nameTagVisibility().key();
+      nmsCollisionRule = otherProps.collisionRule().key();
+    }
+
+    Object chatFormattingColor = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor() != null ? otherProps.playerColor() : NamedTextColor.WHITE);
+
+    DISPLAY_NAME_FIELD.set(teamPacket, displayName);
+    PREFIX_FIELD.set(teamPacket, playerPrefix);
+    SUFFIX_FIELD.set(teamPacket, playerSuffix);
+    NAME_TAG_VISIBILITY_FIELD.set(teamPacket, nmsNameTagVisibility);
+    COLLISION_RULE_FIELD.set(teamPacket, nmsCollisionRule);
+    COLOR_FIELD.set(teamPacket, chatFormattingColor);
+    OPTIONS_FIELD.set(teamPacket, otherProps.packOptions());
   }
 
   public static @NotNull Object fromAdventureComponent(@NotNull Component component) {

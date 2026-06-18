@@ -2,6 +2,8 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -115,8 +117,18 @@ public final class ReflectUtil {
 
   public static <T> @Nullable ConstructorAccessor<T> findOptionalConstructor(@NotNull Class<T> clazz, @NotNull Class<?>... args) {
     try {
-      MethodHandle handle = LOOKUP.findConstructor(clazz, MethodType.methodType(void.class, args));
-      return new ConstructorAccessor<>(convertToGeneric(handle));
+      MethodHandle handle = convertToGeneric(LOOKUP.findConstructor(clazz, MethodType.methodType(void.class, args)));
+      return new ConstructorAccessor<T>() {
+        @Override
+        public @NonNull T invoke(@UnknownNullability Object... args) {
+          try {
+            //noinspection unchecked
+            return (T) handle.invokeExact(args);
+          } catch (Throwable e) {
+            throw new IllegalStateException("couldn't instantiate constructor", e);
+          }
+        }
+      };
     } catch (NoSuchMethodException | IllegalAccessException e) {
       return null;
     }
@@ -130,10 +142,10 @@ public final class ReflectUtil {
     return accessor;
   }
 
-  public static <T> @NotNull PacketConstructor<T> getEmptyConstructor(@NotNull Class<T> packetClass) {
+  public static <T> @NotNull ConstructorAccessor<T> getEmptyConstructor(@NotNull Class<T> packetClass) {
     try {
       MethodHandle constructor = LOOKUP.findConstructor(packetClass, VOID_METHOD_TYPE);
-      return () -> {
+      return (args) -> {
         try {
           // noinspection unchecked
           return (T) constructor.invoke();
@@ -144,7 +156,7 @@ public final class ReflectUtil {
     } catch (NoSuchMethodException | IllegalAccessException ignored) {
     }
 
-    return () -> {
+    return (args) -> {
       try {
         // noinspection unchecked
         return (T) ALLOCATE_INSTANCE_HANDLE.invoke(UNSAFE, packetClass);

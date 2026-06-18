@@ -27,7 +27,12 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
   @Override
   public void onEnable() {
     this.getServer().getPluginManager().registerEvents(this, this);
-    GlobalTranslator.get().addSource(this.translator);
+    try {
+      // 1.16.5 Paper doesn't have translator()
+      GlobalTranslator.get().addSource(this.translator);
+    } catch (NoSuchMethodError ignored) {
+      GlobalTranslator.translator().addSource(this.translator);
+    }
 
     try {
       lib = ScoreboardLibrary.loadScoreboardLibrary(this);
@@ -68,7 +73,13 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
     if (this.lib != null) {
       this.lib.close();
     }
-    GlobalTranslator.get().removeSource(this.translator);
+
+    try {
+      // 1.16.5 Paper doesn't have translator()
+      GlobalTranslator.get().removeSource(this.translator);
+    } catch (NoSuchMethodError ignored) {
+      GlobalTranslator.translator().removeSource(this.translator);
+    }
   }
 
   @EventHandler

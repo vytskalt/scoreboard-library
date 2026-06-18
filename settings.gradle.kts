@@ -9,3 +9,7 @@ val modulePrefix = rootProject.name
 rootProject.children.forEach {
   it.name = "$modulePrefix-${it.name}"
 }
+
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}

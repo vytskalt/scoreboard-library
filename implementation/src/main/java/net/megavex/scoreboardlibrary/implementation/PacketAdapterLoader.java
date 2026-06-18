@@ -15,13 +15,26 @@ public final class PacketAdapterLoader {
 
   public static @NotNull PacketAdapterProvider loadPacketAdapter(Plugin plugin) throws NoPacketAdapterAvailableException {
     Class<?> nmsClass = findAndLoadImplementationClass();
+    boolean swallowException = false;
     if (nmsClass == null) {
-      throw new NoPacketAdapterAvailableException();
+      // Hide from relocation checkers
+      String property = "net.mega".concat("vex.scoreboardlibrary.dontSwallowUntestedLoadException");
+
+      swallowException = !System.getProperty(property, "").equalsIgnoreCase("true");
+      nmsClass = tryLoadModern();
+      if (nmsClass == null) {
+        throw new NoPacketAdapterAvailableException();
+      }
     }
 
     try {
       return (PacketAdapterProvider) nmsClass.getConstructors()[0].newInstance(plugin);
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException("couldn't initialize packet adapter", e);
+    } catch (InvocationTargetException e) {
+      if (swallowException) {
+        throw new NoPacketAdapterAvailableException();
+      }
       throw new RuntimeException("couldn't initialize packet adapter", e);
     }
   }
@@ -119,14 +132,9 @@ public final class PacketAdapterLoader {
       case "26.1":
       case "26.1.1":
       case "26.1.2":
+      case "26.2":
         return tryLoadModern();
       default:
-        // Hide from relocation checkers
-        String property = "net.mega".concat("vex.scoreboardlibrary.forceModern");
-        if (System.getProperty(property, "").equalsIgnoreCase("true")) {
-          return tryLoadModern();
-        }
-
         return null;
     }
   }

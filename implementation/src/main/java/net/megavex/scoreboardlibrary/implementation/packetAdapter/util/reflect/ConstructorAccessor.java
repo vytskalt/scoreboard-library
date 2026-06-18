@@ -5,19 +5,6 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.lang.invoke.MethodHandle;
 
-public final class ConstructorAccessor<T> {
-  private final MethodHandle handle;
-
-  public ConstructorAccessor(@NotNull MethodHandle handle) {
-    this.handle = handle;
-  }
-
-  public @NotNull T invoke(@UnknownNullability Object... args) {
-    try {
-      //noinspection unchecked
-      return (T) handle.invokeExact(args);
-    } catch (Throwable e) {
-      throw new IllegalStateException("couldn't instantiate constructor", e);
-    }
-  }
+public interface ConstructorAccessor<T> {
+  @NotNull T invoke(@UnknownNullability Object... args);
 }
