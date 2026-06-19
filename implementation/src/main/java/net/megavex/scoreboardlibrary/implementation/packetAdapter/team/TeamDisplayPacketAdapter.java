@@ -9,6 +9,7 @@ import java.util.Collection;
 public interface TeamDisplayPacketAdapter {
   void removeTeam(@NotNull Iterable<Player> players);
 
+  // TODO: remove
   default void updateTeamPackets() {
   }
 

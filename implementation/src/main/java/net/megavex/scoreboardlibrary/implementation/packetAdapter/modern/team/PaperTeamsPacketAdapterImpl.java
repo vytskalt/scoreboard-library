@@ -30,10 +30,6 @@ public final class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapte
     }
 
     @Override
-    public void updateTeamPackets() {
-    }
-
-    @Override
     public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
       Collection<String> entries = new ArrayList<>(properties.syncedEntries());
 

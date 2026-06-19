@@ -27,8 +27,8 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
   @Override
   public void onEnable() {
     this.getServer().getPluginManager().registerEvents(this, this);
+    // 1.16.5 Paper doesn't have translator(), while 26.2 Paper doesn't have get() because it upgraded to Adventure 5
     try {
-      // 1.16.5 Paper doesn't have translator()
       GlobalTranslator.get().addSource(this.translator);
     } catch (NoSuchMethodError ignored) {
       GlobalTranslator.translator().addSource(this.translator);
@@ -74,8 +74,8 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
       this.lib.close();
     }
 
+    // see above
     try {
-      // 1.16.5 Paper doesn't have translator()
       GlobalTranslator.get().removeSource(this.translator);
     } catch (NoSuchMethodError ignored) {
       GlobalTranslator.translator().removeSource(this.translator);
