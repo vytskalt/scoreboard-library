@@ -1,6 +1,6 @@
 # Installation
 
-Latest version: `2.7.4`
+Latest version: `2.8.0`
 
 ## Gradle
 
@@ -13,7 +13,7 @@ dependencies {
   implementation("net.megavex:scoreboard-library-api:2.7.4")
   runtimeOnly("net.megavex:scoreboard-library-implementation:2.7.4")
 
-  // If targeting a server version without native Adventure support, add it as well:
+  // If targeting a server version without native Adventure support (Spigot or older than 1.16.5 Paper), add it as well:
   implementation("net.kyori:adventure-platform-bukkit:4.4.1")
 }
 ```
@@ -37,7 +37,7 @@ like [Shadow](https://gradleup.com/shadow/).
     <scope>runtime</scope>
   </dependency>
 
-  <!-- If targeting a server version without native Adventure support, add it as well: -->
+  <!-- If targeting a server version without native Adventure support (Spigot or older than 1.16.5 Paper), add it as well: -->
   <dependency>
     <groupId>net.kyori</groupId>
     <artifactId>adventure-platform-bukkit</artifactId>
