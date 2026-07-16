@@ -23,6 +23,7 @@ public final class ViaConnectionGuard {
       && channel.isActive()
       && !connection.isPendingDisconnect()
       && protocolInfo != null
+      // for some reason these states are LOGIN for native players?
       && protocolInfo.getServerState() == State.PLAY
       && protocolInfo.getClientState() == State.PLAY
       && via.getConnection(player.getUniqueId()) == connection;

@@ -104,9 +104,9 @@ download_file() {
 
 download_file "buildtools.jar" "https://hub.spigotmc.org/jenkins/job/BuildTools/198/artifact/target/BuildTools.jar" "23eefb5a08655fe83c40ddac7a4ca78b6b2583efccd9c98c58b27df0aa31fa35"
 
-download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion-Java8/45/artifact/build/libs/ViaVersion-5.9.2-SNAPSHOT-downgraded.jar" "041cffd686a12bb7eff4762d5cd5455a9a8a992786cd01de79c8feed1edcb12a"
-download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards-Java8/37/artifact/build/libs/ViaBackwards-5.9.2-SNAPSHOT-downgraded.jar" "ce43af0c445cbb72fda3487333f4851eacd560226fc9c9a4975e7ad4400af7b9"
-download_file "viarewind.jar" "https://ci.viaversion.com/view/ViaRewind/job/ViaRewind-Java8/32/artifact/build/libs/ViaRewind-4.1.2-SNAPSHOT-downgraded.jar" "4beae0b490f3bf4c799c946f4a8ec76e2f345929199880b1423b965fa83604a0"
+download_file "viaversion.jar" "https://ci.viaversion.com/job/ViaVersion-Java8/49/artifact/build/libs/ViaVersion-5.11.0-downgraded.jar" "0f7800596dc4e1a10548c0636cc7d9af7ecd250b3b3181927140e5c019aeb562"
+download_file "viabackwards.jar" "https://ci.viaversion.com/view/ViaBackwards/job/ViaBackwards-Java8/41/artifact/build/libs/ViaBackwards-5.11.0-downgraded.jar" "b7591d569917d2d97384041d3c55cd993853818c26b662bfde22ec20f96ccde4"
+download_file "viarewind.jar" "https://ci.viaversion.com/view/ViaRewind/job/ViaRewind-Java8/34/artifact/build/libs/ViaRewind-4.1.4-SNAPSHOT-downgraded.jar" "68894e02932c25b1e62ffcb5e8d8bd81b872bcb66e2ab6377845204ba3413565"
 
 # --- 1.7.10 ---
 download_file "1.7.10-paper.jar" "https://fill-data.papermc.io/v1/objects/33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185/paper-1.7.10-2025.jar" "33772078d92e9dbb027602da016524ef29af5b4c12eaddac1fe2465b01108185"
@@ -248,7 +248,7 @@ create_spigot_server "26.1.2" "jdk25"
 
 # --- 26.2 ---
 
-download_file "26.2-paper.jar" "https://fill-data.papermc.io/v1/objects/d175ef544246c69df6689d80f2525bad2faf41aa24c88f08fd6cfca15139495c/paper-26.2-23.jar" "d175ef544246c69df6689d80f2525bad2faf41aa24c88f08fd6cfca15139495c"
+download_file "26.2-paper.jar" "https://fill-data.papermc.io/v1/objects/c2ece6c481c70b7f369234cff3628c35414df005c51043cc8b4d51a8bf853ac8/paper-26.2-60.jar" "c2ece6c481c70b7f369234cff3628c35414df005c51043cc8b4d51a8bf853ac8"
 create_server "26.2-paper" "jdk25"
 
 create_spigot_server "26.2" "jdk25" "true"

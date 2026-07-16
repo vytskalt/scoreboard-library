@@ -82,26 +82,25 @@ public final class ModernPacketSender implements PacketSender<Object> {
       final UserConnection conn = this.via.getConnection(player.getUniqueId());
       if (conn != null) {
         final Channel channel = conn.getChannel();
-        if (!ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
+        if (ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
+          assert channel != null; // checked by ViaConnectionGuard
+
+          // Paper has some "network optimization" patch that makes the NMS sendPacket method
+          // not always send the packet immediately to the player's netty channel,
+          // and this is a problem when we send some packets using ViaVersion API because it always sends
+          // the packet to the channel immediately, so the packet order between NMS and ViaVersion API can
+          // get messed up. So for ViaVersion players we send the packet directly to the player's channel
+          // bypassing Paper logic to work around this. Fortunately ViaVersion provides easy access to the player's channel.
+          channel.eventLoop().execute(() -> {
+            // The player can disconnect or enter configuration while this write is queued. The
+            // channel remains open in that state, but its encoder no longer accepts game packets.
+            // Also guard against a reconnect replacing ViaVersion's UUID mapping in the meantime.
+            if (ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
+              channel.writeAndFlush(packet);
+            }
+          });
           return;
         }
-        assert channel != null; // checked by ViaConnectionGuard
-
-        // Paper has some "network optimization" patch that makes the NMS sendPacket method
-        // not always send the packet immediately to the player's netty channel,
-        // and this is a problem when we send some packets using ViaVersion API because it always sends
-        // the packet to the channel immediately, so the packet order between NMS and ViaVersion API can
-        // get messed up. So for ViaVersion players we send the packet directly to the player's channel
-        // bypassing Paper logic to work around this. Fortunately ViaVersion provides easy access to the player's channel.
-        channel.eventLoop().execute(() -> {
-          // The player can disconnect or enter configuration while this write is queued. The
-          // channel remains open in that state, but its encoder no longer accepts game packets.
-          // Also guard against a reconnect replacing ViaVersion's UUID mapping in the meantime.
-          if (ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
-            channel.writeAndFlush(packet);
-          }
-        });
-        return;
       }
     }
 
