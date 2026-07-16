@@ -2,6 +2,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
 
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
@@ -83,13 +84,24 @@ public final class ModernPacketSender implements PacketSender<Object> {
       if (conn != null) {
         final Channel channel = conn.getChannel();
         if (channel != null) {
+          if (!isCurrentPlayConnection(player, conn, channel)) {
+            return;
+          }
+
           // Paper has some "network optimization" patch that makes the NMS sendPacket method
           // not always send the packet immediately to the player's netty channel,
           // and this is a problem when we send some packets using ViaVersion API because it always sends
           // the packet to the channel immediately, so the packet order between NMS and ViaVersion API can
           // get messed up. So for ViaVersion players we send the packet directly to the player's channel
           // bypassing Paper logic to work around this. Fortunately ViaVersion provides easy access to the player's channel.
-          channel.eventLoop().execute(() -> channel.writeAndFlush(packet));
+          channel.eventLoop().execute(() -> {
+            // The player can disconnect or enter configuration while this write is queued. The
+            // channel remains open in that state, but its encoder no longer accepts game packets.
+            // Also guard against a reconnect replacing ViaVersion's UUID mapping in the meantime.
+            if (isCurrentPlayConnection(player, conn, channel)) {
+              channel.writeAndFlush(packet);
+            }
+          });
           return;
         }
       }
@@ -102,5 +114,14 @@ public final class ModernPacketSender implements PacketSender<Object> {
     } catch (Throwable e) {
       throw new IllegalStateException("couldn't send packet to player", e);
     }
+  }
+
+  private boolean isCurrentPlayConnection(Player player, UserConnection connection, Channel channel) {
+    return player.isOnline()
+      && channel.isActive()
+      && !connection.isPendingDisconnect()
+      && connection.getProtocolInfo() != null
+      && connection.getProtocolInfo().getServerState() == State.PLAY
+      && this.via.getConnection(player.getUniqueId()) == connection;
   }
 }
