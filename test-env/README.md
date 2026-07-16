@@ -23,6 +23,10 @@
 - [x] 1.21.6
 - [x] 1.21.9
 - [x] 1.21.11
+- [x] 26.1 (Spigot)
+- [x] 26.1.1 (Paper)
+- [x] 26.1.2 (Spigot)
+- [x] 26.2
 
 ## Untested server versions
 
