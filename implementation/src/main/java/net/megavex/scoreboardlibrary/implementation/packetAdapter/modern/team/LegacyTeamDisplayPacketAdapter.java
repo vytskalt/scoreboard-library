@@ -10,10 +10,12 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ViaConnectionGuard;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -45,14 +47,14 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
     assert via != null;
     for (final Player player : players) {
       final UserConnection conn = via.getConnection(player.getUniqueId());
-      if (conn == null) continue;
+      if (conn == null || !ViaConnectionGuard.isCurrentPlayConnection(via, player, conn)) continue;
 
       final ByteBuf buf = Unpooled.buffer(128);
       Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
       Types.STRING.write(buf, teamName);
       Types.BYTE.writePrimitive(buf, (byte) TeamConstants.MODE_REMOVE);
 
-      via.sendRawPacket(player.getUniqueId(), buf);
+      sendRawPacket(via, player, conn, buf);
     }
   }
 
@@ -62,7 +64,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
     assert via != null;
     for (final Player player : players) {
       final UserConnection conn = via.getConnection(player.getUniqueId());
-      if (conn == null) continue;
+      if (conn == null || !ViaConnectionGuard.isCurrentPlayConnection(via, player, conn)) continue;
 
       final ByteBuf buf = Unpooled.buffer(128);
       Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
@@ -81,7 +83,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
         Types.STRING.write(buf, entry);
       }
 
-      via.sendRawPacket(player.getUniqueId(), buf);
+      sendRawPacket(via, player, conn, buf);
     }
   }
 
@@ -91,7 +93,7 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
     assert via != null;
     for (final Player player : players) {
       final UserConnection conn = via.getConnection(player.getUniqueId());
-      if (conn == null) continue;
+      if (conn == null || !ViaConnectionGuard.isCurrentPlayConnection(via, player, conn)) continue;
 
       final ByteBuf buf = Unpooled.buffer(128);
       Types.VAR_INT.writePrimitive(buf, teamsPacketId(player, conn));
@@ -134,7 +136,28 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
         }
       }
 
-      via.sendRawPacket(player.getUniqueId(), buf);
+      sendRawPacket(via, player, conn, buf);
+    }
+  }
+
+  private static void sendRawPacket(ViaAPI<Player> via, Player player, UserConnection connection, ByteBuf packet) {
+    final Channel channel = connection.getChannel();
+    if (!ViaConnectionGuard.isCurrentPlayConnection(via, player, connection, channel)) {
+      packet.release();
+      return;
+    }
+
+    try {
+      channel.eventLoop().execute(() -> {
+        if (ViaConnectionGuard.isCurrentPlayConnection(via, player, connection, channel)) {
+          connection.sendRawPacket(packet);
+        } else {
+          packet.release();
+        }
+      });
+    } catch (RuntimeException | Error exception) {
+      packet.release();
+      throw exception;
     }
   }
 

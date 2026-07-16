@@ -1,0 +1,38 @@
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
+
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import io.netty.channel.Channel;
+import org.bukkit.entity.Player;
+
+public final class ViaConnectionGuard {
+  private ViaConnectionGuard() {
+  }
+
+  public static boolean isCurrentPlayConnection(
+    ViaAPI<Player> via,
+    Player player,
+    UserConnection connection
+  ) {
+    return isCurrentPlayConnection(via, player, connection, connection.getChannel());
+  }
+
+  public static boolean isCurrentPlayConnection(
+    ViaAPI<Player> via,
+    Player player,
+    UserConnection connection,
+    Channel channel
+  ) {
+    final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+    return channel != null
+      && player.isOnline()
+      && channel.isActive()
+      && !connection.isPendingDisconnect()
+      && protocolInfo != null
+      && protocolInfo.getServerState() == State.PLAY
+      && protocolInfo.getClientState() == State.PLAY
+      && via.getConnection(player.getUniqueId()) == connection;
+  }
+}
