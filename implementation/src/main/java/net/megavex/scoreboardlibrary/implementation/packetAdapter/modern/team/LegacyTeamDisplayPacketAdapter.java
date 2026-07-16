@@ -142,23 +142,12 @@ public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAd
 
   private static void sendRawPacket(ViaAPI<Player> via, Player player, UserConnection connection, ByteBuf packet) {
     final Channel channel = connection.getChannel();
-    if (!ViaConnectionGuard.isCurrentPlayConnection(via, player, connection, channel)) {
-      packet.release();
-      return;
-    }
-
-    try {
-      channel.eventLoop().execute(() -> {
-        if (ViaConnectionGuard.isCurrentPlayConnection(via, player, connection, channel)) {
-          connection.sendRawPacket(packet);
-        } else {
-          packet.release();
-        }
-      });
-    } catch (RuntimeException | Error exception) {
-      packet.release();
-      throw exception;
-    }
+    assert channel != null; // checked by ViaConnectionGuard, field is final and will never change
+    channel.eventLoop().execute(() -> {
+      if (ViaConnectionGuard.isCurrentPlayConnection(via, player, connection)) {
+        connection.sendRawPacket(packet);
+      }
+    });
   }
 
   private @NotNull Integer teamsPacketId(final Player player, final UserConnection conn) {

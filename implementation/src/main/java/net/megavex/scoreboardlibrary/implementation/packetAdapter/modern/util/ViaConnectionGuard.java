@@ -16,15 +16,7 @@ public final class ViaConnectionGuard {
     Player player,
     UserConnection connection
   ) {
-    return isCurrentPlayConnection(via, player, connection, connection.getChannel());
-  }
-
-  public static boolean isCurrentPlayConnection(
-    ViaAPI<Player> via,
-    Player player,
-    UserConnection connection,
-    Channel channel
-  ) {
+    final Channel channel = connection.getChannel();
     final ProtocolInfo protocolInfo = connection.getProtocolInfo();
     return channel != null
       && player.isOnline()

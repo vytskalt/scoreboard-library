@@ -82,9 +82,10 @@ public final class ModernPacketSender implements PacketSender<Object> {
       final UserConnection conn = this.via.getConnection(player.getUniqueId());
       if (conn != null) {
         final Channel channel = conn.getChannel();
-        if (!ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn, channel)) {
+        if (!ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
           return;
         }
+        assert channel != null; // checked by ViaConnectionGuard
 
         // Paper has some "network optimization" patch that makes the NMS sendPacket method
         // not always send the packet immediately to the player's netty channel,
@@ -96,7 +97,7 @@ public final class ModernPacketSender implements PacketSender<Object> {
           // The player can disconnect or enter configuration while this write is queued. The
           // channel remains open in that state, but its encoder no longer accepts game packets.
           // Also guard against a reconnect replacing ViaVersion's UUID mapping in the meantime.
-          if (ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn, channel)) {
+          if (ViaConnectionGuard.isCurrentPlayConnection(this.via, player, conn)) {
             channel.writeAndFlush(packet);
           }
         });
