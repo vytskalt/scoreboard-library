@@ -2,6 +2,7 @@ package net.megavex.scoreboardlibrary.implementation;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.MapMaker;
+import net.kyori.adventure.Adventure;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -53,8 +54,8 @@ public final class ScoreboardLibraryImpl implements ScoreboardLibrary {
     Preconditions.checkNotNull(plugin, "plugin");
 
     try {
-      Class.forName("net.kyori.adventure.Adventure");
-    } catch (ClassNotFoundException e) {
+      Adventure.class.getName();
+    } catch (NoClassDefFoundError e) {
       throw new IllegalStateException("Adventure is not in the classpath");
     }
 
