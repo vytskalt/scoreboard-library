@@ -13,12 +13,18 @@ class LegacyFormatUtilTest {
   @Test
   void serializeTest() {
     assertSerialization(text(""), "");
-    assertSerialization(text(" ", NamedTextColor.RED), "§c ");
+    assertSerialization(text("Regular", NamedTextColor.RED), "§cRegular");
     assertSerialization(text("", NamedTextColor.RED), "§c");
 
     assertSerialization(text("Text", NamedTextColor.AQUA, TextDecoration.BOLD), "§b§lText");
-    Component nested = text("Text ", NamedTextColor.AQUA, TextDecoration.BOLD).append(text("", NamedTextColor.AQUA).append(text("", NamedTextColor.RED)));
-    assertSerialization(nested, "§b§lText §c");
+    Component nested = text("Text ", NamedTextColor.AQUA, TextDecoration.BOLD)
+      .append(text("", NamedTextColor.AQUA)
+        .append(text("", NamedTextColor.RED)));
+    assertSerialization(nested, "§b§lText §c§l");
+
+    Component decorated = text("Text ", NamedTextColor.AQUA)
+      .append(text("", NamedTextColor.AQUA, TextDecoration.BOLD).append(text("", NamedTextColor.RED)));
+    assertSerialization(decorated, "§bText §c§l");
   }
 
   private void assertSerialization(Component component, String expected) {

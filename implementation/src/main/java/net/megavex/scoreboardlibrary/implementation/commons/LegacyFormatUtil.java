@@ -9,13 +9,9 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static net.kyori.adventure.text.Component.empty;
-import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.parseChar;
 
@@ -59,24 +55,42 @@ public final class LegacyFormatUtil {
       translated = component;
     }
 
-    String legacyFormat = legacySection().serialize(translated);
-
     // Legacy format serializer ignores empty components, so it's impossible to set player color on 1.8 via team prefix
     // Need to manually add the missing legacy format of the last component
-    Component lastChild = translated;
-    while (!lastChild.children().isEmpty()) {
-      lastChild = lastChild.children().get(0);
-    }
 
-    if (lastChild instanceof TextComponent) {
-      String content = ((TextComponent) lastChild).content();
-      if (content.isEmpty()) {
-        String ending = legacySection().serialize(lastChild.append(space()));
-        legacyFormat += ending.substring(0, ending.length() - 1);
-      }
+    Component processed = processLastTextComponent(translated);
+    String legacyFormat = legacySection().serialize(processed);
+
+    if (processed != translated) {
+      legacyFormat = legacyFormat.substring(0, legacyFormat.length() - 1);
     }
 
     return legacyFormat;
+  }
+
+  private static Component processLastTextComponent(Component component) {
+    List<Component> children = component.children();
+    if (children.isEmpty()) {
+      if (component instanceof TextComponent) {
+        TextComponent textComponent = (TextComponent) component;
+        String content = textComponent.content();
+        if (content.isEmpty()) {
+          // Add space at the last component if it's empty, forces legacy serializer to include formatting for its style
+          return textComponent.content(" ");
+        }
+      }
+
+      return component;
+    }
+
+    Component last = children.get(children.size() - 1);
+    Component processed = processLastTextComponent(last);
+    if (processed == last) {
+      return component;
+    }
+    children = new ArrayList<>(children);
+    children.set(children.size() - 1, processed);
+    return component.children(children);
   }
 
   public static char getChar(@Nullable NamedTextColor color) {
