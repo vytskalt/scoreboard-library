@@ -1,7 +1,3 @@
-plugins {
-  id("net.megavex.scoreboardlibrary.base-conventions")
-}
-
 dependencies {
   testImplementation(project(":scoreboard-library-api"))
   testImplementation(project(":scoreboard-library-implementation"))

@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-  id("net.megavex.scoreboardlibrary.base-conventions")
   alias(libs.plugins.kotlin)
 }
 
