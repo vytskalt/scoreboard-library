@@ -3,10 +3,9 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 
 plugins {
-  `maven-publish`
   `java-library`
-  id("net.kyori.indra")
-  id("net.kyori.indra.publishing")
+  `maven-publish`
+  signing
   id("com.gradleup.nmcp")
 }
 
@@ -23,22 +22,45 @@ repositories {
   }
 }
 
-indra {
-  github("MegavexNetwork", "scoreboard-library") {
-    ci(true)
-  }
-  mitLicense()
-  reproducibleBuilds(true)
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 
-  javaVersions {
-    target(8)
-    minimumToolchain(21)
-  }
+  withSourcesJar()
+  withJavadocJar()
+}
 
-  publishSnapshotsTo("forgejo", "https://git.megavex.net/api/packages/MegavexPublic/maven")
-  configurePublications {
+tasks.withType<AbstractArchiveTask>().configureEach {
+  isPreserveFileTimestamps = false
+  isReproducibleFileOrder = true
+}
+
+publishing {
+  publications.withType<MavenPublication>().configureEach {
+    from(components["java"])
+
     pom {
-      url = "https://github.com/MegavexNetwork/scoreboard-library"
+      name = project.name
+      description = project.provider { project.description }
+      url = "https://github.com/vytskalt/scoreboard-library"
+
+      licenses {
+        license {
+          name = "The MIT License"
+          url = "https://opensource.org/licenses/MIT"
+          distribution = "repo"
+        }
+      }
+
+      scm {
+        connection =
+          "scm:git:https://github.com/vytskalt/scoreboard-library.git"
+        developerConnection =
+          "scm:git:ssh://git@github.com/vytskalt/scoreboard-library.git"
+        url =
+          "https://github.com/vytskalt/scoreboard-library"
+      }
+
       developers {
         developer {
           id = "vytskalt"
@@ -48,6 +70,11 @@ indra {
       }
     }
   }
+}
+
+signing {
+  useGpgCmd()
+  sign(publishing.publications)
 }
 
 nmcp {
