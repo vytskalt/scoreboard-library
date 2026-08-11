@@ -1,17 +1,18 @@
-package net.megavex.scoreboardlibrary.implementation;
+package net.megavex.scoreboardlibrary.tests.implementation;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
 
 import static net.kyori.adventure.text.Component.text;
 
-class LegacyFormatUtilTest {
-  @Test
-  void serializeTest() {
+public final class LegacyFormatUtilTest {
+  private LegacyFormatUtilTest() {
+  }
+
+  public static void serialize() {
     assertSerialization(text(""), "");
     assertSerialization(text("Regular", NamedTextColor.RED), "§cRegular");
     assertSerialization(text("", NamedTextColor.RED), "§c");
@@ -27,8 +28,8 @@ class LegacyFormatUtilTest {
     assertSerialization(decorated, "§bText §c§l");
   }
 
-  private void assertSerialization(Component component, String expected) {
+  private static void assertSerialization(final Component component, final String expected) {
     String legacy = LegacyFormatUtil.serialize(component, null);
-    Assertions.assertEquals(expected, legacy);
+    Assert.assertEquals(expected, legacy);
   }
 }

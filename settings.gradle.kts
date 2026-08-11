@@ -4,6 +4,7 @@ include(":api")
 include(":implementation")
 include(":extra-kotlin")
 include(":test-plugin")
+include(":tests")
 
 val modulePrefix = rootProject.name
 rootProject.children.forEach {

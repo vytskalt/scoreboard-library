@@ -10,10 +10,6 @@ adventureApi = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventureTextSerializerGson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
 adventureTextSerializerLegacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure" }
 
-# TODO: v6 only supports java 17
-junitJupiter = "org.junit.jupiter:junit-jupiter:5.13.4"
-junitPlatformLauncher = "org.junit.platform:junit-platform-launcher:1.14.1"
-
 [plugins]
 kotlin = "org.jetbrains.kotlin.jvm:2.2.21"
 

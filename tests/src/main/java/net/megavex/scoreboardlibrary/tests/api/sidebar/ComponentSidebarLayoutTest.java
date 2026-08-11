@@ -1,22 +1,25 @@
-package net.megavex.scoreboardlibrary.api.sidebar.component;
+package net.megavex.scoreboardlibrary.tests.api.sidebar;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
+import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout;
+import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
 import net.megavex.scoreboardlibrary.api.sidebar.component.animation.CollectionSidebarAnimation;
 import net.megavex.scoreboardlibrary.api.sidebar.component.animation.SidebarAnimation;
-import org.junit.jupiter.api.Test;
+import net.megavex.scoreboardlibrary.tests.Assert;
 
 import java.util.Arrays;
 
 import static net.kyori.adventure.text.Component.text;
-import static org.junit.jupiter.api.Assertions.*;
 
-class ComponentSidebarLayoutTest {
-  private final Sidebar sidebar = new NoopScoreboardLibrary().createSidebar();
+public final class ComponentSidebarLayoutTest {
+  private static final Sidebar sidebar = new NoopScoreboardLibrary().createSidebar();
 
-  @Test
-  void maxLines() {
+  private ComponentSidebarLayoutTest() {
+  }
+
+  public static void maxLines() {
     SidebarComponent.Builder builder = SidebarComponent.builder();
     for (int i = 0; i < Sidebar.MAX_LINES + 1; i++) {
       builder.addComponent(SidebarComponent.staticLine(text(i)));
@@ -28,36 +31,33 @@ class ComponentSidebarLayoutTest {
     componentSidebar.apply(sidebar);
 
     for (int i = 0; i < Sidebar.MAX_LINES; i++) {
-      assertNotNull(sidebar.line(i));
+      Assert.isTrue(sidebar.line(i) != null, "line not null");
     }
   }
 
-  @Test
-  void titleComponent() {
+  public static void titleComponent() {
     Component title = text("title");
     ComponentSidebarLayout componentSidebar = new ComponentSidebarLayout(SidebarComponent.staticLine(title), drawable -> {
     });
     componentSidebar.apply(sidebar);
-    assertEquals(title, sidebar.title());
+    Assert.equals(title, sidebar.title());
   }
 
-  @Test
-  void animatedLines() {
+  public static void animatedLines() {
     SidebarAnimation<Component> animation = new CollectionSidebarAnimation<>(Arrays.asList(text("frame 1"), text("frame 2")));
     SidebarComponent lines = SidebarComponent.builder().addAnimatedLine(animation).build();
     ComponentSidebarLayout componentSidebar = new ComponentSidebarLayout(drawable -> {
     }, lines);
 
     componentSidebar.apply(sidebar);
-    assertEquals(animation.currentFrame(), sidebar.line(0));
+    Assert.equals(animation.currentFrame(), sidebar.line(0));
 
     animation.nextFrame();
     componentSidebar.apply(sidebar);
-    assertEquals(animation.currentFrame(), sidebar.line(0));
+    Assert.equals(animation.currentFrame(), sidebar.line(0));
   }
 
-  @Test
-  void animatedComponents() {
+  public static void animatedComponents() {
     Component frame1Line = text("frame with one line");
     Component frame2Line1 = text("frame with");
     Component frame2Line2 = text("two lines");
@@ -74,17 +74,17 @@ class ComponentSidebarLayoutTest {
     }, lines);
 
     componentSidebar.apply(sidebar);
-    assertEquals(frame1Line, sidebar.line(0));
-    assertNull(sidebar.line(1));
+    Assert.equals(frame1Line, sidebar.line(0));
+    Assert.isNull(sidebar.line(1));
 
     animation.nextFrame();
     componentSidebar.apply(sidebar);
-    assertEquals(frame2Line1, sidebar.line(0));
-    assertEquals(frame2Line2, sidebar.line(1));
+    Assert.equals(frame2Line1, sidebar.line(0));
+    Assert.equals(frame2Line2, sidebar.line(1));
 
     animation.nextFrame();
     componentSidebar.apply(sidebar);
-    assertEquals(frame1Line, sidebar.line(0));
-    assertNull(sidebar.line(1));
+    Assert.equals(frame1Line, sidebar.line(0));
+    Assert.isNull(sidebar.line(1));
   }
 }
