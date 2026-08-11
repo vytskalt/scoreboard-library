@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
-import org.junit.Assert;
+import net.megavex.scoreboardlibrary.tests.Assert;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -30,6 +30,6 @@ public final class LegacyFormatUtilTest {
 
   private static void assertSerialization(final Component component, final String expected) {
     String legacy = LegacyFormatUtil.serialize(component, null);
-    Assert.assertEquals(expected, legacy);
+    Assert.equals(expected, legacy);
   }
 }

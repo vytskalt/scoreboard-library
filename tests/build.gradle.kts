@@ -3,14 +3,14 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":scoreboard-library-api"))
-  implementation(project(":scoreboard-library-implementation"))
+  testImplementation(project(":scoreboard-library-api"))
+  testImplementation(project(":scoreboard-library-implementation"))
 
-  implementation(libs.spigotApi)
+  testImplementation(libs.spigotApi)
 
-  implementation(libs.adventureApi)
-  implementation(libs.adventureTextSerializerGson)
-  implementation(libs.adventureTextSerializerLegacy)
+  testImplementation(libs.adventureApi)
+  testImplementation(libs.adventureTextSerializerGson)
+  testImplementation(libs.adventureTextSerializerLegacy)
 }
 
 tasks.named("test") {
@@ -20,6 +20,6 @@ tasks.named("test") {
 
 tasks.register<JavaExec>("runTests") {
   group = "verification"
-  classpath = sourceSets.main.get().runtimeClasspath
+  classpath = sourceSets.test.get().runtimeClasspath
   mainClass.set("net.megavex.scoreboardlibrary.tests.Main")
 }

@@ -23,11 +23,6 @@ repositories {
   }
 }
 
-dependencies {
-  testImplementation(libs.spigotApi)
-  testImplementation(libs.bundles.adventure)
-}
-
 indra {
   github("MegavexNetwork", "scoreboard-library") {
     ci(true)
