@@ -1,14 +1,14 @@
 plugins {
-  id("com.gradleup.nmcp.aggregation") version "1.6.1"
   `java-library`
   `maven-publish`
   signing
+  alias(libs.plugins.nmcpAggregation)
 }
 
 allprojects {
-  version = "2.8.2"
+  version = "2.8.2-SNAPSHOT"
   group = "net.megavex"
-  description = "Powerful packet-level scoreboard library for Paper/Spigot servers"
+  description = "Powerful packet-level scoreboard library for Minecraft Paper/Spigot servers"
 
   apply(plugin = "java-library")
   apply(plugin = "maven-publish")
@@ -17,8 +17,11 @@ allprojects {
 
   repositories {
     mavenCentral()
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
+      content {
+        includeGroup("org.spigotmc")
+      }
+    }
     maven("https://hub.spigotmc.org/nexus/content/repositories/sonatype-nexus-snapshots/") {
       content {
         includeGroup("net.md-5")

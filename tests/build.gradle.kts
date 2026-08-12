@@ -3,10 +3,7 @@ dependencies {
   testImplementation(project(":scoreboard-library-implementation"))
 
   testImplementation(libs.spigotApi)
-
-  testImplementation(libs.adventureApi)
-  testImplementation(libs.adventureTextSerializerGson)
-  testImplementation(libs.adventureTextSerializerLegacy)
+  testImplementation(libs.bundles.adventure)
 }
 
 tasks.named("test") {

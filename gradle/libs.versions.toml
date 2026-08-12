@@ -1,15 +1,23 @@
 [versions]
 adventure = "4.25.0"
+netty = "4.2.10.Final"
 
 [libraries]
 spigotApi = "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT" # do not update
+viaversionApi = "com.viaversion:viaversion-api:5.7.1"
 
 adventureApi = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventureTextSerializerGson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
 adventureTextSerializerLegacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure" }
 
+nettyBuffer = { module = "io.netty:netty-buffer", version.ref = "netty" }
+nettyHandler = { module = "io.netty:netty-handler", version.ref = "netty" }
+
 [plugins]
 kotlin = "org.jetbrains.kotlin.jvm:2.2.21"
+shadow = "com.gradleup.shadow:9.3.1"
+nmcpAggregation = "com.gradleup.nmcp.aggregation:1.6.1"
 
 [bundles]
 adventure = [ "adventureApi", "adventureTextSerializerGson", "adventureTextSerializerLegacy" ]
+netty = [ "nettyBuffer", "nettyHandler" ]

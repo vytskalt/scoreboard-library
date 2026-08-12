@@ -9,10 +9,8 @@ repositories {
 dependencies {
   api(project(":scoreboard-library-api"))
   compileOnly(libs.spigotApi)
-
-  compileOnly("com.viaversion:viaversion-api:5.7.1")
-  compileOnly("io.netty:netty-buffer:4.2.10.Final")
-  compileOnly("io.netty:netty-handler:4.2.10.Final")
+  compileOnly(libs.viaversionApi)
+  compileOnly(libs.bundles.netty)
 }
 
 publishing {
