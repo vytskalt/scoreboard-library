@@ -21,10 +21,12 @@ import java.util.Objects;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
 public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter {
+  private final PacketAdapterProviderImpl provider;
   private final String objectiveName;
   private Object removePacket;
 
-  public ObjectivePacketAdapterImpl(@NotNull String objectiveName) {
+  public ObjectivePacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
+    this.provider = provider;
     this.objectiveName = objectiveName;
   }
 
@@ -38,7 +40,7 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
     Object packet = PacketAccessors.DISPLAY_CONSTRUCTOR.invoke();
     Objects.requireNonNull(PacketAccessors.DISPLAY_SLOT).set(packet, ObjectiveConstants.displaySlotIndex(slot, false));
     PacketAccessors.DISPLAY_OBJECTIVE_NAME.set(packet, objectiveName);
-    LegacyPacketSender.INSTANCE.sendPacket(players, packet);
+    provider.packetSender().sendPacket(players, packet);
   }
 
   @Override
@@ -50,7 +52,7 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
     @Nullable ScoreFormat scoreFormat
   ) {
     LocalePacketUtil.sendLocalePackets(
-      LegacyPacketSender.INSTANCE,
+      provider.packetSender(),
       players,
       locale -> createPropertiesPacket(packetType, GlobalTranslator.render(value, locale), renderType)
     );
@@ -64,7 +66,7 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
       PacketAccessors.OBJECTIVE_VALUE_FIELD.set(removePacket, "");
       PacketAccessors.OBJECTIVE_MODE_FIELD.set(removePacket, ObjectiveConstants.MODE_REMOVE);
     }
-    LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
+    provider.packetSender().sendPacket(players, removePacket);
   }
 
   @Override
@@ -84,14 +86,14 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
       Objects.requireNonNull(PacketAccessors.SCORE_ACTION_FIELD).set(packet, 0);
     }
 
-    LegacyPacketSender.INSTANCE.sendPacket(players, packet);
+    provider.packetSender().sendPacket(players, packet);
   }
 
   @Override
   public void removeScore(@NotNull Collection<Player> players, @NotNull String entry) {
     Object packet = PacketAccessors.SCORE_CONSTRUCTOR.invoke(entry);
     Objects.requireNonNull(PacketAccessors.SCORE_OBJECTIVE_NAME_FIELD).set(packet, objectiveName);
-    LegacyPacketSender.INSTANCE.sendPacket(players, packet);
+    provider.packetSender().sendPacket(players, packet);
   }
 
   private @NotNull Object createPropertiesPacket(

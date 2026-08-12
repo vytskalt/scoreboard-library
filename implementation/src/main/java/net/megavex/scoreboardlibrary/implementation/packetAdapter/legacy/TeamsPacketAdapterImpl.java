@@ -22,10 +22,12 @@ import java.util.Objects;
 import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
 public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
+  private final PacketAdapterProviderImpl provider;
   private final String teamName;
   private Object removePacket;
 
-  public TeamsPacketAdapterImpl(@NotNull String teamName) {
+  public TeamsPacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String teamName) {
+    this.provider = provider;
     this.teamName = teamName;
   }
 
@@ -54,7 +56,7 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
         Objects.requireNonNull(PacketAccessors.TEAM_MODE_FIELD).set(removePacket, TeamConstants.MODE_REMOVE);
       }
 
-      LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
+      provider.packetSender().sendPacket(players, removePacket);
     }
 
     @Override
@@ -63,13 +65,13 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
       Objects.requireNonNull(PacketAccessors.TEAM_NAME_FIELD).set(packet, teamName);
       Objects.requireNonNull(PacketAccessors.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
       Objects.requireNonNull(PacketAccessors.TEAM_ENTRIES_FIELD).set(packet, entries);
-      LegacyPacketSender.INSTANCE.sendPacket(players, packet);
+      provider.packetSender().sendPacket(players, packet);
     }
 
     @Override
     public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
       LocalePacketUtil.sendLocalePackets(
-        LegacyPacketSender.INSTANCE,
+        provider.packetSender(),
         players,
         locale -> {
           String displayName = limitLegacyText(toLegacy(properties.displayName(), locale), TeamConstants.DISPLAY_NAME_LEGACY_LIMIT);

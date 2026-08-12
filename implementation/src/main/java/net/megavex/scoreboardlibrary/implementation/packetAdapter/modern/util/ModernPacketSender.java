@@ -25,17 +25,10 @@ public final class ModernPacketSender implements PacketSender<Object> {
   }
 
   static {
-    Class<?> craftPlayer;
-    try {
-      craftPlayer = Class.forName(MinecraftClasses.craftBukkit("entity.CraftPlayer"));
-    } catch (ClassNotFoundException e) {
-      throw new ExceptionInInitializerError(e);
-    }
-
     MethodHandles.Lookup lookup = MethodHandles.publicLookup();
     MethodType methodType = MethodType.methodType(PacketAccessors.SERVER_PLAYER_CLASS);
     try {
-      GET_HANDLE = lookup.findVirtual(craftPlayer, "getHandle", methodType);
+      GET_HANDLE = lookup.findVirtual(PacketAccessors.CRAFT_PLAYER_CLASS, "getHandle", methodType);
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new ExceptionInInitializerError(e);
     }

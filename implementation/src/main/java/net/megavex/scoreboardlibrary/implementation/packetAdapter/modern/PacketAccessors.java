@@ -5,12 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.team.enums.CollisionRule;
 import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
-import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.FieldAccessor;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MethodAccessor;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.*;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -152,6 +148,7 @@ public final class PacketAccessors {
     DYNAMIC_OPS_CLASS,
     JSON_OPS_CLASS,
     CODEC_CLASS,
+    CRAFT_PLAYER_CLASS,
     SERVER_PLAYER_CLASS,
     PLAYER_CONNECTION_CLASS,
     ADVENTURE_COMPONENT_CLASS,
@@ -181,6 +178,7 @@ public final class PacketAccessors {
     DYNAMIC_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DynamicOps");
     JSON_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.JsonOps");
     CODEC_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.Codec");
+    CRAFT_PLAYER_CLASS = ReflectUtil.getClassOrThrow(MinecraftClasses.craftBukkit("entity.CraftPlayer"));
     SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer", oldSpigotClassName("EntityPlayer"));
     PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection", oldSpigotClassName("PlayerConnection"));
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
