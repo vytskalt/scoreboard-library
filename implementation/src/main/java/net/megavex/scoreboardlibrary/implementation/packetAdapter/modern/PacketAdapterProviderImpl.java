@@ -5,6 +5,8 @@ import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.LegacyObjectivePacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.LegacyTeamsPacketAdapterImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.PaperObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.SpigotObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.PaperTeamsPacketAdapterImpl;
@@ -41,6 +43,10 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull ObjectivePacketAdapter createObjectiveAdapter(@NotNull String objectiveName) {
+    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+      return new LegacyObjectivePacketAdapterImpl(this, objectiveName);
+    }
+
     return ModernComponentProvider.IS_NATIVE_ADVENTURE
       ? new PaperObjectivePacketAdapter(this, objectiveName)
       : new SpigotObjectivePacketAdapter(this, objectiveName);
@@ -48,6 +54,10 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull TeamsPacketAdapter createTeamPacketAdapter(@NotNull String teamName) {
+    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+      return new LegacyTeamsPacketAdapterImpl(this, teamName);
+    }
+
     return ModernComponentProvider.IS_NATIVE_ADVENTURE
       ? new PaperTeamsPacketAdapterImpl(this, teamName)
       : new SpigotTeamsPacketAdapter(this, teamName);
@@ -55,6 +65,10 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
+    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+      return LineRenderingStrategy.LEGACY;
+    }
+
     if (this.via != null) {
       final ProtocolVersion ver = this.via.getPlayerProtocolVersion(player);
       if (ver.olderThan(ProtocolVersion.v1_13)) {

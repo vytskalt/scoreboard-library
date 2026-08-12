@@ -1,4 +1,4 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.legacy;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
@@ -7,6 +7,7 @@ import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -21,12 +22,12 @@ import java.util.Objects;
 
 import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
-public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
+public final class LegacyTeamsPacketAdapterImpl implements TeamsPacketAdapter {
   private final PacketAdapterProviderImpl provider;
   private final String teamName;
   private Object removePacket;
 
-  public TeamsPacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String teamName) {
+  public LegacyTeamsPacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String teamName) {
     this.provider = provider;
     this.teamName = teamName;
   }

@@ -78,11 +78,6 @@ public final class PacketAdapterLoader {
       case "1.12":
       case "1.12.1":
       case "1.12.2":
-        try {
-          return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.legacy.PacketAdapterProviderImpl");
-        } catch (ClassNotFoundException ignored) {
-          return null;
-        }
       case "1.13":
       case "1.13.1":
       case "1.13.2":

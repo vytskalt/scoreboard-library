@@ -1,4 +1,4 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.legacy;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -8,6 +8,7 @@ import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectiveConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -20,12 +21,12 @@ import java.util.Objects;
 
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
-public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter {
+public final class LegacyObjectivePacketAdapterImpl implements ObjectivePacketAdapter {
   private final PacketAdapterProviderImpl provider;
   private final String objectiveName;
   private Object removePacket;
 
-  public ObjectivePacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
+  public LegacyObjectivePacketAdapterImpl(PacketAdapterProviderImpl provider, @NotNull String objectiveName) {
     this.provider = provider;
     this.objectiveName = objectiveName;
   }
