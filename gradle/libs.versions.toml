@@ -3,7 +3,7 @@ adventure = "4.26.1" # last v4 release, staying for java 8 support. v5 is ABI co
 netty = "4.2.15.Final" # latest paper uses this version
 
 [libraries]
-spigotApi = "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT" # do not update
+spigotApi = "org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT" # oldest release on spigot repo
 viaversionApi = "com.viaversion:viaversion-api:5.11.0"
 
 adventureApi = { module = "net.kyori:adventure-api", version.ref = "adventure" }

@@ -8,19 +8,22 @@ import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableExcep
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import net.megavex.scoreboardlibrary.implementation.objective.ObjectiveManagerImpl;
+import net.megavex.scoreboardlibrary.implementation.objective.ObjectiveManagerTask;
 import net.megavex.scoreboardlibrary.implementation.objective.ObjectiveUpdaterTask;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
-import net.megavex.scoreboardlibrary.implementation.player.LocaleListener;
 import net.megavex.scoreboardlibrary.implementation.player.ScoreboardLibraryPlayer;
 import net.megavex.scoreboardlibrary.implementation.scheduler.TaskScheduler;
-import net.megavex.scoreboardlibrary.implementation.sidebar.AbstractSidebar;
-import net.megavex.scoreboardlibrary.implementation.sidebar.PlayerDependantLocaleSidebar;
-import net.megavex.scoreboardlibrary.implementation.sidebar.SidebarUpdaterTask;
-import net.megavex.scoreboardlibrary.implementation.sidebar.SingleLocaleSidebar;
+import net.megavex.scoreboardlibrary.implementation.sidebar.*;
 import net.megavex.scoreboardlibrary.implementation.team.TeamManagerImpl;
+import net.megavex.scoreboardlibrary.implementation.team.TeamManagerTask;
 import net.megavex.scoreboardlibrary.implementation.team.TeamUpdaterTask;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +45,7 @@ public final class ScoreboardLibraryImpl implements ScoreboardLibrary {
   private volatile Set<ObjectiveManagerImpl> objectiveManagers;
   private volatile Set<AbstractSidebar> sidebars;
 
-  private final LocaleListener localeListener;
+  private final Listener localeListener;
   private TeamUpdaterTask teamTask;
   private ObjectiveUpdaterTask objectiveTask;
   private SidebarUpdaterTask sidebarTask;
@@ -63,16 +66,43 @@ public final class ScoreboardLibraryImpl implements ScoreboardLibrary {
     this.packetAdapter = PacketAdapterLoader.loadPacketAdapter(plugin);
     this.taskScheduler = TaskScheduler.create(plugin);
 
-    boolean localeEventExists = false;
+    Class<? extends Event> playerLocaleChangeEvent = null;
     try {
-      Class.forName("org.bukkit.event.player.PlayerLocaleChangeEvent");
-      localeEventExists = true;
+      //noinspection unchecked
+      playerLocaleChangeEvent = (Class<? extends Event>) Class.forName("org.bukkit.event.player.PlayerLocaleChangeEvent");
     } catch (ClassNotFoundException ignored) {
     }
 
-    if (localeEventExists) {
-      localeListener = new LocaleListener(this);
-      plugin.getServer().getPluginManager().registerEvents(localeListener, plugin);
+    if (playerLocaleChangeEvent != null) {
+      localeListener = new Listener() {
+      };
+
+      EventExecutor executor = (listener, event) -> {
+        Player player = ((PlayerEvent) event).getPlayer();
+
+        // Need to wait a tick because the locale didn't update yet
+        taskScheduler.runNextTick(() -> {
+          ScoreboardLibraryPlayer slPlayer = getPlayer(player);
+          if (slPlayer != null) {
+            TeamManagerImpl teamManager = slPlayer.teamManagerQueue().current();
+            if (teamManager != null) {
+              teamManager.taskQueue().add(new TeamManagerTask.ReloadPlayer(player));
+            }
+
+            ObjectiveManagerImpl objectiveManager = slPlayer.objectiveManagerQueue().current();
+            if (objectiveManager != null) {
+              objectiveManager.taskQueue().add(new ObjectiveManagerTask.ReloadPlayer(player));
+            }
+
+            AbstractSidebar sidebar = slPlayer.sidebarQueue().current();
+            if (sidebar instanceof PlayerDependantLocaleSidebar) {
+              sidebar.taskQueue().add(new SidebarTask.ReloadPlayer(player));
+            }
+          }
+        });
+      };
+
+      plugin.getServer().getPluginManager().registerEvent(playerLocaleChangeEvent, localeListener, EventPriority.NORMAL, executor, plugin);
     } else {
       localeListener = null;
     }
@@ -141,7 +171,9 @@ public final class ScoreboardLibraryImpl implements ScoreboardLibrary {
       closed = true;
     }
 
-    HandlerList.unregisterAll(localeListener);
+    if (localeListener != null) {
+      HandlerList.unregisterAll(localeListener);
+    }
 
     if (teamManagers != null) {
       teamTask.task().cancel();
