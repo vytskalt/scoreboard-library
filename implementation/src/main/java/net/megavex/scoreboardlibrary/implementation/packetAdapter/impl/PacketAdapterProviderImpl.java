@@ -43,7 +43,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull ObjectivePacketAdapter createObjectiveAdapter(@NotNull String objectiveName) {
-    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
       return new LegacyObjectivePacketAdapterImpl(this, objectiveName);
     }
 
@@ -54,7 +54,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull TeamsPacketAdapter createTeamPacketAdapter(@NotNull String teamName) {
-    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
       return new LegacyTeamsPacketAdapterImpl(this, teamName);
     }
 
@@ -65,7 +65,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
-    if (!PacketAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
       return LineRenderingStrategy.LEGACY;
     }
 

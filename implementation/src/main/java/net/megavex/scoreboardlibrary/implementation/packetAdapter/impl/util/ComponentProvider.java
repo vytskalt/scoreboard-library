@@ -2,7 +2,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
@@ -34,9 +34,9 @@ public final class ComponentProvider {
     String notRelocatedPackage = "net.ky".concat("ori.adventure.text");
 
     // The native adventure optimizations only work when the adventure library isn't relocated
-    IS_NATIVE_ADVENTURE = PacketAccessors.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
+    IS_NATIVE_ADVENTURE = NmsAccessors.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
 
-    if (PacketAccessors.IS_1_20_5_OR_ABOVE) {
+    if (NmsAccessors.IS_1_20_5_OR_ABOVE) {
       Class<?> craftRegistry;
       try {
         craftRegistry = Class.forName(MinecraftClasses.craftBukkit("CraftRegistry"));
@@ -54,12 +54,12 @@ public final class ComponentProvider {
       MINECRAFT_REGISTRY = null;
     }
 
-    if (PacketAccessors.IS_1_21_6_OR_ABOVE) {
-      CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.COMPONENT_SERIALIZATION_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
+    if (NmsAccessors.IS_1_21_6_OR_ABOVE) {
+      CODEC = ReflectUtil.findFieldUnchecked(NmsAccessors.COMPONENT_SERIALIZATION_CLASS, 0, NmsAccessors.CODEC_CLASS, true).get(null);
       FROM_JSON_METHOD = null;
     } else {
       MethodHandle handle = null;
-      for (Method method : PacketAccessors.CHAT_SERIALIZER_CLASS.getMethods()) {
+      for (Method method : NmsAccessors.CHAT_SERIALIZER_CLASS.getMethods()) {
         if (method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&
           method.getParameterTypes()[0].getName().equals(RelocatedGson.SERVER_GSON_PKG + ".JsonElement")
@@ -84,7 +84,7 @@ public final class ComponentProvider {
 
   public static @NotNull Object fromAdventure(@NotNull Component adventure, @Nullable Locale locale) {
     if (IS_NATIVE_ADVENTURE) {
-      return PacketAccessors.fromAdventureComponent(adventure);
+      return NmsAccessors.fromAdventureComponent(adventure);
     }
 
     Component translated = adventure;
@@ -96,9 +96,9 @@ public final class ComponentProvider {
 
     if (FROM_JSON_METHOD == null) {
       // 1.21.6+
-      Object result = PacketAccessors.CODEC_PARSE.invoke(CODEC, PacketAccessors.JSON_OPS, json);
+      Object result = NmsAccessors.CODEC_PARSE.invoke(CODEC, NmsAccessors.JSON_OPS, json);
       //noinspection OptionalGetWithoutIsPresent
-      return ((Optional<?>) PacketAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
+      return ((Optional<?>) NmsAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
     }
 
     Object[] args;

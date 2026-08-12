@@ -3,7 +3,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -33,32 +33,32 @@ public final class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapte
     public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
       Collection<String> entries = new ArrayList<>(properties.syncedEntries());
 
-      Object displayName = PacketAccessors.fromAdventureComponent(properties.displayName());
-      Object prefix = PacketAccessors.fromAdventureComponent(properties.prefix());
-      Object suffix = PacketAccessors.fromAdventureComponent(properties.suffix());
+      Object displayName = NmsAccessors.fromAdventureComponent(properties.displayName());
+      Object prefix = NmsAccessors.fromAdventureComponent(properties.prefix());
+      Object suffix = NmsAccessors.fromAdventureComponent(properties.suffix());
 
       Object packet;
-      if (PacketAccessors.IS_1_17_OR_ABOVE) {
-        assert PacketAccessors.PARAMETERS_CONSTRUCTOR != null;
-        Object parameters = PacketAccessors.createTeamParameters(displayName, prefix, suffix, properties);
+      if (NmsAccessors.IS_1_17_OR_ABOVE) {
+        assert NmsAccessors.PARAMETERS_CONSTRUCTOR != null;
+        Object parameters = NmsAccessors.createTeamParameters(displayName, prefix, suffix, properties);
 
-        packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+        packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
           teamName,
           TeamConstants.mode(packetType),
           Optional.of(parameters),
           entries
         );
       } else {
-        assert PacketAccessors.TEAM_NAME_FIELD != null;
-        assert PacketAccessors.TEAM_MODE_FIELD != null;
-        assert PacketAccessors.TEAM_ENTRIES_FIELD != null;
+        assert NmsAccessors.TEAM_NAME_FIELD != null;
+        assert NmsAccessors.TEAM_MODE_FIELD != null;
+        assert NmsAccessors.TEAM_ENTRIES_FIELD != null;
 
-        packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-        PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
-        PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
-        PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+        packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+        NmsAccessors.TEAM_NAME_FIELD.set(packet, teamName);
+        NmsAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
+        NmsAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
 
-        PacketAccessors.setupOldTeamPropertiesFields(packet, displayName, prefix, suffix, properties);
+        NmsAccessors.setupOldTeamPropertiesFields(packet, displayName, prefix, suffix, properties);
       }
 
       provider.packetSender().sendPacket(players, packet);

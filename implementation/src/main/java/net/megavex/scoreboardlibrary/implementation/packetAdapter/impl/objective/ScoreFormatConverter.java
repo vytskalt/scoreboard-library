@@ -1,7 +1,7 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective;
 
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
@@ -20,17 +20,17 @@ public final class ScoreFormatConverter {
   private static final ConstructorAccessor<?> FIXED_CONSTRUCTOR;
 
   static {
-    if (PacketAccessors.IS_1_20_3_OR_ABOVE) {
-      STYLE_CODEC = ReflectUtil.findFieldUnchecked(PacketAccessors.STYLE_SERIALIZER_CLASS, 0, PacketAccessors.CODEC_CLASS, true).get(null);
+    if (NmsAccessors.IS_1_20_3_OR_ABOVE) {
+      STYLE_CODEC = ReflectUtil.findFieldUnchecked(NmsAccessors.STYLE_SERIALIZER_CLASS, 0, NmsAccessors.CODEC_CLASS, true).get(null);
 
       Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
       BLANK = ReflectUtil.findFieldUnchecked(blankFormatClass, 0, blankFormatClass, true).get(null);
 
       Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
-      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, PacketAccessors.STYLE_CLASS);
+      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, NmsAccessors.STYLE_CLASS);
 
       Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
-      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, PacketAccessors.COMPONENT_CLASS);
+      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, NmsAccessors.COMPONENT_CLASS);
     } else {
       STYLE_CODEC = null;
       BLANK = null;
@@ -43,7 +43,7 @@ public final class ScoreFormatConverter {
   }
 
   public static @Nullable Object convert(@Nullable Locale locale, @Nullable ScoreFormat format) {
-    if (format == null || !PacketAccessors.IS_1_20_3_OR_ABOVE) {
+    if (format == null || !NmsAccessors.IS_1_20_3_OR_ABOVE) {
       return null;
     }
 
@@ -51,9 +51,9 @@ public final class ScoreFormatConverter {
       return BLANK;
     } else if (format instanceof ScoreFormat.Styled) {
       Object json = RelocatedGson.convertToServerGson(gson().serializer().toJsonTree(((ScoreFormat.Styled) format).style()));
-      Object result = PacketAccessors.CODEC_PARSE.invoke(STYLE_CODEC, PacketAccessors.JSON_OPS, json);
+      Object result = NmsAccessors.CODEC_PARSE.invoke(STYLE_CODEC, NmsAccessors.JSON_OPS, json);
       //noinspection OptionalGetWithoutIsPresent
-      Object style = ((Optional<?>) PacketAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
+      Object style = ((Optional<?>) NmsAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
       return STYLED_CONSTRUCTOR.invoke(style);
     } else if (format instanceof ScoreFormat.Fixed) {
       return FIXED_CONSTRUCTOR.invoke(ComponentProvider.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));

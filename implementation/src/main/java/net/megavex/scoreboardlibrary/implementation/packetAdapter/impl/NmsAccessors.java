@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.invoke.MethodType;
 import java.util.*;
 
-public final class PacketAccessors {
-  private PacketAccessors() {
+public final class NmsAccessors {
+  private NmsAccessors() {
   }
 
   public static final boolean
@@ -241,14 +241,14 @@ public final class PacketAccessors {
       }
     }
 
-    if (PacketAccessors.DATA_RESULT_CLASS != null) {
-      RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(PacketAccessors.DATA_RESULT_CLASS, false, MethodType.methodType(Optional.class), "result");
+    if (NmsAccessors.DATA_RESULT_CLASS != null) {
+      RESULT_UNWRAP_METHOD = ReflectUtil.findMethod(NmsAccessors.DATA_RESULT_CLASS, false, MethodType.methodType(Optional.class), "result");
       try {
-        JSON_OPS = PacketAccessors.JSON_OPS_CLASS.getField("INSTANCE").get(null);
+        JSON_OPS = NmsAccessors.JSON_OPS_CLASS.getField("INSTANCE").get(null);
       } catch (IllegalAccessException | NoSuchFieldException e) {
         throw new RuntimeException(e);
       }
-      CODEC_PARSE = ReflectUtil.findMethod(PacketAccessors.CODEC_CLASS, false, MethodType.methodType(PacketAccessors.DATA_RESULT_CLASS, PacketAccessors.DYNAMIC_OPS_CLASS, Object.class), "parse");
+      CODEC_PARSE = ReflectUtil.findMethod(NmsAccessors.CODEC_CLASS, false, MethodType.methodType(NmsAccessors.DATA_RESULT_CLASS, NmsAccessors.DYNAMIC_OPS_CLASS, Object.class), "parse");
     } else {
       RESULT_UNWRAP_METHOD = null;
       JSON_OPS = null;
@@ -453,13 +453,13 @@ public final class PacketAccessors {
   public static Object nameTagVisibility(NameTagVisibility value) {
     switch (value) {
       case NEVER:
-        return PacketAccessors.NAME_TAG_VISIBILITY_NEVER;
+        return NmsAccessors.NAME_TAG_VISIBILITY_NEVER;
       case ALWAYS:
-        return PacketAccessors.NAME_TAG_VISIBILITY_ALWAYS;
+        return NmsAccessors.NAME_TAG_VISIBILITY_ALWAYS;
       case HIDE_FOR_OTHER_TEAMS:
-        return PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OTHER_TEAMS;
+        return NmsAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OTHER_TEAMS;
       case HIDE_FOR_OWN_TEAM:
-        return PacketAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OWN_TEAM;
+        return NmsAccessors.NAME_TAG_VISIBILITY_HIDE_FOR_OWN_TEAM;
       default:
         throw new IllegalStateException("unknown name tag visibility " + value.name());
     }
@@ -468,13 +468,13 @@ public final class PacketAccessors {
   public static Object collisionRule(CollisionRule value) {
     switch (value) {
       case NEVER:
-        return PacketAccessors.COLLISION_RULE_NEVER;
+        return NmsAccessors.COLLISION_RULE_NEVER;
       case ALWAYS:
-        return PacketAccessors.COLLISION_RULE_ALWAYS;
+        return NmsAccessors.COLLISION_RULE_ALWAYS;
       case PUSH_OTHER_TEAMS:
-        return PacketAccessors.COLLISION_RULE_PUSH_OTHER_TEAMS;
+        return NmsAccessors.COLLISION_RULE_PUSH_OTHER_TEAMS;
       case PUSH_OWN_TEAM:
-        return PacketAccessors.COLLISION_RULE_PUSH_OWN_TEAM;
+        return NmsAccessors.COLLISION_RULE_PUSH_OWN_TEAM;
       default:
         throw new IllegalStateException("unknown collision rule " + value.name());
     }
@@ -483,9 +483,9 @@ public final class PacketAccessors {
   public static Object renderType(ObjectiveRenderType renderType) {
     switch (renderType) {
       case INTEGER:
-        return PacketAccessors.RENDER_TYPE_INTEGER;
+        return NmsAccessors.RENDER_TYPE_INTEGER;
       case HEARTS:
-        return PacketAccessors.RENDER_TYPE_HEARTS;
+        return NmsAccessors.RENDER_TYPE_HEARTS;
       default:
         throw new IllegalStateException("unknown render type " + renderType);
     }
@@ -495,10 +495,10 @@ public final class PacketAccessors {
     if (IS_26_2_OR_ABOVE) {
       Object chatFormattingColor = null;
       if (otherProps.playerColor() != null) {
-        chatFormattingColor = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor());
+        chatFormattingColor = NmsAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor());
       }
-      Object nmsNameTagVisibility = PacketAccessors.nameTagVisibility(otherProps.nameTagVisibility());
-      Object nmsCollisionRule = PacketAccessors.collisionRule(otherProps.collisionRule());
+      Object nmsNameTagVisibility = NmsAccessors.nameTagVisibility(otherProps.nameTagVisibility());
+      Object nmsCollisionRule = NmsAccessors.collisionRule(otherProps.collisionRule());
       return PARAMETERS_CONSTRUCTOR.invoke(displayName, playerPrefix, playerSuffix, nmsNameTagVisibility, nmsCollisionRule, Optional.ofNullable(chatFormattingColor), (byte) otherProps.packOptions());
     }
 
@@ -511,14 +511,14 @@ public final class PacketAccessors {
     Object nmsNameTagVisibility;
     Object nmsCollisionRule;
     if (IS_1_21_5_OR_ABOVE) {
-      nmsNameTagVisibility = PacketAccessors.nameTagVisibility(otherProps.nameTagVisibility());
-      nmsCollisionRule = PacketAccessors.collisionRule(otherProps.collisionRule());
+      nmsNameTagVisibility = NmsAccessors.nameTagVisibility(otherProps.nameTagVisibility());
+      nmsCollisionRule = NmsAccessors.collisionRule(otherProps.collisionRule());
     } else {
       nmsNameTagVisibility = otherProps.nameTagVisibility().key();
       nmsCollisionRule = otherProps.collisionRule().key();
     }
 
-    Object chatFormattingColor = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor() != null ? otherProps.playerColor() : NamedTextColor.WHITE);
+    Object chatFormattingColor = NmsAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor() != null ? otherProps.playerColor() : NamedTextColor.WHITE);
 
     DISPLAY_NAME_FIELD.set(teamPacket, displayName);
     PREFIX_FIELD.set(teamPacket, playerPrefix);
@@ -530,7 +530,7 @@ public final class PacketAccessors {
   }
 
   public static @NotNull Object fromAdventureComponent(@NotNull Component component) {
-    return Objects.requireNonNull(PacketAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
+    return Objects.requireNonNull(NmsAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
   }
 
   public static @Nullable String oldSpigotClassName(String clazz) {
