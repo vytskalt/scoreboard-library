@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public final class ReflectUtil {
   // Inspired by
@@ -146,6 +147,9 @@ public final class ReflectUtil {
     try {
       MethodHandle constructor = LOOKUP.findConstructor(packetClass, VOID_METHOD_TYPE);
       return (args) -> {
+        if (args.length != 0) {
+          throw new IllegalStateException("empty constructor expected no args, but got " + Arrays.toString(args));
+        }
         try {
           // noinspection unchecked
           return (T) constructor.invoke();

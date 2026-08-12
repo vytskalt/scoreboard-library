@@ -174,7 +174,7 @@ public final class PacketAccessors {
     DISPLAY_SLOT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.DisplaySlot");
     OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective", "net.minecraft.world.scores.ScoreboardObjective", oldSpigotClassName("ScoreboardObjective"));
     TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility", oldSpigotClassName("ScoreboardTeamBase$EnumNameTagVisibility"));
-    TEAM_COLLISION_RULE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
+    TEAM_COLLISION_RULE_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
     TEAM_COLOR_OR_CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.TeamColor", "net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat", oldSpigotClassName("EnumChatFormat"));
     OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
     DATA_RESULT_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DataResult");
@@ -184,7 +184,7 @@ public final class PacketAccessors {
     SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer", oldSpigotClassName("EntityPlayer"));
     PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection", oldSpigotClassName("PlayerConnection"));
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
-    SCORE_ACTION_CLASS = ReflectUtil.getOptionalClass(oldSpigotClassName("PacketPlayOutScoreboardScore$EnumScoreboardAction")); // double check
+    SCORE_ACTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.ServerScoreboard$Method", "net.minecraft.server.ScoreboardServer$Action", oldSpigotClassName("ScoreboardServer$Action"), oldSpigotClassName("PacketPlayOutScoreboardScore$EnumScoreboardAction"));
   }
 
   static {
@@ -218,10 +218,9 @@ public final class PacketAccessors {
     } else if (IS_1_13_OR_ABOVE) {
       OBJECTIVE_NUMBER_FORMAT_FIELD = null;
 
-      Class<?> methodClass = ReflectUtil.getClassOrThrow("net.minecraft.server.ServerScoreboard$Method", "net.minecraft.server.ScoreboardServer$Action", oldSpigotClassName("ScoreboardServer$Action"));
-      SCORE_1_20_2_METHOD_CHANGE = ReflectUtil.getEnumInstance(methodClass, "CHANGE", "a");
-      SCORE_1_20_2_METHOD_REMOVE = ReflectUtil.getEnumInstance(methodClass, "REMOVE", "b");
-      SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, methodClass, String.class, String.class, int.class);
+      SCORE_1_20_2_METHOD_CHANGE = ReflectUtil.getEnumInstance(SCORE_ACTION_CLASS, "CHANGE", "a");
+      SCORE_1_20_2_METHOD_REMOVE = ReflectUtil.getEnumInstance(SCORE_ACTION_CLASS, "REMOVE", "b");
+      SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, SCORE_ACTION_CLASS, String.class, String.class, int.class);
 
       SCORE_OBJECTIVE_NAME_FIELD = null;
       SCORE_VALUE_FIELD = null;
@@ -231,7 +230,7 @@ public final class PacketAccessors {
       OBJECTIVE_NUMBER_FORMAT_FIELD = null;
       SCORE_1_20_2_METHOD_CHANGE = null;
       SCORE_1_20_2_METHOD_REMOVE = null;
-      SCORE_CONSTRUCTOR = ReflectUtil.getEmptyConstructor(SET_SCORE_PKT_CLASS);
+      SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, String.class);
 
       SCORE_OBJECTIVE_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 1, String.class);
       SCORE_VALUE_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 0, int.class);
@@ -271,7 +270,6 @@ public final class PacketAccessors {
 
     outer:
     for (NamedTextColor color : NamedTextColor.NAMES.values()) {
-      char c = LegacyFormatUtil.getChar(color);
       for (Object chatFormatting : chatFormattings) {
         if (color.toString().equalsIgnoreCase((String) nameField.get(chatFormatting))) {
           NMS_CHAT_FORMATTING_MAP.put(color, chatFormatting);
@@ -287,10 +285,24 @@ public final class PacketAccessors {
   public static final Object NAME_TAG_VISIBILITY_HIDE_FOR_OTHER_TEAMS = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "HIDE_FOR_OTHER_TEAMS");
   public static final Object NAME_TAG_VISIBILITY_HIDE_FOR_OWN_TEAM = ReflectUtil.getEnumInstance(TEAM_VISIBILITY_CLASS, "HIDE_FOR_OWN_TEAM");
 
-  public static final Object COLLISION_RULE_ALWAYS = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "ALWAYS");
-  public static final Object COLLISION_RULE_NEVER = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "NEVER");
-  public static final Object COLLISION_RULE_PUSH_OTHER_TEAMS = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "PUSH_OTHER_TEAMS");
-  public static final Object COLLISION_RULE_PUSH_OWN_TEAM = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "PUSH_OWN_TEAM");
+  public static final Object COLLISION_RULE_ALWAYS;
+  public static final Object COLLISION_RULE_NEVER;
+  public static final Object COLLISION_RULE_PUSH_OTHER_TEAMS;
+  public static final Object COLLISION_RULE_PUSH_OWN_TEAM;
+
+  static {
+    if (TEAM_COLLISION_RULE_CLASS != null) {
+      COLLISION_RULE_ALWAYS = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "ALWAYS");
+      COLLISION_RULE_NEVER = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "NEVER");
+      COLLISION_RULE_PUSH_OTHER_TEAMS = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "PUSH_OTHER_TEAMS");
+      COLLISION_RULE_PUSH_OWN_TEAM = ReflectUtil.getEnumInstance(TEAM_COLLISION_RULE_CLASS, "PUSH_OWN_TEAM");
+    } else {
+      COLLISION_RULE_ALWAYS = null;
+      COLLISION_RULE_NEVER = null;
+      COLLISION_RULE_PUSH_OTHER_TEAMS = null;
+      COLLISION_RULE_PUSH_OWN_TEAM = null;
+    }
+  }
 
   public static final Object RENDER_TYPE_INTEGER = ReflectUtil.getEnumInstance(OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS, "INTEGER");
   public static final Object RENDER_TYPE_HEARTS = ReflectUtil.getEnumInstance(OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS, "HEARTS");
@@ -307,7 +319,7 @@ public final class PacketAccessors {
   public static final FieldAccessor<Object, String> OBJECTIVE_NAME_FIELD =
     ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, String.class);
   public static final FieldAccessor<Object, Object> OBJECTIVE_VALUE_FIELD =
-    ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, IS_1_13_OR_ABOVE ? COMPONENT_CLASS : String.class);
+    ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, IS_1_13_OR_ABOVE ? 0 : 1, IS_1_13_OR_ABOVE ? COMPONENT_CLASS : String.class);
   public static final FieldAccessor<Object, Object> OBJECTIVE_RENDER_TYPE_FIELD =
     IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS) : null;
   // Optional<NumberFormat> for 1.20.5+, NumberFormat for below
@@ -343,7 +355,6 @@ public final class PacketAccessors {
   public static final FieldAccessor<Object, Integer> SCORE_VALUE_FIELD;
   public static final FieldAccessor<Object, Object> SCORE_ACTION_FIELD;
   public static final Object SCORE_ACTION_CHANGE_1_8;
-    ;
 
   // --- TEAMS ---
 
@@ -436,7 +447,7 @@ public final class PacketAccessors {
       NAME_TAG_VISIBILITY_FIELD = IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 4, String.class) : null;
       COLLISION_RULE_FIELD = IS_1_9_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 5, String.class) : null;
 
-      COLOR_FIELD = IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS) : null;
+      COLOR_FIELD = IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, int.class) : null;
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, IS_1_8_OR_ABOVE ? 2 : 1, int.class);
     }
   }
