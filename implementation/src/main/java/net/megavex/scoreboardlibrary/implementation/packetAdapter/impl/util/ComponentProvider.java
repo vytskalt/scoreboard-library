@@ -1,9 +1,9 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.RelocatedGson;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 
-public final class ModernComponentProvider {
+public final class ComponentProvider {
   public static final boolean IS_NATIVE_ADVENTURE;
 
   private static final Object MINECRAFT_REGISTRY;
@@ -26,14 +26,14 @@ public final class ModernComponentProvider {
 
   private static final MethodHandle FROM_JSON_METHOD;
 
-  private ModernComponentProvider() {
+  private ComponentProvider() {
   }
 
   static {
     // Hide from relocation checkers
     String notRelocatedPackage = "net.ky".concat("ori.adventure.text");
 
-    // The native adventure optimisations only work when the adventure library isn't relocated
+    // The native adventure optimizations only work when the adventure library isn't relocated
     IS_NATIVE_ADVENTURE = PacketAccessors.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
 
     if (PacketAccessors.IS_1_20_5_OR_ABOVE) {

@@ -1,4 +1,4 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
 
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;

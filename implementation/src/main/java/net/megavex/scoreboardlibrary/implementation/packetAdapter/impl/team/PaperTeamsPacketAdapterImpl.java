@@ -1,10 +1,10 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import org.bukkit.entity.Player;

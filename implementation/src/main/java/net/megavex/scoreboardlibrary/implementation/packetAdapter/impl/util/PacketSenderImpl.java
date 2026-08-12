@@ -1,11 +1,10 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
 
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -13,14 +12,14 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
-public final class ModernPacketSender implements PacketSender<Object> {
+public final class PacketSenderImpl implements PacketSender<Object> {
   private static final MethodHandle GET_HANDLE;
   private static final MethodHandle PLAYER_CONNECTION;
   private static final MethodHandle SEND_PACKET;
 
   private final ViaAPI<Player> via;
 
-  public ModernPacketSender(final ViaAPI<Player> via) {
+  public PacketSenderImpl(final ViaAPI<Player> via) {
     this.via = via;
   }
 

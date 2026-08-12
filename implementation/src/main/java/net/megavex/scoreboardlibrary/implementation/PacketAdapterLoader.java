@@ -21,7 +21,7 @@ public final class PacketAdapterLoader {
       String property = "net.mega".concat("vex.scoreboardlibrary.dontSwallowUntestedLoadException");
 
       swallowException = !System.getProperty(property, "").equalsIgnoreCase("true");
-      nmsClass = tryLoadModern();
+      nmsClass = tryLoad();
       if (nmsClass == null) {
         throw new NoPacketAdapterAvailableException();
       }
@@ -52,15 +52,11 @@ public final class PacketAdapterLoader {
       version = version.substring(0, buildIndex);
     }
 
-    return tryLoadVersion(version);
-  }
-
-  private static @Nullable Class<?> tryLoadVersion(@NotNull String serverVersion) {
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-legacy/
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-10-1-15/
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-16/
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-21/
-    switch (serverVersion) {
+    switch (version) {
       case "1.7.10":
       case "1.8":
       case "1.8.3":
@@ -128,15 +124,15 @@ public final class PacketAdapterLoader {
       case "26.1.1":
       case "26.1.2":
       case "26.2":
-        return tryLoadModern();
+        return tryLoad();
       default:
         return null;
     }
   }
 
-  private static Class<?> tryLoadModern() {
+  private static Class<?> tryLoad() {
     try {
-      return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl");
+      return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl");
     } catch (ClassNotFoundException ignored) {
       return null;
     }

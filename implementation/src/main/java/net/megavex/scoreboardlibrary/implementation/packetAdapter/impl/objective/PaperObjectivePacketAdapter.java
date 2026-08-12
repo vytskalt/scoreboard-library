@@ -1,12 +1,12 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ public final class PaperObjectivePacketAdapter extends AbstractObjectivePacketAd
 
   @Override
   public void sendScore(@NotNull Collection<Player> players, @NotNull String entry, int value, @Nullable Component display, @Nullable ScoreFormat scoreFormat) {
-    Object nmsDisplay = display == null ? null : ModernComponentProvider.fromAdventure(display, null);
+    Object nmsDisplay = display == null ? null : ComponentProvider.fromAdventure(display, null);
     Object numberFormat = ScoreFormatConverter.convert(null, scoreFormat);
     Object packet = createScorePacket(entry, value, nmsDisplay, numberFormat);
     provider.packetSender().sendPacket(players, packet);

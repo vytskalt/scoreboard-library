@@ -1,18 +1,18 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.LegacyObjectivePacketAdapterImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.LegacyTeamsPacketAdapterImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.PaperObjectivePacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.SpigotObjectivePacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.PaperTeamsPacketAdapterImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.SpigotTeamsPacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.LegacyObjectivePacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.LegacyTeamsPacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.PaperObjectivePacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.SpigotObjectivePacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.PaperTeamsPacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.SpigotTeamsPacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.PacketSenderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ import java.util.WeakHashMap;
 @SuppressWarnings("unused")
 public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
   private final ViaAPI<Player> via;
-  private final ModernPacketSender packetSender;
+  private final PacketSenderImpl packetSender;
   private final WeakHashMap<Player, Integer> viaTeamPacketIds = new WeakHashMap<>();
 
   public PacketAdapterProviderImpl(Plugin plugin) {
@@ -38,7 +38,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
     } else {
       this.via = null;
     }
-    this.packetSender = new ModernPacketSender(this.via);
+    this.packetSender = new PacketSenderImpl(this.via);
   }
 
   @Override
@@ -47,7 +47,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
       return new LegacyObjectivePacketAdapterImpl(this, objectiveName);
     }
 
-    return ModernComponentProvider.IS_NATIVE_ADVENTURE
+    return ComponentProvider.IS_NATIVE_ADVENTURE
       ? new PaperObjectivePacketAdapter(this, objectiveName)
       : new SpigotObjectivePacketAdapter(this, objectiveName);
   }
@@ -58,7 +58,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
       return new LegacyTeamsPacketAdapterImpl(this, teamName);
     }
 
-    return ModernComponentProvider.IS_NATIVE_ADVENTURE
+    return ComponentProvider.IS_NATIVE_ADVENTURE
       ? new PaperTeamsPacketAdapterImpl(this, teamName)
       : new SpigotTeamsPacketAdapter(this, teamName);
   }
@@ -84,7 +84,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
     return via;
   }
 
-  public @NotNull ModernPacketSender packetSender() {
+  public @NotNull PacketSenderImpl packetSender() {
     return packetSender;
   }
 

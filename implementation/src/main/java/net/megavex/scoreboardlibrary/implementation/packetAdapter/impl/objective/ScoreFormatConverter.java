@@ -1,9 +1,9 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective;
 
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.RelocatedGson;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,7 @@ public final class ScoreFormatConverter {
       Object style = ((Optional<?>) PacketAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
       return STYLED_CONSTRUCTOR.invoke(style);
     } else if (format instanceof ScoreFormat.Fixed) {
-      return FIXED_CONSTRUCTOR.invoke(ModernComponentProvider.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));
+      return FIXED_CONSTRUCTOR.invoke(ComponentProvider.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));
     } else {
       throw new IllegalArgumentException("Invalid score format: " + format);
     }

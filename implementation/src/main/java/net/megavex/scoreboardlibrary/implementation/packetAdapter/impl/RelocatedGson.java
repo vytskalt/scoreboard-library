@@ -1,4 +1,4 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl;
 
 import com.google.gson.JsonElement;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MethodAccessor;

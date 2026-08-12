@@ -1,11 +1,11 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -38,9 +38,9 @@ public final class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterIm
         provider.packetSender(),
         players,
         locale -> {
-          Object displayName = ModernComponentProvider.fromAdventure(properties.displayName(), locale);
-          Object prefix = ModernComponentProvider.fromAdventure(properties.prefix(), locale);
-          Object suffix = ModernComponentProvider.fromAdventure(properties.suffix(), locale);
+          Object displayName = ComponentProvider.fromAdventure(properties.displayName(), locale);
+          Object prefix = ComponentProvider.fromAdventure(properties.prefix(), locale);
+          Object suffix = ComponentProvider.fromAdventure(properties.suffix(), locale);
 
           if (PacketAccessors.IS_1_17_OR_ABOVE) {
             assert PacketAccessors.PARAMETERS_CONSTRUCTOR != null;
