@@ -3,7 +3,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsCodec;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
@@ -35,9 +35,9 @@ public final class PaperTeamsPacketAdapterImpl extends AbstractTeamsPacketAdapte
     public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
       Collection<String> entries = new ArrayList<>(properties.syncedEntries());
 
-      Object displayName = NmsAccessors.fromAdventureComponent(properties.displayName());
-      Object prefix = NmsAccessors.fromAdventureComponent(properties.prefix());
-      Object suffix = NmsAccessors.fromAdventureComponent(properties.suffix());
+      Object displayName = NmsCodec.fromAdventureComponent(properties.displayName());
+      Object prefix = NmsCodec.fromAdventureComponent(properties.prefix());
+      Object suffix = NmsCodec.fromAdventureComponent(properties.suffix());
 
       Object packet;
       if (NmsClasses.IS_1_17_OR_ABOVE) {

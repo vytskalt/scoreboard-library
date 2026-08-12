@@ -49,9 +49,9 @@ public final class NmsScoreFormat {
       return BLANK;
     } else if (format instanceof ScoreFormat.Styled) {
       Object json = RelocatedGson.convertToServerGson(gson().serializer().toJsonTree(((ScoreFormat.Styled) format).style()));
-      Object result = NmsAccessors.CODEC_PARSE.invoke(STYLE_CODEC, NmsAccessors.JSON_OPS, json);
+      Object result = NmsCodec.CODEC_PARSE.invoke(STYLE_CODEC, NmsCodec.JSON_OPS, json);
       //noinspection OptionalGetWithoutIsPresent
-      Object style = ((Optional<?>) NmsAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
+      Object style = ((Optional<?>) NmsCodec.RESULT_UNWRAP_METHOD.invoke(result)).get();
       return STYLED_CONSTRUCTOR.invoke(style);
     } else if (format instanceof ScoreFormat.Fixed) {
       return FIXED_CONSTRUCTOR.invoke(NmsComponent.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));

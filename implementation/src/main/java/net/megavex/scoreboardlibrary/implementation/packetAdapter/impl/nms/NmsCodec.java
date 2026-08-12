@@ -1,22 +1,16 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 
-import net.kyori.adventure.text.Component;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MethodAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodType;
-import java.util.Objects;
 import java.util.Optional;
 
 import static net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses.*;
 
-public final class NmsAccessors {
-  private NmsAccessors() {
+public final class NmsCodec {
+  private NmsCodec() {
   }
-
-  // --- CODEC ---
 
   public static final MethodAccessor RESULT_UNWRAP_METHOD;
   public static final Object JSON_OPS;
@@ -36,14 +30,5 @@ public final class NmsAccessors {
       JSON_OPS = null;
       CODEC_PARSE = null;
     }
-  }
-
-  // --- ??? ---
-
-  public static final ConstructorAccessor<?> ADVENTURE_COMPONENT_CONSTRUCTOR =
-    ADVENTURE_COMPONENT_CLASS != null ? ReflectUtil.findOptionalConstructor(ADVENTURE_COMPONENT_CLASS, Component.class) : null;
-
-  public static @NotNull Object fromAdventureComponent(@NotNull Component component) {
-    return Objects.requireNonNull(NmsAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
   }
 }

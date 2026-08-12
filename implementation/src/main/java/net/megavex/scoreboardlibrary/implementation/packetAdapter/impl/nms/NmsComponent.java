@@ -3,6 +3,7 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,9 +13,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
+import static net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses.ADVENTURE_COMPONENT_CLASS;
 
 public final class NmsComponent {
   public static final boolean IS_NATIVE_ADVENTURE;
@@ -23,6 +26,9 @@ public final class NmsComponent {
   private static final Object CODEC;
 
   private static final MethodHandle FROM_JSON_METHOD;
+
+  private static final ConstructorAccessor<?> ADVENTURE_COMPONENT_CONSTRUCTOR =
+    ADVENTURE_COMPONENT_CLASS != null ? ReflectUtil.findOptionalConstructor(ADVENTURE_COMPONENT_CLASS, Component.class) : null;
 
   private NmsComponent() {
   }
@@ -75,7 +81,7 @@ public final class NmsComponent {
 
   public static @NotNull Object fromAdventure(@NotNull Component adventure, @Nullable Locale locale) {
     if (IS_NATIVE_ADVENTURE) {
-      return NmsAccessors.fromAdventureComponent(adventure);
+      return Objects.requireNonNull(ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(adventure);
     }
 
     Component translated = adventure;
@@ -87,9 +93,9 @@ public final class NmsComponent {
 
     if (FROM_JSON_METHOD == null) {
       // 1.21.6+
-      Object result = NmsAccessors.CODEC_PARSE.invoke(CODEC, NmsAccessors.JSON_OPS, json);
+      Object result = NmsCodec.CODEC_PARSE.invoke(CODEC, NmsCodec.JSON_OPS, json);
       //noinspection OptionalGetWithoutIsPresent
-      return ((Optional<?>) NmsAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
+      return ((Optional<?>) NmsCodec.RESULT_UNWRAP_METHOD.invoke(result)).get();
     }
 
     Object[] args;

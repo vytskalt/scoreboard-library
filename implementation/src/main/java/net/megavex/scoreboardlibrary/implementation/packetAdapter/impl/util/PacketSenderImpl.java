@@ -4,7 +4,6 @@ import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import org.bukkit.entity.Player;
 
