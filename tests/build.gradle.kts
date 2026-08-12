@@ -1,16 +1,9 @@
-plugins {
-  id("net.megavex.scoreboardlibrary.base-conventions")
-}
-
 dependencies {
   testImplementation(project(":scoreboard-library-api"))
   testImplementation(project(":scoreboard-library-implementation"))
 
   testImplementation(libs.spigotApi)
-
-  testImplementation(libs.adventureApi)
-  testImplementation(libs.adventureTextSerializerGson)
-  testImplementation(libs.adventureTextSerializerLegacy)
+  testImplementation(libs.bundles.adventure)
 }
 
 tasks.named("test") {

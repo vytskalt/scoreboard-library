@@ -1,6 +1,5 @@
 plugins {
-  id("net.megavex.scoreboardlibrary.base-conventions")
-  id("com.gradleup.shadow") version "9.3.1"
+  alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -9,16 +8,12 @@ dependencies {
   implementation(project(":scoreboard-library-api"))
   implementation(project(":scoreboard-library-implementation"))
 
-  compileOnly(libs.adventureApi)
-  compileOnly(libs.adventureTextSerializerGson)
-  compileOnly(libs.adventureTextSerializerLegacy)
+  //compileOnly(libs.bundles.adventure)
 
   // bundled adventure:
-  implementation(libs.adventureApi)
-  implementation(libs.adventureTextSerializerGson) {
+  implementation(libs.bundles.adventure) {
     //exclude("com.google.code.gson")
   }
-  implementation(libs.adventureTextSerializerLegacy)
 }
 
 tasks.shadowJar {

@@ -18,6 +18,6 @@ public final class Main {
 
     LegacyFormatUtilTest.serialize();
 
-    System.err.println("ALL TESTS PASSED!");
+    System.out.println("ALL TESTS PASSED!");
   }
 }

@@ -1,8 +1,8 @@
-plugins {
-  id("net.megavex.scoreboardlibrary.base-conventions")
-}
-
 dependencies {
   compileOnlyApi(libs.bundles.adventure)
   compileOnly(libs.spigotApi)
+}
+
+publishing {
+  publications.create<MavenPublication>("maven")
 }
