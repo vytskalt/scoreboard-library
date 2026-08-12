@@ -262,7 +262,7 @@ public final class PacketAccessors {
   public static final MethodAccessor CODEC_PARSE;
   public static final Object JSON_OPS;
 
-  public static final Map<NamedTextColor, Object> NMS_CHAT_FORMATTING_MAP = new HashMap<>();
+  public static final Map<NamedTextColor, Enum<?>> NMS_CHAT_FORMATTING_MAP = new HashMap<>();
 
   static {
     Object[] chatFormattings = TEAM_COLOR_OR_CHAT_FORMATTING_CLASS.getEnumConstants();
@@ -272,7 +272,7 @@ public final class PacketAccessors {
     for (NamedTextColor color : NamedTextColor.NAMES.values()) {
       for (Object chatFormatting : chatFormattings) {
         if (color.toString().equalsIgnoreCase((String) nameField.get(chatFormatting))) {
-          NMS_CHAT_FORMATTING_MAP.put(color, chatFormatting);
+          NMS_CHAT_FORMATTING_MAP.put(color, (Enum<?>) chatFormatting);
           continue outer;
         }
       }

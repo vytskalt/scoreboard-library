@@ -89,7 +89,7 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
 
           NamedTextColor color = properties.playerColor();
           if (PacketAccessors.COLOR_FIELD != null && color != null) {
-            int teamColorField = ChatColorUtil.getColorIndex(color);
+            int teamColorField = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(color).ordinal();
             PacketAccessors.COLOR_FIELD.set(packet, teamColorField);
           }
 
