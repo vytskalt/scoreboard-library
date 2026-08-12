@@ -21,7 +21,8 @@ public final class NmsEnums {
   private NmsEnums() {
   }
 
-  public static final Object SCORE_ACTION_CHANGE, SCORE_ACTION_REMOVE;
+  public static final Object SCORE_ACTION_CHANGE;
+  public static final Object SCORE_ACTION_REMOVE;
 
   static {
     if (IS_1_8_OR_ABOVE && !IS_1_20_3_OR_ABOVE) {

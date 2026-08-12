@@ -1,9 +1,7 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +16,7 @@ import java.util.Optional;
 
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 
-public final class ComponentProvider {
+public final class NmsComponent {
   public static final boolean IS_NATIVE_ADVENTURE;
 
   private static final Object MINECRAFT_REGISTRY;
@@ -26,7 +24,7 @@ public final class ComponentProvider {
 
   private static final MethodHandle FROM_JSON_METHOD;
 
-  private ComponentProvider() {
+  private NmsComponent() {
   }
 
   static {

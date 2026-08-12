@@ -1,10 +1,7 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +11,10 @@ import java.util.Optional;
 
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 
-public final class ScoreFormatConverter {
+public final class NmsScoreFormat {
+  private NmsScoreFormat() {
+  }
+
   private static final Object STYLE_CODEC;
   private static final Object BLANK;
   private static final ConstructorAccessor<?> STYLED_CONSTRUCTOR;
@@ -40,9 +40,6 @@ public final class ScoreFormatConverter {
     }
   }
 
-  private ScoreFormatConverter() {
-  }
-
   public static @Nullable Object convert(@Nullable Locale locale, @Nullable ScoreFormat format) {
     if (format == null || !NmsClasses.IS_1_20_3_OR_ABOVE) {
       return null;
@@ -57,7 +54,7 @@ public final class ScoreFormatConverter {
       Object style = ((Optional<?>) NmsAccessors.RESULT_UNWRAP_METHOD.invoke(result)).get();
       return STYLED_CONSTRUCTOR.invoke(style);
     } else if (format instanceof ScoreFormat.Fixed) {
-      return FIXED_CONSTRUCTOR.invoke(ComponentProvider.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));
+      return FIXED_CONSTRUCTOR.invoke(NmsComponent.fromAdventure(((ScoreFormat.Fixed) format).content(), locale));
     } else {
       throw new IllegalArgumentException("Invalid score format: " + format);
     }

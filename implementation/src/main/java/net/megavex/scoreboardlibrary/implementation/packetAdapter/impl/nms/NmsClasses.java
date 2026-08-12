@@ -119,6 +119,6 @@ public final class NmsClasses {
     SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer", oldSpigotClassName("EntityPlayer"));
     PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection", oldSpigotClassName("PlayerConnection"));
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
-    SCORE_ACTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.ServerScoreboard$Method", "net.minecraft.server.ScoreboardServer$Action", oldSpigotClassName("ScoreboardServer$Action"), oldSpigotClassName("PacketPlayOutScoreboardScore$EnumScoreboardAction"));
+    SCORE_ACTION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.server.ServerScoreboard$Method", "net.minecraft.server.ScoreboardServer$Action", oldSpigotClassName("ScoreboardServer$Action"), oldSpigotClassName("PacketPlayOutScoreboardScore$EnumScoreboardAction"));
   }
 }

@@ -5,7 +5,8 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsScoreFormat;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +22,8 @@ public final class SpigotObjectivePacketAdapter extends AbstractObjectivePacketA
   @Override
   public void sendScore(@NotNull Collection<Player> players, @NotNull String entry, int value, @Nullable Component display, @Nullable ScoreFormat scoreFormat) {
     LocalePacketUtil.sendLocalePackets(provider.packetSender(), players, locale -> {
-      Object nmsDisplay = display == null ? null : ComponentProvider.fromAdventure(display, locale);
-      Object numberFormat = ScoreFormatConverter.convert(locale, scoreFormat);
+      Object nmsDisplay = display == null ? null : NmsComponent.fromAdventure(display, locale);
+      Object numberFormat = NmsScoreFormat.convert(locale, scoreFormat);
       return createScorePacket(entry, value, nmsDisplay, numberFormat);
     });
   }
@@ -39,8 +40,8 @@ public final class SpigotObjectivePacketAdapter extends AbstractObjectivePacketA
       provider.packetSender(),
       players,
       locale -> {
-        Object numberFormat = ScoreFormatConverter.convert(locale, scoreFormat);
-        return createObjectivePacket(packetType, ComponentProvider.fromAdventure(value, locale), renderType, numberFormat);
+        Object numberFormat = NmsScoreFormat.convert(locale, scoreFormat);
+        return createObjectivePacket(packetType, NmsComponent.fromAdventure(value, locale), renderType, numberFormat);
       }
     );
   }

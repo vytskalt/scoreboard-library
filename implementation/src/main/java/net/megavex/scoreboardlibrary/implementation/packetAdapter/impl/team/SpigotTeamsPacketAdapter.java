@@ -6,7 +6,7 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPack
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -39,9 +39,9 @@ public final class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterIm
         provider.packetSender(),
         players,
         locale -> {
-          Object displayName = ComponentProvider.fromAdventure(properties.displayName(), locale);
-          Object prefix = ComponentProvider.fromAdventure(properties.prefix(), locale);
-          Object suffix = ComponentProvider.fromAdventure(properties.suffix(), locale);
+          Object displayName = NmsComponent.fromAdventure(properties.displayName(), locale);
+          Object prefix = NmsComponent.fromAdventure(properties.prefix(), locale);
+          Object suffix = NmsComponent.fromAdventure(properties.suffix(), locale);
 
           if (NmsClasses.IS_1_17_OR_ABOVE) {
             assert NmsTeams.PARAMETERS_CONSTRUCTOR != null;

@@ -6,7 +6,8 @@ import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsScoreFormat;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,8 +21,8 @@ public final class PaperObjectivePacketAdapter extends AbstractObjectivePacketAd
 
   @Override
   public void sendScore(@NotNull Collection<Player> players, @NotNull String entry, int value, @Nullable Component display, @Nullable ScoreFormat scoreFormat) {
-    Object nmsDisplay = display == null ? null : ComponentProvider.fromAdventure(display, null);
-    Object numberFormat = ScoreFormatConverter.convert(null, scoreFormat);
+    Object nmsDisplay = display == null ? null : NmsComponent.fromAdventure(display, null);
+    Object numberFormat = NmsScoreFormat.convert(null, scoreFormat);
     Object packet = createScorePacket(entry, value, nmsDisplay, numberFormat);
     provider.packetSender().sendPacket(players, packet);
   }
@@ -35,7 +36,7 @@ public final class PaperObjectivePacketAdapter extends AbstractObjectivePacketAd
     @Nullable ScoreFormat scoreFormat
   ) {
     Object nmsValue = NmsAccessors.fromAdventureComponent(value);
-    Object numberFormat = ScoreFormatConverter.convert(null, scoreFormat);
+    Object numberFormat = NmsScoreFormat.convert(null, scoreFormat);
     Object packet = createObjectivePacket(packetType, nmsValue, renderType, numberFormat);
     provider.packetSender().sendPacket(players, packet);
   }

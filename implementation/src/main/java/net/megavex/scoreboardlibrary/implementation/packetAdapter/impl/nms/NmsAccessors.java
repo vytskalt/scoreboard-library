@@ -43,7 +43,6 @@ public final class NmsAccessors {
   public static final ConstructorAccessor<?> ADVENTURE_COMPONENT_CONSTRUCTOR =
     ADVENTURE_COMPONENT_CLASS != null ? ReflectUtil.findOptionalConstructor(ADVENTURE_COMPONENT_CLASS, Component.class) : null;
 
-
   public static @NotNull Object fromAdventureComponent(@NotNull Component component) {
     return Objects.requireNonNull(NmsAccessors.ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(component);
   }
