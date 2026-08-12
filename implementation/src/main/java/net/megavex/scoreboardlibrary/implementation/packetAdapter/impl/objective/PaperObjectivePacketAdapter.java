@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import org.bukkit.entity.Player;

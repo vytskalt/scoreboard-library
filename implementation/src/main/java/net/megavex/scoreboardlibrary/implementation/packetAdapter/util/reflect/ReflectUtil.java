@@ -205,4 +205,13 @@ public final class ReflectUtil {
     target = target.asSpreader(Object[].class, handle.type().parameterCount());
     return target.asType(methodType);
   }
+
+  public static boolean hasClass(String className) {
+    try {
+      Class.forName(className);
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
 }

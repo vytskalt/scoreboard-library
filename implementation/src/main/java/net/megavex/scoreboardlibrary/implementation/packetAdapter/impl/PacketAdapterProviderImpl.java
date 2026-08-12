@@ -5,6 +5,8 @@ import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.LegacyObjectivePacketAdapterImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.LegacyTeamsPacketAdapterImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.PaperObjectivePacketAdapter;
@@ -43,7 +45,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull ObjectivePacketAdapter createObjectiveAdapter(@NotNull String objectiveName) {
-    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
       return new LegacyObjectivePacketAdapterImpl(this, objectiveName);
     }
 
@@ -54,7 +56,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull TeamsPacketAdapter createTeamPacketAdapter(@NotNull String teamName) {
-    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
       return new LegacyTeamsPacketAdapterImpl(this, teamName);
     }
 
@@ -65,7 +67,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
-    if (!NmsAccessors.IS_1_13_OR_ABOVE) {
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
       return LineRenderingStrategy.LEGACY;
     }
 

@@ -1,7 +1,8 @@
 package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective;
 
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ComponentProvider;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
@@ -20,17 +21,17 @@ public final class ScoreFormatConverter {
   private static final ConstructorAccessor<?> FIXED_CONSTRUCTOR;
 
   static {
-    if (NmsAccessors.IS_1_20_3_OR_ABOVE) {
-      STYLE_CODEC = ReflectUtil.findFieldUnchecked(NmsAccessors.STYLE_SERIALIZER_CLASS, 0, NmsAccessors.CODEC_CLASS, true).get(null);
+    if (NmsClasses.IS_1_20_3_OR_ABOVE) {
+      STYLE_CODEC = ReflectUtil.findFieldUnchecked(NmsClasses.STYLE_SERIALIZER_CLASS, 0, NmsClasses.CODEC_CLASS, true).get(null);
 
       Class<?> blankFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.BlankFormat");
       BLANK = ReflectUtil.findFieldUnchecked(blankFormatClass, 0, blankFormatClass, true).get(null);
 
       Class<?> styledFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.StyledFormat");
-      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, NmsAccessors.STYLE_CLASS);
+      STYLED_CONSTRUCTOR = ReflectUtil.findConstructor(styledFormatClass, NmsClasses.STYLE_CLASS);
 
       Class<?> fixedFormatClass = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.numbers.FixedFormat");
-      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, NmsAccessors.COMPONENT_CLASS);
+      FIXED_CONSTRUCTOR = ReflectUtil.findConstructor(fixedFormatClass, NmsClasses.COMPONENT_CLASS);
     } else {
       STYLE_CODEC = null;
       BLANK = null;
@@ -43,7 +44,7 @@ public final class ScoreFormatConverter {
   }
 
   public static @Nullable Object convert(@Nullable Locale locale, @Nullable ScoreFormat format) {
-    if (format == null || !NmsAccessors.IS_1_20_3_OR_ABOVE) {
+    if (format == null || !NmsClasses.IS_1_20_3_OR_ABOVE) {
       return null;
     }
 

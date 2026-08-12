@@ -4,7 +4,8 @@ import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -25,16 +26,16 @@ public final class PacketSenderImpl implements PacketSender<Object> {
 
   static {
     MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-    MethodType methodType = MethodType.methodType(NmsAccessors.SERVER_PLAYER_CLASS);
+    MethodType methodType = MethodType.methodType(NmsClasses.SERVER_PLAYER_CLASS);
     try {
-      GET_HANDLE = lookup.findVirtual(NmsAccessors.CRAFT_PLAYER_CLASS, "getHandle", methodType);
+      GET_HANDLE = lookup.findVirtual(NmsClasses.CRAFT_PLAYER_CLASS, "getHandle", methodType);
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new ExceptionInInitializerError(e);
     }
 
     MethodHandle playerConnection = null;
-    for (Field field : NmsAccessors.SERVER_PLAYER_CLASS.getFields()) {
-      if (field.getType() == NmsAccessors.PLAYER_CONNECTION_CLASS) {
+    for (Field field : NmsClasses.SERVER_PLAYER_CLASS.getFields()) {
+      if (field.getType() == NmsClasses.PLAYER_CONNECTION_CLASS) {
         try {
           playerConnection = lookup.unreflectGetter(field);
         } catch (IllegalAccessException e) {
@@ -48,13 +49,13 @@ public final class PacketSenderImpl implements PacketSender<Object> {
     }
     PLAYER_CONNECTION = playerConnection;
 
-    MethodType sendMethodType = MethodType.methodType(void.class, NmsAccessors.PKT_CLASS);
+    MethodType sendMethodType = MethodType.methodType(void.class, NmsClasses.PKT_CLASS);
     MethodHandle sendPacket = null;
 
     String[] sendPacketNames = {"a", "sendPacket", "b", "send"};
     for (String name : sendPacketNames) {
       try {
-        sendPacket = lookup.findVirtual(NmsAccessors.PLAYER_CONNECTION_CLASS, name, sendMethodType);
+        sendPacket = lookup.findVirtual(NmsClasses.PLAYER_CONNECTION_CLASS, name, sendMethodType);
       } catch (NoSuchMethodException ignored) {
       } catch (IllegalAccessException e) {
         throw new ExceptionInInitializerError(e);

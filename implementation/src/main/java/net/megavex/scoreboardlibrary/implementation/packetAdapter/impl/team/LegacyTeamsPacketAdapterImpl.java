@@ -6,7 +6,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsEnums;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
@@ -52,9 +53,9 @@ public final class LegacyTeamsPacketAdapterImpl implements TeamsPacketAdapter {
     @Override
     public void removeTeam(@NotNull Iterable<Player> players) {
       if (removePacket == null) {
-        removePacket = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-        Objects.requireNonNull(NmsAccessors.TEAM_NAME_FIELD).set(removePacket, teamName);
-        Objects.requireNonNull(NmsAccessors.TEAM_MODE_FIELD).set(removePacket, TeamConstants.MODE_REMOVE);
+        removePacket = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+        Objects.requireNonNull(NmsTeams.TEAM_NAME_FIELD).set(removePacket, teamName);
+        Objects.requireNonNull(NmsTeams.TEAM_MODE_FIELD).set(removePacket, TeamConstants.MODE_REMOVE);
       }
 
       provider.packetSender().sendPacket(players, removePacket);
@@ -62,10 +63,10 @@ public final class LegacyTeamsPacketAdapterImpl implements TeamsPacketAdapter {
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      Object packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-      Objects.requireNonNull(NmsAccessors.TEAM_NAME_FIELD).set(packet, teamName);
-      Objects.requireNonNull(NmsAccessors.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
-      Objects.requireNonNull(NmsAccessors.TEAM_ENTRIES_FIELD).set(packet, entries);
+      Object packet = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+      Objects.requireNonNull(NmsTeams.TEAM_NAME_FIELD).set(packet, teamName);
+      Objects.requireNonNull(NmsTeams.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
+      Objects.requireNonNull(NmsTeams.TEAM_ENTRIES_FIELD).set(packet, entries);
       provider.packetSender().sendPacket(players, packet);
     }
 
@@ -79,29 +80,29 @@ public final class LegacyTeamsPacketAdapterImpl implements TeamsPacketAdapter {
           String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
           String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
 
-          Object packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-          Objects.requireNonNull(NmsAccessors.TEAM_NAME_FIELD).set(packet, teamName);
-          Objects.requireNonNull(NmsAccessors.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
-          Objects.requireNonNull(NmsAccessors.DISPLAY_NAME_FIELD).set(packet, displayName);
-          Objects.requireNonNull(NmsAccessors.PREFIX_FIELD).set(packet, prefix);
-          Objects.requireNonNull(NmsAccessors.SUFFIX_FIELD).set(packet, suffix);
-          Objects.requireNonNull(NmsAccessors.OPTIONS_FIELD).set(packet, properties.packOptions());
-          if (NmsAccessors.NAME_TAG_VISIBILITY_FIELD != null) {
-            NmsAccessors.NAME_TAG_VISIBILITY_FIELD.set(packet, properties.nameTagVisibility().key());
+          Object packet = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+          Objects.requireNonNull(NmsTeams.TEAM_NAME_FIELD).set(packet, teamName);
+          Objects.requireNonNull(NmsTeams.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
+          Objects.requireNonNull(NmsTeams.DISPLAY_NAME_FIELD).set(packet, displayName);
+          Objects.requireNonNull(NmsTeams.PREFIX_FIELD).set(packet, prefix);
+          Objects.requireNonNull(NmsTeams.SUFFIX_FIELD).set(packet, suffix);
+          Objects.requireNonNull(NmsTeams.OPTIONS_FIELD).set(packet, properties.packOptions());
+          if (NmsTeams.NAME_TAG_VISIBILITY_FIELD != null) {
+            NmsTeams.NAME_TAG_VISIBILITY_FIELD.set(packet, properties.nameTagVisibility().key());
           }
 
           NamedTextColor color = properties.playerColor();
-          if (NmsAccessors.COLOR_FIELD != null && color != null) {
-            int teamColorField = NmsAccessors.NMS_CHAT_FORMATTING_MAP.get(color).ordinal();
-            NmsAccessors.COLOR_FIELD.set(packet, teamColorField);
+          if (NmsTeams.COLOR_FIELD != null && color != null) {
+            int teamColorField = NmsEnums.ADVENTURE_TO_NMS_CHAT_FORMATTING.get(color).ordinal();
+            NmsTeams.COLOR_FIELD.set(packet, teamColorField);
           }
 
-          if (NmsAccessors.COLLISION_RULE_FIELD != null) {
-            NmsAccessors.COLLISION_RULE_FIELD.set(packet, properties.collisionRule().key());
+          if (NmsTeams.COLLISION_RULE_FIELD != null) {
+            NmsTeams.COLLISION_RULE_FIELD.set(packet, properties.collisionRule().key());
           }
 
           if (packetType == PropertiesPacketType.CREATE) {
-            Objects.requireNonNull(NmsAccessors.TEAM_ENTRIES_FIELD).set(packet, ImmutableList.copyOf(properties.syncedEntries()));
+            Objects.requireNonNull(NmsTeams.TEAM_ENTRIES_FIELD).set(packet, ImmutableList.copyOf(properties.syncedEntries()));
           }
 
           return packet;

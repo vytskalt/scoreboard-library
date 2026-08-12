@@ -2,9 +2,9 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsAccessors;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.RelocatedGson;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,18 +34,11 @@ public final class ComponentProvider {
     String notRelocatedPackage = "net.ky".concat("ori.adventure.text");
 
     // The native adventure optimizations only work when the adventure library isn't relocated
-    IS_NATIVE_ADVENTURE = NmsAccessors.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
+    IS_NATIVE_ADVENTURE = NmsClasses.ADVENTURE_COMPONENT_CLASS != null && Component.class.getPackage().getName().equals(notRelocatedPackage);
 
-    if (NmsAccessors.IS_1_20_5_OR_ABOVE) {
-      Class<?> craftRegistry;
+    if (NmsClasses.IS_1_20_5_OR_ABOVE) {
       try {
-        craftRegistry = Class.forName(MinecraftClasses.craftBukkit("CraftRegistry"));
-      } catch (ClassNotFoundException e) {
-        throw new ExceptionInInitializerError(e);
-      }
-
-      try {
-        Method method = craftRegistry.getMethod("getMinecraftRegistry");
+        Method method = NmsClasses.CRAFT_REGISTRY_CLASS.getMethod("getMinecraftRegistry");
         MINECRAFT_REGISTRY = method.invoke(null);
       } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
         throw new RuntimeException(e);
@@ -54,12 +47,12 @@ public final class ComponentProvider {
       MINECRAFT_REGISTRY = null;
     }
 
-    if (NmsAccessors.IS_1_21_6_OR_ABOVE) {
-      CODEC = ReflectUtil.findFieldUnchecked(NmsAccessors.COMPONENT_SERIALIZATION_CLASS, 0, NmsAccessors.CODEC_CLASS, true).get(null);
+    if (NmsClasses.IS_1_21_6_OR_ABOVE) {
+      CODEC = ReflectUtil.findFieldUnchecked(NmsClasses.COMPONENT_SERIALIZATION_CLASS, 0, NmsClasses.CODEC_CLASS, true).get(null);
       FROM_JSON_METHOD = null;
     } else {
       MethodHandle handle = null;
-      for (Method method : NmsAccessors.CHAT_SERIALIZER_CLASS.getMethods()) {
+      for (Method method : NmsClasses.CHAT_SERIALIZER_CLASS.getMethods()) {
         if (method.getParameterCount() >= 1 &&
           method.getParameterCount() <= 2 &&
           method.getParameterTypes()[0].getName().equals(RelocatedGson.SERVER_GSON_PKG + ".JsonElement")

@@ -2,8 +2,9 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.NmsAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -40,20 +41,20 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
     @Override
     public void removeTeam(@NotNull Iterable<Player> players) {
       if (removePacket == null) {
-        if (NmsAccessors.IS_1_17_OR_ABOVE) {
-          removePacket = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+        if (NmsClasses.IS_1_17_OR_ABOVE) {
+          removePacket = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke(
             teamName,
             TeamConstants.MODE_REMOVE,
             null,
             Collections.emptyList()
           );
         } else {
-          assert NmsAccessors.TEAM_NAME_FIELD != null;
-          assert NmsAccessors.TEAM_MODE_FIELD != null;
+          assert NmsTeams.TEAM_NAME_FIELD != null;
+          assert NmsTeams.TEAM_MODE_FIELD != null;
 
-          removePacket = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-          NmsAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
-          NmsAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
+          removePacket = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+          NmsTeams.TEAM_NAME_FIELD.set(removePacket, teamName);
+          NmsTeams.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
         }
       }
       provider.packetSender().sendPacket(players, removePacket);
@@ -61,8 +62,8 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      if (NmsAccessors.IS_1_17_OR_ABOVE) {
-        Object packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+      if (NmsClasses.IS_1_17_OR_ABOVE) {
+        Object packet = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke(
           teamName,
           TeamConstants.mode(packetType),
           Optional.empty(),
@@ -70,14 +71,14 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
         );
         provider.packetSender().sendPacket(players, packet);
       } else {
-        assert NmsAccessors.TEAM_NAME_FIELD != null;
-        assert NmsAccessors.TEAM_MODE_FIELD != null;
-        assert NmsAccessors.TEAM_ENTRIES_FIELD != null;
+        assert NmsTeams.TEAM_NAME_FIELD != null;
+        assert NmsTeams.TEAM_MODE_FIELD != null;
+        assert NmsTeams.TEAM_ENTRIES_FIELD != null;
 
-        Object packet = NmsAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-        NmsAccessors.TEAM_NAME_FIELD.set(packet, teamName);
-        NmsAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
-        NmsAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+        Object packet = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+        NmsTeams.TEAM_NAME_FIELD.set(packet, teamName);
+        NmsTeams.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
+        NmsTeams.TEAM_ENTRIES_FIELD.set(packet, entries);
         provider.packetSender().sendPacket(players, packet);
       }
     }
