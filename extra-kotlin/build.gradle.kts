@@ -19,3 +19,7 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     jvmTarget = JvmTarget.JVM_1_8
   }
 }
+
+publishing {
+  publications.create<MavenPublication>("maven")
+}

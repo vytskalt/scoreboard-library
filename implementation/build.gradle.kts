@@ -14,3 +14,7 @@ dependencies {
   compileOnly("io.netty:netty-buffer:4.2.10.Final")
   compileOnly("io.netty:netty-handler:4.2.10.Final")
 }
+
+publishing {
+  publications.create<MavenPublication>("maven")
+}
