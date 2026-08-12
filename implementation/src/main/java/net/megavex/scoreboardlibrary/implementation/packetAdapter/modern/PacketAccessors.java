@@ -2,11 +2,15 @@ package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.team.enums.CollisionRule;
 import net.megavex.scoreboardlibrary.api.team.enums.NameTagVisibility;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.*;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ConstructorAccessor;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.FieldAccessor;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MethodAccessor;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.ReflectUtil;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +22,17 @@ public final class PacketAccessors {
   private PacketAccessors() {
   }
 
-  public static final boolean IS_1_17_OR_ABOVE, IS_1_20_2_OR_ABOVE, IS_1_20_3_OR_ABOVE, IS_1_20_5_OR_ABOVE, IS_1_21_5_OR_ABOVE, IS_1_21_6_OR_ABOVE, IS_26_2_OR_ABOVE;
+  public static final boolean
+    IS_1_8_OR_ABOVE,
+    IS_1_9_OR_ABOVE,
+    IS_1_13_OR_ABOVE,
+    IS_1_17_OR_ABOVE,
+    IS_1_20_2_OR_ABOVE,
+    IS_1_20_3_OR_ABOVE,
+    IS_1_20_5_OR_ABOVE,
+    IS_1_21_5_OR_ABOVE,
+    IS_1_21_6_OR_ABOVE,
+    IS_26_2_OR_ABOVE;
   private static final String OLD_NMS_VERSION_STRING;
 
   static {
@@ -35,6 +49,36 @@ public final class PacketAccessors {
     } else {
       OLD_NMS_VERSION_STRING = null;
     }
+
+    boolean is1_8OrAbove = is1_17OrAbove;
+    if (!is1_8OrAbove) {
+      try {
+        Class.forName(oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
+        is1_8OrAbove = true;
+      } catch (ClassNotFoundException ignored) {
+      }
+    }
+    IS_1_8_OR_ABOVE = is1_8OrAbove;
+
+    boolean is1_9OrAbove = is1_17OrAbove;
+    if (!is1_9OrAbove) {
+      try {
+        Class.forName(oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
+        is1_9OrAbove = true;
+      } catch (ClassNotFoundException ignored) {
+      }
+    }
+    IS_1_9_OR_ABOVE = is1_9OrAbove;
+
+    boolean is1_13OrAbove = is1_17OrAbove;
+    if (!is1_13OrAbove) {
+      try {
+        Class.forName(oldSpigotClassName("EntityDolphin"));
+        is1_13OrAbove = true;
+      } catch (ClassNotFoundException ignored) {
+      }
+    }
+    IS_1_13_OR_ABOVE = is1_13OrAbove;
 
     boolean is1_20_2OrAbove = false;
     try {
@@ -110,7 +154,8 @@ public final class PacketAccessors {
     CODEC_CLASS,
     SERVER_PLAYER_CLASS,
     PLAYER_CONNECTION_CLASS,
-    ADVENTURE_COMPONENT_CLASS;
+    ADVENTURE_COMPONENT_CLASS,
+    SCORE_ACTION_CLASS;
 
   static {
     PKT_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.protocol.Packet", oldSpigotClassName("Packet"));
@@ -139,6 +184,7 @@ public final class PacketAccessors {
     SERVER_PLAYER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.level.ServerPlayer", "net.minecraft.server.level.EntityPlayer", oldSpigotClassName("EntityPlayer"));
     PLAYER_CONNECTION_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.server.network.ServerGamePacketListenerImpl", "net.minecraft.server.network.PlayerConnection", oldSpigotClassName("PlayerConnection"));
     ADVENTURE_COMPONENT_CLASS = ReflectUtil.getOptionalClass("io.papermc.paper.adventure.AdventureComponent");
+    SCORE_ACTION_CLASS = ReflectUtil.getOptionalClass(oldSpigotClassName("PacketPlayOutScoreboardScore$EnumScoreboardAction")); // double check
   }
 
   static {
@@ -153,19 +199,49 @@ public final class PacketAccessors {
       SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, String.class, String.class, int.class, Optional.class, Optional.class);
       SCORE_1_20_2_METHOD_CHANGE = null;
       SCORE_1_20_2_METHOD_REMOVE = null;
+
+      SCORE_OBJECTIVE_NAME_FIELD = null;
+      SCORE_VALUE_FIELD = null;
+      SCORE_ACTION_FIELD = null;
+      SCORE_ACTION_CHANGE_1_8 = null;
     } else if (IS_1_20_3_OR_ABOVE) {
       assert NUMBER_FORMAT_CLASS != null;
       OBJECTIVE_NUMBER_FORMAT_FIELD = ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, NUMBER_FORMAT_CLASS);
       SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, String.class, String.class, int.class, COMPONENT_CLASS, NUMBER_FORMAT_CLASS);
       SCORE_1_20_2_METHOD_CHANGE = null;
       SCORE_1_20_2_METHOD_REMOVE = null;
-    } else {
+
+      SCORE_OBJECTIVE_NAME_FIELD = null;
+      SCORE_VALUE_FIELD = null;
+      SCORE_ACTION_FIELD = null;
+      SCORE_ACTION_CHANGE_1_8 = null;
+    } else if (IS_1_13_OR_ABOVE) {
       OBJECTIVE_NUMBER_FORMAT_FIELD = null;
 
       Class<?> methodClass = ReflectUtil.getClassOrThrow("net.minecraft.server.ServerScoreboard$Method", "net.minecraft.server.ScoreboardServer$Action", oldSpigotClassName("ScoreboardServer$Action"));
       SCORE_1_20_2_METHOD_CHANGE = ReflectUtil.getEnumInstance(methodClass, "CHANGE", "a");
       SCORE_1_20_2_METHOD_REMOVE = ReflectUtil.getEnumInstance(methodClass, "REMOVE", "b");
       SCORE_CONSTRUCTOR = ReflectUtil.findConstructor(SET_SCORE_PKT_CLASS, methodClass, String.class, String.class, int.class);
+
+      SCORE_OBJECTIVE_NAME_FIELD = null;
+      SCORE_VALUE_FIELD = null;
+      SCORE_ACTION_FIELD = null;
+      SCORE_ACTION_CHANGE_1_8 = null;
+    } else {
+      OBJECTIVE_NUMBER_FORMAT_FIELD = null;
+      SCORE_1_20_2_METHOD_CHANGE = null;
+      SCORE_1_20_2_METHOD_REMOVE = null;
+      SCORE_CONSTRUCTOR = ReflectUtil.getEmptyConstructor(SET_SCORE_PKT_CLASS);
+
+      SCORE_OBJECTIVE_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 1, String.class);
+      SCORE_VALUE_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 0, int.class);
+      if (IS_1_8_OR_ABOVE) {
+        SCORE_ACTION_CHANGE_1_8 = ReflectUtil.getEnumInstance(SCORE_ACTION_CLASS, "CHANGE");
+        SCORE_ACTION_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 0, SCORE_ACTION_CLASS);
+      } else {
+        SCORE_ACTION_CHANGE_1_8 = null;
+        SCORE_ACTION_FIELD = ReflectUtil.findFieldUnchecked(SET_SCORE_PKT_CLASS, 1, int.class);
+      }
     }
 
     if (PacketAccessors.DATA_RESULT_CLASS != null) {
@@ -231,9 +307,9 @@ public final class PacketAccessors {
   public static final FieldAccessor<Object, String> OBJECTIVE_NAME_FIELD =
     ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, String.class);
   public static final FieldAccessor<Object, Object> OBJECTIVE_VALUE_FIELD =
-    ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, COMPONENT_CLASS);
+    ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, IS_1_13_OR_ABOVE ? COMPONENT_CLASS : String.class);
   public static final FieldAccessor<Object, Object> OBJECTIVE_RENDER_TYPE_FIELD =
-    ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS);
+    IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_OBJECTIVE_PKT_CLASS, 0, OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS) : null;
   // Optional<NumberFormat> for 1.20.5+, NumberFormat for below
   public static final FieldAccessor<Object, Object> OBJECTIVE_NUMBER_FORMAT_FIELD;
   public static final FieldAccessor<Object, Integer> OBJECTIVE_MODE_FIELD =
@@ -261,8 +337,13 @@ public final class PacketAccessors {
   public static final ConstructorAccessor<?> RESET_SCORE_CONSTRUCTOR; // 1.20.3+
 
   public static final ConstructorAccessor<?> SCORE_CONSTRUCTOR;
-
   public static final Object SCORE_1_20_2_METHOD_CHANGE, SCORE_1_20_2_METHOD_REMOVE;
+
+  public static final FieldAccessor<Object, String> SCORE_OBJECTIVE_NAME_FIELD;
+  public static final FieldAccessor<Object, Integer> SCORE_VALUE_FIELD;
+  public static final FieldAccessor<Object, Object> SCORE_ACTION_FIELD;
+  public static final Object SCORE_ACTION_CHANGE_1_8;
+    ;
 
   // --- TEAMS ---
 
@@ -321,7 +402,7 @@ public final class PacketAccessors {
 
       COLOR_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, int.class);
-    } else {
+    } else if (IS_1_13_OR_ABOVE) {
       PARAMETERS_CONSTRUCTOR = null;
       TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS);
 
@@ -338,6 +419,25 @@ public final class PacketAccessors {
 
       COLOR_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, int.class);
+    } else {
+      // dedupe?
+      PARAMETERS_CONSTRUCTOR = null;
+      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS);
+
+      TEAM_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, String.class);
+      TEAM_MODE_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, IS_1_8_OR_ABOVE ? 1 : 0, int.class);
+      TEAM_ENTRIES_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, Collection.class);
+      //
+
+      DISPLAY_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, String.class);
+      PREFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 2, String.class);
+      SUFFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 3, String.class);
+
+      NAME_TAG_VISIBILITY_FIELD = IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 4, String.class) : null;
+      COLLISION_RULE_FIELD = IS_1_9_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 5, String.class) : null;
+
+      COLOR_FIELD = IS_1_8_OR_ABOVE ? ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS) : null;
+      OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, IS_1_8_OR_ABOVE ? 2 : 1, int.class);
     }
   }
 
@@ -371,8 +471,19 @@ public final class PacketAccessors {
     }
   }
 
+  public static Object renderType(ObjectiveRenderType renderType) {
+    switch (renderType) {
+      case INTEGER:
+        return PacketAccessors.RENDER_TYPE_INTEGER;
+      case HEARTS:
+        return PacketAccessors.RENDER_TYPE_HEARTS;
+      default:
+        throw new IllegalStateException("unknown render type " + renderType);
+    }
+  }
+
   public static Object createTeamParameters(Object displayName, Object playerPrefix, Object playerSuffix, ImmutableTeamProperties<?> otherProps) {
-    if (IS_26_2_OR_ABOVE){
+    if (IS_26_2_OR_ABOVE) {
       Object chatFormattingColor = null;
       if (otherProps.playerColor() != null) {
         chatFormattingColor = PacketAccessors.NMS_CHAT_FORMATTING_MAP.get(otherProps.playerColor());

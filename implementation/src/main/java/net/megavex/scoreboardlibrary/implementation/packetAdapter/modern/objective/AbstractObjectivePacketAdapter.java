@@ -115,19 +115,7 @@ public abstract class AbstractObjectivePacketAdapter implements ObjectivePacketA
       PacketAccessors.OBJECTIVE_NUMBER_FORMAT_FIELD.set(packet, value);
     }
 
-    Object nmsRenderType;
-    switch (renderType) {
-      case INTEGER:
-        nmsRenderType = PacketAccessors.RENDER_TYPE_INTEGER;
-        break;
-      case HEARTS:
-        nmsRenderType = PacketAccessors.RENDER_TYPE_HEARTS;
-        break;
-      default:
-        throw new IllegalStateException("unknown render type " + renderType);
-    }
-
-    PacketAccessors.OBJECTIVE_RENDER_TYPE_FIELD.set(packet, nmsRenderType);
+    PacketAccessors.OBJECTIVE_RENDER_TYPE_FIELD.set(packet, PacketAccessors.renderType(renderType));
     return packet;
   }
 }

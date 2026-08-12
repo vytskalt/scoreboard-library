@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 
 import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
@@ -47,9 +49,9 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
     @Override
     public void removeTeam(@NotNull Iterable<Player> players) {
       if (removePacket == null) {
-        removePacket = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
-        PacketAccessors.TEAM_NAME_FIELD.set(removePacket, teamName);
-        PacketAccessors.TEAM_MODE_FIELD.set(removePacket, TeamConstants.MODE_REMOVE);
+        removePacket = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+        Objects.requireNonNull(PacketAccessors.TEAM_NAME_FIELD).set(removePacket, teamName);
+        Objects.requireNonNull(PacketAccessors.TEAM_MODE_FIELD).set(removePacket, TeamConstants.MODE_REMOVE);
       }
 
       LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
@@ -57,10 +59,10 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
 
     @Override
     public void sendEntries(@NotNull EntriesPacketType packetType, @NotNull Collection<Player> players, @NotNull Collection<String> entries) {
-      Object packet = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
-      PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
-      PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
-      PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+      Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+      Objects.requireNonNull(PacketAccessors.TEAM_NAME_FIELD).set(packet, teamName);
+      Objects.requireNonNull(PacketAccessors.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
+      Objects.requireNonNull(PacketAccessors.TEAM_ENTRIES_FIELD).set(packet, entries);
       LegacyPacketSender.INSTANCE.sendPacket(players, packet);
     }
 
@@ -74,29 +76,29 @@ public final class TeamsPacketAdapterImpl implements TeamsPacketAdapter {
           String prefix = limitLegacyText(toLegacy(properties.prefix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
           String suffix = limitLegacyText(toLegacy(properties.suffix(), locale), TeamConstants.PREFIX_SUFFIX_LEGACY_LIMIT);
 
-          Object packet = PacketAccessors.TEAM_CONSTRUCTOR.invoke();
-          PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
-          PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
-          PacketAccessors.TEAM_DISPLAY_NAME_FIELD.set(packet, displayName);
-          PacketAccessors.TEAM_PREFIX_FIELD.set(packet, prefix);
-          PacketAccessors.TEAM_SUFFIX_FIELD.set(packet, suffix);
-          PacketAccessors.TEAM_RULES_FIELD.set(packet, properties.packOptions());
-          if (PacketAccessors.TEAM_NAME_TAG_VISIBILITY_FIELD != null) {
-            PacketAccessors.TEAM_NAME_TAG_VISIBILITY_FIELD.set(packet, properties.nameTagVisibility().key());
+          Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
+          Objects.requireNonNull(PacketAccessors.TEAM_NAME_FIELD).set(packet, teamName);
+          Objects.requireNonNull(PacketAccessors.TEAM_MODE_FIELD).set(packet, TeamConstants.mode(packetType));
+          Objects.requireNonNull(PacketAccessors.DISPLAY_NAME_FIELD).set(packet, displayName);
+          Objects.requireNonNull(PacketAccessors.PREFIX_FIELD).set(packet, prefix);
+          Objects.requireNonNull(PacketAccessors.SUFFIX_FIELD).set(packet, suffix);
+          Objects.requireNonNull(PacketAccessors.OPTIONS_FIELD).set(packet, properties.packOptions());
+          if (PacketAccessors.NAME_TAG_VISIBILITY_FIELD != null) {
+            PacketAccessors.NAME_TAG_VISIBILITY_FIELD.set(packet, properties.nameTagVisibility().key());
           }
 
           NamedTextColor color = properties.playerColor();
-          if (PacketAccessors.TEAM_COLOR_FIELD != null && color != null) {
+          if (PacketAccessors.COLOR_FIELD != null && color != null) {
             int teamColorField = ChatColorUtil.getColorIndex(color);
-            PacketAccessors.TEAM_COLOR_FIELD.set(packet, teamColorField);
+            PacketAccessors.COLOR_FIELD.set(packet, teamColorField);
           }
 
-          if (PacketAccessors.TEAM_COLLISION_RULE_FIELD != null) {
-            PacketAccessors.TEAM_COLLISION_RULE_FIELD.set(packet, properties.collisionRule().key());
+          if (PacketAccessors.COLLISION_RULE_FIELD != null) {
+            PacketAccessors.COLLISION_RULE_FIELD.set(packet, properties.collisionRule().key());
           }
 
           if (packetType == PropertiesPacketType.CREATE) {
-            PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, ImmutableList.copyOf(properties.syncedEntries()));
+            Objects.requireNonNull(PacketAccessors.TEAM_ENTRIES_FIELD).set(packet, ImmutableList.copyOf(properties.syncedEntries()));
           }
 
           return packet;

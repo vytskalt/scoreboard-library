@@ -7,6 +7,7 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveRenderType;
 import net.megavex.scoreboardlibrary.api.objective.ScoreFormat;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectiveConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection;
 
@@ -33,8 +35,8 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
 
   @Override
   public void display(@NotNull Collection<Player> players, @NotNull ObjectiveDisplaySlot slot) {
-    Object packet = PacketAccessors.DISPLAY_OBJECTIVE_CONSTRUCTOR.invoke();
-    PacketAccessors.DISPLAY_OBJECTIVE_POSITION.set(packet, ObjectiveConstants.displaySlotIndex(slot, false));
+    Object packet = PacketAccessors.DISPLAY_CONSTRUCTOR.invoke();
+    Objects.requireNonNull(PacketAccessors.DISPLAY_SLOT).set(packet, ObjectiveConstants.displaySlotIndex(slot, false));
     PacketAccessors.DISPLAY_OBJECTIVE_NAME.set(packet, objectiveName);
     LegacyPacketSender.INSTANCE.sendPacket(players, packet);
   }
@@ -57,9 +59,9 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
   @Override
   public void remove(@NotNull Collection<Player> players) {
     if (removePacket == null) {
-      removePacket = PacketAccessors.OBJECTIVE_CONSTRUCTOR.invoke();
+      removePacket = PacketAccessors.OBJECTIVE_PACKET_CONSTRUCTOR.invoke();
       PacketAccessors.OBJECTIVE_NAME_FIELD.set(removePacket, objectiveName);
-      PacketAccessors.OBJECTIVE_DISPLAY_NAME_FIELD.set(removePacket, "");
+      PacketAccessors.OBJECTIVE_VALUE_FIELD.set(removePacket, "");
       PacketAccessors.OBJECTIVE_MODE_FIELD.set(removePacket, ObjectiveConstants.MODE_REMOVE);
     }
     LegacyPacketSender.INSTANCE.sendPacket(players, removePacket);
@@ -74,12 +76,12 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
     @Nullable ScoreFormat scoreFormat
   ) {
     Object packet = PacketAccessors.SCORE_CONSTRUCTOR.invoke(entry);
-    PacketAccessors.SCORE_OBJECTIVE_NAME_FIELD.set(packet, objectiveName);
-    PacketAccessors.SCORE_VALUE_FIELD.set(packet, value);
-    if (PacketAccessors.SCORE_ACTION_FIELD_1_8 != null) {
-      PacketAccessors.SCORE_ACTION_FIELD_1_8.set(packet, PacketAccessors.SCORE_ACTION_CHANGE_1_8);
+    Objects.requireNonNull(PacketAccessors.SCORE_OBJECTIVE_NAME_FIELD).set(packet, objectiveName);
+    Objects.requireNonNull(PacketAccessors.SCORE_VALUE_FIELD).set(packet, value);
+    if (PacketAccessors.IS_1_8_OR_ABOVE) {
+      Objects.requireNonNull(PacketAccessors.SCORE_ACTION_FIELD).set(packet, PacketAccessors.SCORE_ACTION_CHANGE_1_8);
     } else {
-      PacketAccessors.SCORE_ACTION_FIELD_1_7.set(packet, 0);
+      Objects.requireNonNull(PacketAccessors.SCORE_ACTION_FIELD).set(packet, 0);
     }
 
     LegacyPacketSender.INSTANCE.sendPacket(players, packet);
@@ -88,7 +90,7 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
   @Override
   public void removeScore(@NotNull Collection<Player> players, @NotNull String entry) {
     Object packet = PacketAccessors.SCORE_CONSTRUCTOR.invoke(entry);
-    PacketAccessors.SCORE_OBJECTIVE_NAME_FIELD.set(packet, objectiveName);
+    Objects.requireNonNull(PacketAccessors.SCORE_OBJECTIVE_NAME_FIELD).set(packet, objectiveName);
     LegacyPacketSender.INSTANCE.sendPacket(players, packet);
   }
 
@@ -97,26 +99,15 @@ public final class ObjectivePacketAdapterImpl implements ObjectivePacketAdapter 
     @NotNull Component value,
     @NotNull ObjectiveRenderType renderType
   ) {
-    Object packet = PacketAccessors.OBJECTIVE_CONSTRUCTOR.invoke();
+    Object packet = PacketAccessors.OBJECTIVE_PACKET_CONSTRUCTOR.invoke();
     PacketAccessors.OBJECTIVE_NAME_FIELD.set(packet, objectiveName);
     PacketAccessors.OBJECTIVE_MODE_FIELD.set(packet, ObjectiveConstants.mode(packetType));
 
     String legacyValue = LegacyFormatUtil.limitLegacyText(legacySection().serialize(value), ObjectiveConstants.LEGACY_VALUE_CHAR_LIMIT);
-    PacketAccessors.OBJECTIVE_DISPLAY_NAME_FIELD.set(packet, legacyValue);
+    PacketAccessors.OBJECTIVE_VALUE_FIELD.set(packet, legacyValue);
 
-    if (PacketAccessors.OBJECTIVE_HEALTH_DISPLAY_FIELD != null) {
-      Object nmsRenderType;
-      switch (renderType) {
-        case INTEGER:
-          nmsRenderType = PacketAccessors.HEALTH_DISPLAY_INTEGER;
-          break;
-        case HEARTS:
-          nmsRenderType = PacketAccessors.HEALTH_DISPLAY_HEARTS;
-          break;
-        default:
-          throw new IllegalStateException();
-      }
-      PacketAccessors.OBJECTIVE_HEALTH_DISPLAY_FIELD.set(packet, nmsRenderType);
+    if (PacketAccessors.OBJECTIVE_RENDER_TYPE_FIELD != null) {
+      PacketAccessors.OBJECTIVE_RENDER_TYPE_FIELD.set(packet, PacketAccessors.renderType(renderType));
     }
 
     return packet;
