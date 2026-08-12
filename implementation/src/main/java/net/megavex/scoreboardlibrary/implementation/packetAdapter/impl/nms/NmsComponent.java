@@ -81,7 +81,7 @@ public final class NmsComponent {
 
   public static @NotNull Object fromAdventure(@NotNull Component adventure, @Nullable Locale locale) {
     if (IS_NATIVE_ADVENTURE) {
-      return Objects.requireNonNull(ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(adventure);
+      return fromAdventureComponent(adventure);
     }
 
     Component translated = adventure;
@@ -110,5 +110,9 @@ public final class NmsComponent {
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static Object fromAdventureComponent(Component adventure) {
+    return Objects.requireNonNull(ADVENTURE_COMPONENT_CONSTRUCTOR).invoke(adventure);
   }
 }
