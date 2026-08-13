@@ -1,10 +1,9 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.ViaConnectionGuard;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -12,14 +11,14 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
-public final class PacketSenderImpl implements PacketSender<Object> {
+public final class NmsPacketSender {
   private static final MethodHandle GET_HANDLE;
   private static final MethodHandle PLAYER_CONNECTION;
   private static final MethodHandle SEND_PACKET;
 
   private final ViaAPI<Player> via;
 
-  public PacketSenderImpl(final ViaAPI<Player> via) {
+  public NmsPacketSender(final ViaAPI<Player> via) {
     this.via = via;
   }
 
@@ -68,7 +67,6 @@ public final class PacketSenderImpl implements PacketSender<Object> {
     SEND_PACKET = sendPacket;
   }
 
-  @Override
   public void sendPacket(Player player, Object packet) {
     if (this.via != null) {
       final UserConnection conn = this.via.getConnection(player.getUniqueId());
@@ -102,6 +100,12 @@ public final class PacketSenderImpl implements PacketSender<Object> {
       SEND_PACKET.invoke(connection, packet);
     } catch (Throwable e) {
       throw new IllegalStateException("couldn't send packet to player", e);
+    }
+  }
+
+  public void sendPacket(Iterable<Player> players, Object packet) {
+    for (Player player : players) {
+      sendPacket(player, packet);
     }
   }
 }

@@ -13,7 +13,7 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.PaperTeamsPacketAdapterImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.SpigotTeamsPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.PacketSenderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
@@ -26,20 +26,20 @@ import java.util.WeakHashMap;
 @SuppressWarnings("unused")
 public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
   private final ViaAPI<Player> via;
-  private final PacketSenderImpl packetSender;
+  private final NmsPacketSender packetSender;
   private final WeakHashMap<Player, Integer> viaTeamPacketIds = new WeakHashMap<>();
 
   public PacketAdapterProviderImpl(Plugin plugin) {
     final String viaPlugin = "ViaVersion";
     boolean isViaEnabled = plugin.getServer().getPluginManager().isPluginEnabled(viaPlugin);
     boolean isViaAllowed = plugin.getDescription().getSoftDepend().contains(viaPlugin) || plugin.getDescription().getDepend().contains(viaPlugin);
-    if (isViaEnabled && isViaAllowed) {
+    if (NmsClasses.IS_1_13_OR_ABOVE && isViaEnabled && isViaAllowed) {
       //noinspection unchecked
       this.via = (ViaAPI<Player>) Via.getAPI();
     } else {
       this.via = null;
     }
-    this.packetSender = new PacketSenderImpl(this.via);
+    this.packetSender = new NmsPacketSender(this.via);
   }
 
   @Override
@@ -85,7 +85,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
     return via;
   }
 
-  public @NotNull PacketSenderImpl packetSender() {
+  public @NotNull NmsPacketSender packetSender() {
     return packetSender;
   }
 

@@ -15,7 +15,7 @@ import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.util.ViaConnectionGuard;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.ViaConnectionGuard;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;

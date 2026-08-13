@@ -23,6 +23,32 @@ public final class NmsTeams {
   public static final FieldAccessor<Object, Integer> TEAM_MODE_FIELD;
   public static final FieldAccessor<Object, Collection<String>> TEAM_ENTRIES_FIELD;
 
+  static {
+    if (IS_26_2_OR_ABOVE) {
+      PARAMETERS_CONSTRUCTOR = ReflectUtil.findConstructor(TEAM_PARAMETERS_PKT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, TEAM_VISIBILITY_CLASS, TEAM_COLLISION_RULE_CLASS, Optional.class, byte.class);
+      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class); // same as below
+
+      TEAM_NAME_FIELD = null;
+      TEAM_MODE_FIELD = null;
+      TEAM_ENTRIES_FIELD = null;
+    } else if (IS_1_17_OR_ABOVE) {
+      assert TEAM_PARAMETERS_PKT_CLASS != null;
+      PARAMETERS_CONSTRUCTOR = ReflectUtil.getEmptyConstructor(TEAM_PARAMETERS_PKT_CLASS);
+      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class);
+
+      TEAM_NAME_FIELD = null;
+      TEAM_MODE_FIELD = null;
+      TEAM_ENTRIES_FIELD = null;
+    } else {
+      PARAMETERS_CONSTRUCTOR = null;
+      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS);
+
+      TEAM_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, String.class);
+      TEAM_MODE_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, int.class);
+      TEAM_ENTRIES_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, Collection.class);
+    }
+  }
+
   public static final FieldAccessor<Object, Object> DISPLAY_NAME_FIELD;
   public static final FieldAccessor<Object, Object> PREFIX_FIELD;
   public static final FieldAccessor<Object, Object> SUFFIX_FIELD;
@@ -35,12 +61,6 @@ public final class NmsTeams {
 
   static {
     if (IS_26_2_OR_ABOVE) {
-      PARAMETERS_CONSTRUCTOR = ReflectUtil.findConstructor(TEAM_PARAMETERS_PKT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, COMPONENT_CLASS, TEAM_VISIBILITY_CLASS, TEAM_COLLISION_RULE_CLASS, Optional.class, byte.class);
-      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class); // same as below
-
-      TEAM_NAME_FIELD = null;
-      TEAM_MODE_FIELD = null;
-      TEAM_ENTRIES_FIELD = null;
       DISPLAY_NAME_FIELD = null;
       PREFIX_FIELD = null;
       SUFFIX_FIELD = null;
@@ -49,14 +69,6 @@ public final class NmsTeams {
       COLOR_FIELD = null;
       OPTIONS_FIELD = null;
     } else if (IS_1_17_OR_ABOVE) {
-      assert TEAM_PARAMETERS_PKT_CLASS != null;
-      PARAMETERS_CONSTRUCTOR = ReflectUtil.getEmptyConstructor(TEAM_PARAMETERS_PKT_CLASS);
-      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS, String.class, int.class, Optional.class, Collection.class);
-
-      TEAM_NAME_FIELD = null;
-      TEAM_MODE_FIELD = null;
-      TEAM_ENTRIES_FIELD = null;
-
       DISPLAY_NAME_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, COMPONENT_CLASS);
       PREFIX_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 1, COMPONENT_CLASS);
       SUFFIX_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 2, COMPONENT_CLASS);
@@ -72,13 +84,6 @@ public final class NmsTeams {
       COLOR_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(TEAM_PARAMETERS_PKT_CLASS, 0, int.class);
     } else if (IS_1_13_OR_ABOVE) {
-      PARAMETERS_CONSTRUCTOR = null;
-      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS);
-
-      TEAM_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, String.class);
-      TEAM_MODE_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, int.class);
-      TEAM_ENTRIES_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, Collection.class);
-
       DISPLAY_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, COMPONENT_CLASS);
       PREFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, COMPONENT_CLASS);
       SUFFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 2, COMPONENT_CLASS);
@@ -89,15 +94,6 @@ public final class NmsTeams {
       COLOR_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, TEAM_COLOR_OR_CHAT_FORMATTING_CLASS);
       OPTIONS_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, int.class);
     } else {
-      // dedupe?
-      PARAMETERS_CONSTRUCTOR = null;
-      TEAM_PACKET_CONSTRUCTOR = ReflectUtil.findConstructor(SET_PLAYER_TEAM_PKT_CLASS);
-
-      TEAM_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, String.class);
-      TEAM_MODE_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, IS_1_8_OR_ABOVE ? 1 : 0, int.class);
-      TEAM_ENTRIES_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 0, Collection.class);
-      //
-
       DISPLAY_NAME_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 1, String.class);
       PREFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 2, String.class);
       SUFFIX_FIELD = ReflectUtil.findFieldUnchecked(SET_PLAYER_TEAM_PKT_CLASS, 3, String.class);
