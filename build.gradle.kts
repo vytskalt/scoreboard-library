@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-  version = "2.8.2-SNAPSHOT"
+  version = "2.8.2"
   group = "net.megavex"
   description = "Powerful packet-level scoreboard library for Minecraft Paper/Spigot servers"
 
