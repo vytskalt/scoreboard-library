@@ -48,6 +48,7 @@ create_server() {
 create_spigot_server() {
   local version=$1
   local nixshell=$2
+  local enable_via=$3
 
   if [ ! -f "cache/$version-spigot.jar" ]; then
     echo Running BuildTools for Spigot $version
@@ -78,7 +79,7 @@ create_spigot_server() {
     popd &> /dev/null
   fi
 
-  create_server "$version-spigot" "$nixshell"
+  create_server "$version-spigot" "$nixshell" "$enable_via"
 }
 
 download_file() {

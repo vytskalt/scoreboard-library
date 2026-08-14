@@ -1,6 +1,7 @@
 package net.megavex.scoreboardlibrary.testplugin;
 
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.Translator;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.testplugin.module.Module;
@@ -20,19 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class ScoreboardPlugin extends JavaPlugin implements Listener {
-  private final TestTranslator translator = new TestTranslator();
+  private Object translator;
   private ScoreboardLibrary lib;
   private List<Module> modules;
 
   @Override
   public void onEnable() {
     this.getServer().getPluginManager().registerEvents(this, this);
-    // 1.16.5 Paper doesn't have translator(), while 26.2 Paper doesn't have get() because it upgraded to Adventure 5
-    try {
-      GlobalTranslator.get().addSource(this.translator);
-    } catch (NoSuchMethodError ignored) {
-      GlobalTranslator.translator().addSource(this.translator);
-    }
 
     try {
       lib = ScoreboardLibrary.loadScoreboardLibrary(this);
@@ -40,6 +35,14 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
       this.getLogger().warning("No packet adapter found, disabling plugin");
       this.getServer().getPluginManager().disablePlugin(this);
       return;
+    }
+
+    // 1.16.5 Paper doesn't have translator(), while 26.2 Paper doesn't have get() because it upgraded to Adventure 5
+    this.translator = new TestTranslator();
+    try {
+      GlobalTranslator.get().addSource((Translator) this.translator);
+    } catch (NoSuchMethodError ignored) {
+      GlobalTranslator.translator().addSource((Translator) this.translator);
     }
 
     this.modules = Arrays.asList(
@@ -76,9 +79,9 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
 
     // see above
     try {
-      GlobalTranslator.get().removeSource(this.translator);
+      GlobalTranslator.get().removeSource((Translator) this.translator);
     } catch (NoSuchMethodError ignored) {
-      GlobalTranslator.translator().removeSource(this.translator);
+      GlobalTranslator.translator().removeSource((Translator) this.translator);
     }
   }
 
