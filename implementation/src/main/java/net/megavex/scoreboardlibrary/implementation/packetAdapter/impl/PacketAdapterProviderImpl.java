@@ -1,16 +1,19 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.PaperObjectivePacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.objective.SpigotObjectivePacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.PaperTeamsPacketAdapterImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team.SpigotTeamsPacketAdapter;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernPacketSender;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.LegacyObjectivePacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.LegacyTeamsPacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.PaperObjectivePacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.objective.SpigotObjectivePacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.PaperTeamsPacketAdapterImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team.SpigotTeamsPacketAdapter;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsPacketSender;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.objective.ObjectivePacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamsPacketAdapter;
 import org.bukkit.entity.Player;
@@ -23,38 +26,50 @@ import java.util.WeakHashMap;
 @SuppressWarnings("unused")
 public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
   private final ViaAPI<Player> via;
-  private final ModernPacketSender packetSender;
+  private final NmsPacketSender packetSender;
   private final WeakHashMap<Player, Integer> viaTeamPacketIds = new WeakHashMap<>();
 
   public PacketAdapterProviderImpl(Plugin plugin) {
     final String viaPlugin = "ViaVersion";
     boolean isViaEnabled = plugin.getServer().getPluginManager().isPluginEnabled(viaPlugin);
     boolean isViaAllowed = plugin.getDescription().getSoftDepend().contains(viaPlugin) || plugin.getDescription().getDepend().contains(viaPlugin);
-    if (isViaEnabled && isViaAllowed) {
+    if (NmsClasses.IS_1_13_OR_ABOVE && isViaEnabled && isViaAllowed) {
       //noinspection unchecked
       this.via = (ViaAPI<Player>) Via.getAPI();
     } else {
       this.via = null;
     }
-    this.packetSender = new ModernPacketSender(this.via);
+    this.packetSender = new NmsPacketSender(this.via);
   }
 
   @Override
   public @NotNull ObjectivePacketAdapter createObjectiveAdapter(@NotNull String objectiveName) {
-    return ModernComponentProvider.IS_NATIVE_ADVENTURE
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
+      return new LegacyObjectivePacketAdapterImpl(this, objectiveName);
+    }
+
+    return NmsComponent.IS_NATIVE_ADVENTURE
       ? new PaperObjectivePacketAdapter(this, objectiveName)
       : new SpigotObjectivePacketAdapter(this, objectiveName);
   }
 
   @Override
   public @NotNull TeamsPacketAdapter createTeamPacketAdapter(@NotNull String teamName) {
-    return ModernComponentProvider.IS_NATIVE_ADVENTURE
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
+      return new LegacyTeamsPacketAdapterImpl(this, teamName);
+    }
+
+    return NmsComponent.IS_NATIVE_ADVENTURE
       ? new PaperTeamsPacketAdapterImpl(this, teamName)
       : new SpigotTeamsPacketAdapter(this, teamName);
   }
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
+    if (!NmsClasses.IS_1_13_OR_ABOVE) {
+      return LineRenderingStrategy.LEGACY;
+    }
+
     if (this.via != null) {
       final ProtocolVersion ver = this.via.getPlayerProtocolVersion(player);
       if (ver.olderThan(ProtocolVersion.v1_13)) {
@@ -70,7 +85,7 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
     return via;
   }
 
-  public @NotNull ModernPacketSender packetSender() {
+  public @NotNull NmsPacketSender packetSender() {
     return packetSender;
   }
 

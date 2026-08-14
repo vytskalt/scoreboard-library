@@ -1,11 +1,12 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.team;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.team;
 
 import net.kyori.adventure.text.Component;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAdapterProviderImpl;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util.ModernComponentProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsComponent;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePacketUtil;
@@ -38,32 +39,32 @@ public final class SpigotTeamsPacketAdapter extends AbstractTeamsPacketAdapterIm
         provider.packetSender(),
         players,
         locale -> {
-          Object displayName = ModernComponentProvider.fromAdventure(properties.displayName(), locale);
-          Object prefix = ModernComponentProvider.fromAdventure(properties.prefix(), locale);
-          Object suffix = ModernComponentProvider.fromAdventure(properties.suffix(), locale);
+          Object displayName = NmsComponent.fromAdventure(properties.displayName(), locale);
+          Object prefix = NmsComponent.fromAdventure(properties.prefix(), locale);
+          Object suffix = NmsComponent.fromAdventure(properties.suffix(), locale);
 
-          if (PacketAccessors.IS_1_17_OR_ABOVE) {
-            assert PacketAccessors.PARAMETERS_CONSTRUCTOR != null;
+          if (NmsClasses.IS_1_17_OR_ABOVE) {
+            assert NmsTeams.PARAMETERS_CONSTRUCTOR != null;
 
-            Object parameters = PacketAccessors.createTeamParameters(displayName, prefix, suffix, properties);
+            Object parameters = NmsTeams.createTeamParameters(displayName, prefix, suffix, properties);
 
-            return PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke(
+            return NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke(
               teamName,
               TeamConstants.mode(packetType),
               Optional.of(parameters),
               entries
             );
           } else {
-            assert PacketAccessors.TEAM_NAME_FIELD != null;
-            assert PacketAccessors.TEAM_MODE_FIELD != null;
-            assert PacketAccessors.TEAM_ENTRIES_FIELD != null;
+            assert NmsTeams.TEAM_NAME_FIELD != null;
+            assert NmsTeams.TEAM_MODE_FIELD != null;
+            assert NmsTeams.TEAM_ENTRIES_FIELD != null;
 
-            Object packet = PacketAccessors.TEAM_PACKET_CONSTRUCTOR.invoke();
-            PacketAccessors.TEAM_NAME_FIELD.set(packet, teamName);
-            PacketAccessors.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
-            PacketAccessors.TEAM_ENTRIES_FIELD.set(packet, entries);
+            Object packet = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke();
+            NmsTeams.TEAM_NAME_FIELD.set(packet, teamName);
+            NmsTeams.TEAM_MODE_FIELD.set(packet, TeamConstants.mode(packetType));
+            NmsTeams.TEAM_ENTRIES_FIELD.set(packet, entries);
 
-            PacketAccessors.setupOldTeamPropertiesFields(packet, displayName, prefix, suffix, properties);
+            NmsTeams.setupOldTeamPropertiesFields(packet, displayName, prefix, suffix, properties);
             return packet;
           }
         }

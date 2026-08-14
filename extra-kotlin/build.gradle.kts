@@ -23,3 +23,7 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 publishing {
   publications.create<MavenPublication>("maven")
 }
+
+java {
+  withJavadocJar()
+}

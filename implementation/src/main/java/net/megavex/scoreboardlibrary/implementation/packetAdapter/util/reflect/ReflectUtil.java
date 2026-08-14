@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public final class ReflectUtil {
   // Inspired by
@@ -83,7 +84,7 @@ public final class ReflectUtil {
       } catch (IllegalArgumentException ignored) {
       }
     }
-    throw new IllegalStateException("Enum " + clazz.getName() + " instance with names either of  " + String.join(",", names) + " not found");
+    throw new IllegalStateException("Enum " + clazz.getName() + " instance with names either of " + String.join(",", names) + " not found");
   }
 
   public static <T, V> @NotNull FieldAccessor<T, V> findFieldUnchecked(@NotNull Class<?> clazz, int index, @NotNull Class<?> valueClass) {
@@ -146,6 +147,9 @@ public final class ReflectUtil {
     try {
       MethodHandle constructor = LOOKUP.findConstructor(packetClass, VOID_METHOD_TYPE);
       return (args) -> {
+        if (args.length != 0) {
+          throw new IllegalStateException("empty constructor expected no args, but got " + Arrays.toString(args));
+        }
         try {
           // noinspection unchecked
           return (T) constructor.invoke();
@@ -200,5 +204,14 @@ public final class ReflectUtil {
     MethodType methodType = MethodType.genericMethodType(0, true);
     target = target.asSpreader(Object[].class, handle.type().parameterCount());
     return target.asType(methodType);
+  }
+
+  public static boolean hasClass(String className) {
+    try {
+      Class.forName(className);
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
   }
 }
