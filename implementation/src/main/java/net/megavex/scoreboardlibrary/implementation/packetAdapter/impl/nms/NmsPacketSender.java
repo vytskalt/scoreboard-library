@@ -1,11 +1,9 @@
-package net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.util;
+package net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms;
 
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketSender;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.modern.PacketAccessors;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.reflect.MinecraftClasses;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.ViaConnectionGuard;
 import org.bukkit.entity.Player;
 
 import java.lang.invoke.MethodHandle;
@@ -13,36 +11,29 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
-public final class ModernPacketSender implements PacketSender<Object> {
+public final class NmsPacketSender {
   private static final MethodHandle GET_HANDLE;
   private static final MethodHandle PLAYER_CONNECTION;
   private static final MethodHandle SEND_PACKET;
 
   private final ViaAPI<Player> via;
 
-  public ModernPacketSender(final ViaAPI<Player> via) {
+  public NmsPacketSender(final ViaAPI<Player> via) {
     this.via = via;
   }
 
   static {
-    Class<?> craftPlayer;
-    try {
-      craftPlayer = Class.forName(MinecraftClasses.craftBukkit("entity.CraftPlayer"));
-    } catch (ClassNotFoundException e) {
-      throw new ExceptionInInitializerError(e);
-    }
-
     MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-    MethodType methodType = MethodType.methodType(PacketAccessors.SERVER_PLAYER_CLASS);
+    MethodType methodType = MethodType.methodType(NmsClasses.SERVER_PLAYER_CLASS);
     try {
-      GET_HANDLE = lookup.findVirtual(craftPlayer, "getHandle", methodType);
+      GET_HANDLE = lookup.findVirtual(NmsClasses.CRAFT_PLAYER_CLASS, "getHandle", methodType);
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new ExceptionInInitializerError(e);
     }
 
     MethodHandle playerConnection = null;
-    for (Field field : PacketAccessors.SERVER_PLAYER_CLASS.getFields()) {
-      if (field.getType() == PacketAccessors.PLAYER_CONNECTION_CLASS) {
+    for (Field field : NmsClasses.SERVER_PLAYER_CLASS.getFields()) {
+      if (field.getType() == NmsClasses.PLAYER_CONNECTION_CLASS) {
         try {
           playerConnection = lookup.unreflectGetter(field);
         } catch (IllegalAccessException e) {
@@ -56,13 +47,13 @@ public final class ModernPacketSender implements PacketSender<Object> {
     }
     PLAYER_CONNECTION = playerConnection;
 
-    MethodType sendMethodType = MethodType.methodType(void.class, PacketAccessors.PKT_CLASS);
+    MethodType sendMethodType = MethodType.methodType(void.class, NmsClasses.PKT_CLASS);
     MethodHandle sendPacket = null;
 
     String[] sendPacketNames = {"a", "sendPacket", "b", "send"};
     for (String name : sendPacketNames) {
       try {
-        sendPacket = lookup.findVirtual(PacketAccessors.PLAYER_CONNECTION_CLASS, name, sendMethodType);
+        sendPacket = lookup.findVirtual(NmsClasses.PLAYER_CONNECTION_CLASS, name, sendMethodType);
       } catch (NoSuchMethodException ignored) {
       } catch (IllegalAccessException e) {
         throw new ExceptionInInitializerError(e);
@@ -76,7 +67,6 @@ public final class ModernPacketSender implements PacketSender<Object> {
     SEND_PACKET = sendPacket;
   }
 
-  @Override
   public void sendPacket(Player player, Object packet) {
     if (this.via != null) {
       final UserConnection conn = this.via.getConnection(player.getUniqueId());
@@ -110,6 +100,12 @@ public final class ModernPacketSender implements PacketSender<Object> {
       SEND_PACKET.invoke(connection, packet);
     } catch (Throwable e) {
       throw new IllegalStateException("couldn't send packet to player", e);
+    }
+  }
+
+  public void sendPacket(Iterable<Player> players, Object packet) {
+    for (Player player : players) {
+      sendPacket(player, packet);
     }
   }
 }
