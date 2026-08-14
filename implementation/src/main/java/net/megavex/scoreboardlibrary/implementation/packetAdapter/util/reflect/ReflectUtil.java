@@ -84,7 +84,7 @@ public final class ReflectUtil {
       } catch (IllegalArgumentException ignored) {
       }
     }
-    throw new IllegalStateException("Enum " + clazz.getName() + " instance with names either of  " + String.join(",", names) + " not found");
+    throw new IllegalStateException("Enum " + clazz.getName() + " instance with names either of " + String.join(",", names) + " not found");
   }
 
   public static <T, V> @NotNull FieldAccessor<T, V> findFieldUnchecked(@NotNull Class<?> clazz, int index, @NotNull Class<?> valueClass) {

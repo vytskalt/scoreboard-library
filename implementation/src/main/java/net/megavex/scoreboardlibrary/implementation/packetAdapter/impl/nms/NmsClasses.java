@@ -102,14 +102,14 @@ public final class NmsClasses {
     CHAT_SERIALIZER_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", oldSpigotClassName("IChatBaseComponent$ChatSerializer"));
     COMPONENT_SERIALIZATION_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.ComponentSerialization");
     STYLE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style", "net.minecraft.network.chat.ChatModifier", oldSpigotClassName("ChatModifier"));
-    STYLE_SERIALIZER_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer", oldSpigotClassName("ChatModifier$ChatModifierSerializer"));
+    STYLE_SERIALIZER_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.Style$Serializer", "net.minecraft.network.chat.ChatModifier$ChatModifierSerializer", oldSpigotClassName("ChatModifier$ChatModifierSerializer"));
     NUMBER_FORMAT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.network.chat.numbers.NumberFormat");
     DISPLAY_SLOT_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.DisplaySlot");
     OBJECTIVE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Objective", "net.minecraft.world.scores.ScoreboardObjective", oldSpigotClassName("ScoreboardObjective"));
-    TEAM_VISIBILITY_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility", oldSpigotClassName("ScoreboardTeamBase$EnumNameTagVisibility"));
+    TEAM_VISIBILITY_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.Team$Visibility", "net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility", oldSpigotClassName("ScoreboardTeamBase$EnumNameTagVisibility"));
     TEAM_COLLISION_RULE_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.Team$CollisionRule", "net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", oldSpigotClassName("ScoreboardTeamBase$EnumTeamPush"));
     TEAM_COLOR_OR_CHAT_FORMATTING_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.TeamColor", "net.minecraft.ChatFormatting", "net.minecraft.EnumChatFormat", oldSpigotClassName("EnumChatFormat"));
-    OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getClassOrThrow("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
+    OBJECTIVE_CRITERIA_RENDER_TYPE_CLASS = ReflectUtil.getOptionalClass("net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType", "net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", oldSpigotClassName("IScoreboardCriteria$EnumScoreboardHealthDisplay"));
     DATA_RESULT_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DataResult");
     DYNAMIC_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.DynamicOps");
     JSON_OPS_CLASS = ReflectUtil.getOptionalClass("com.mojang.serialization.JsonOps");
