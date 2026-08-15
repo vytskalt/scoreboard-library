@@ -2,6 +2,7 @@ package net.megavex.scoreboardlibrary.implementation;
 
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PacketAdapterProvider;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -14,24 +15,16 @@ public final class PacketAdapterLoader {
   }
 
   public static @NotNull PacketAdapterProvider loadPacketAdapter(Plugin plugin) throws NoPacketAdapterAvailableException {
-    Class<?> nmsClass = findAndLoadImplementationClass();
     boolean swallowException = false;
-    if (nmsClass == null) {
+    if (!isServerVersionSupported()) {
       // Hide from relocation checkers
       String property = "net.mega".concat("vex.scoreboardlibrary.dontSwallowUntestedLoadException");
-
       swallowException = !System.getProperty(property, "").equalsIgnoreCase("true");
-      nmsClass = tryLoad();
-      if (nmsClass == null) {
-        throw new NoPacketAdapterAvailableException();
-      }
     }
 
     try {
-      return (PacketAdapterProvider) nmsClass.getConstructors()[0].newInstance(plugin);
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new RuntimeException("couldn't initialize packet adapter", e);
-    } catch (InvocationTargetException e) {
+      return new PacketAdapterProviderImpl(plugin);
+    } catch (Exception e) {
       if (swallowException) {
         throw new NoPacketAdapterAvailableException();
       }
@@ -39,7 +32,7 @@ public final class PacketAdapterLoader {
     }
   }
 
-  private static @Nullable Class<?> findAndLoadImplementationClass() {
+  private static boolean isServerVersionSupported() {
     String version = Bukkit.getServer().getBukkitVersion();
     int dashIndex = version.indexOf('-');
     if (dashIndex != -1) {
@@ -124,17 +117,9 @@ public final class PacketAdapterLoader {
       case "26.1.1":
       case "26.1.2":
       case "26.2":
-        return tryLoad();
+        return true;
       default:
-        return null;
-    }
-  }
-
-  private static Class<?> tryLoad() {
-    try {
-      return Class.forName("net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl");
-    } catch (ClassNotFoundException ignored) {
-      return null;
+        return false;
     }
   }
 }
