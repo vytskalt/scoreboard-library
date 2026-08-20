@@ -5,20 +5,14 @@ plugins {
 dependencies {
   compileOnly(libs.spigotApi)
 
-  implementation(project(":scoreboard-library-api"))
-  implementation(project(":scoreboard-library-implementation"))
+  implementation("net.megavex:scoreboard-library-api:2.8.2")
+  implementation("net.megavex:scoreboard-library-implementation:2.8.2")
 
-  //compileOnly(libs.bundles.adventure)
-
-  // bundled adventure:
-  implementation(libs.bundles.adventure) {
-    //exclude("com.google.code.gson")
-  }
+  implementation(libs.bundles.adventure)
 }
 
 tasks.shadowJar {
-  //relocate("com.google.gson", "net.megavex.scoreboardlibrary.testplugin.lib.gson")
-  //relocate("net.kyori", "net.megavex.scoreboardlibrary.testplugin.lib.kyori") {
-  //  skipStringConstants = true
-  //}
+  relocate("net.kyori", "net.megavex.scoreboardlibrary.testplugin.lib.kyori") {
+    skipStringConstants = true
+  }
 }
