@@ -1,0 +1,15 @@
+.idea/
+*.iml
+
+.gradle
+build/
+
+.classpath
+.project
+.settings/
+bin/
+
+test-env/servers
+test-env/cache
+
+/.git
