@@ -28,7 +28,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
 
   @Override
   public @NotNull TeamDisplayPacketAdapter createLegacyTeamDisplayAdapter(@NotNull ImmutableTeamProperties<String> properties) {
-    return new LegacyTeamDisplayPacketAdapter(provider, teamName, properties);
+    return new ViaLegacyTeamDisplayPacketAdapter(provider, teamName, properties);
   }
 
   public abstract class TeamDisplayPacketAdapterImpl implements TeamDisplayPacketAdapter {
