@@ -117,6 +117,7 @@ public final class PacketAdapterLoader {
       case "26.1.1":
       case "26.1.2":
       case "26.2":
+      case "26.3":
         return true;
       default:
         return false;

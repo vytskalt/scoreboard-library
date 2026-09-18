@@ -55,6 +55,7 @@ public final class ScoreboardPlugin extends JavaPlugin implements Listener {
       module.onEnable();
     }
 
+    this.getServer().setWhitelist(false);
     for (final World world : this.getServer().getWorlds()) {
       world.setAutoSave(false);
     }

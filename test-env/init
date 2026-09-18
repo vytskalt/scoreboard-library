@@ -249,3 +249,10 @@ download_file "26.2-paper.jar" "https://fill-data.papermc.io/v1/objects/c2ece6c4
 create_server "26.2-paper" "jdk25"
 
 create_spigot_server "26.2" "jdk25" "true"
+
+# --- 26.3 ---
+
+download_file "26.3-paper.jar" "https://fill-data.papermc.io/v1/objects/c809547e1ec99b6cd794e6cc18c966ce5f440cb78c4ace2a6cfad1f0e4e7839a/paper-26.3-17.jar" "c809547e1ec99b6cd794e6cc18c966ce5f440cb78c4ace2a6cfad1f0e4e7839a"
+create_server "26.3-paper" "jdk25"
+
+create_spigot_server "26.3" "jdk25" "true"
