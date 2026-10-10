@@ -45,7 +45,7 @@ public abstract class AbstractTeamsPacketAdapterImpl implements TeamsPacketAdapt
           removePacket = NmsTeams.TEAM_PACKET_CONSTRUCTOR.invoke(
             teamName,
             TeamConstants.MODE_REMOVE,
-            null,
+            Optional.empty(),
             Collections.emptyList()
           );
         } else {
