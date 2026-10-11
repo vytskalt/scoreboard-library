@@ -26,12 +26,12 @@ import java.util.Collection;
 
 import static net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil.limitLegacyText;
 
-public final class LegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAdapter {
+public final class ViaLegacyTeamDisplayPacketAdapter implements TeamDisplayPacketAdapter {
   private final PacketAdapterProviderImpl provider;
   private final String teamName;
   private final ImmutableTeamProperties<String> properties;
 
-  public LegacyTeamDisplayPacketAdapter(final PacketAdapterProviderImpl provider, final String teamName, final ImmutableTeamProperties<String> properties) {
+  public ViaLegacyTeamDisplayPacketAdapter(final PacketAdapterProviderImpl provider, final String teamName, final ImmutableTeamProperties<String> properties) {
     this.provider = provider;
     this.teamName = teamName;
     this.properties = properties;

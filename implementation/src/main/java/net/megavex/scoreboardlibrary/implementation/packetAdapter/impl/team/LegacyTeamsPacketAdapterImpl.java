@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.implementation.commons.LegacyFormatUtil;
+import net.megavex.scoreboardlibrary.implementation.commons.LineRenderingStrategy;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.ImmutableTeamProperties;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.PropertiesPacketType;
+import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsEnums;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.nms.NmsTeams;
-import net.megavex.scoreboardlibrary.implementation.packetAdapter.impl.PacketAdapterProviderImpl;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.EntriesPacketType;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamConstants;
 import net.megavex.scoreboardlibrary.implementation.packetAdapter.team.TeamDisplayPacketAdapter;
@@ -17,6 +18,7 @@ import net.megavex.scoreboardlibrary.implementation.packetAdapter.util.LocalePac
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
@@ -116,6 +118,24 @@ public final class LegacyTeamsPacketAdapterImpl implements TeamsPacketAdapter {
   private class AdventureTeamDisplayPacketAdapter extends AbstractTeamDisplayPacketAdapter<Component> {
     public AdventureTeamDisplayPacketAdapter(@NotNull ImmutableTeamProperties<Component> properties) {
       super(properties);
+    }
+
+    @Override
+    public void sendProperties(@NotNull PropertiesPacketType packetType, @NotNull Collection<Player> players) {
+      Collection<Player> remainingPlayers = players;
+      if (provider.via() != null) {
+        for (final Player player : players) {
+          if (provider.lineRenderingStrategy(player) == LineRenderingStrategy.MODERN) {
+            if (remainingPlayers == players) {
+              remainingPlayers = new ArrayList<>(players);
+            }
+            remainingPlayers.remove(player);
+            ViaModernTeamPackets.sendProperties(provider.via(), player, packetType, properties);
+          }
+        }
+      }
+
+      super.sendProperties(packetType, remainingPlayers);
     }
 
     @Override

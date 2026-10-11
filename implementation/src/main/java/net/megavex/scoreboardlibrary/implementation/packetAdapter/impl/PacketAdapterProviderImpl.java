@@ -66,19 +66,12 @@ public final class PacketAdapterProviderImpl implements PacketAdapterProvider {
 
   @Override
   public @NotNull LineRenderingStrategy lineRenderingStrategy(@NotNull Player player) {
-    if (!NmsClasses.IS_1_13_OR_ABOVE) {
-      return LineRenderingStrategy.LEGACY;
-    }
-
     if (this.via != null) {
       final ProtocolVersion ver = this.via.getPlayerProtocolVersion(player);
-      if (ver.olderThan(ProtocolVersion.v1_13)) {
-        //System.out.println("[DEBUG] " + player.getName() + " is legacy player");
-        return LineRenderingStrategy.LEGACY;
-      }
+      return ver.newerThanOrEqualTo(ProtocolVersion.v1_13) ? LineRenderingStrategy.MODERN : LineRenderingStrategy.LEGACY;
     }
-    //System.out.println("[DEBUG] is modern player");
-    return LineRenderingStrategy.MODERN;
+
+    return NmsClasses.IS_1_13_OR_ABOVE ? LineRenderingStrategy.MODERN : LineRenderingStrategy.LEGACY;
   }
 
   public @Nullable ViaAPI<Player> via() {
